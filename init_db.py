@@ -6,21 +6,21 @@ cur = conn.cursor()
 # Users table
 cur.execute("""
 CREATE TABLE IF NOT EXISTS users (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    username      TEXT UNIQUE NOT NULL,
+    id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    role          TEXT NOT NULL DEFAULT 'student'
+    role TEXT NOT NULL DEFAULT 'student'
 )
 """)
 
 # Food items table
 cur.execute("""
 CREATE TABLE IF NOT EXISTS food_items (
-    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    name      TEXT NOT NULL,
-    stall     TEXT NOT NULL,
-    price     REAL NOT NULL,
-    category  TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    stall TEXT NOT NULL,
+    price REAL NOT NULL,
+    category TEXT NOT NULL,
     is_active INTEGER NOT NULL DEFAULT 1
 )
 """)
@@ -28,11 +28,11 @@ CREATE TABLE IF NOT EXISTS food_items (
 # Survival sessions table
 cur.execute("""
 CREATE TABLE IF NOT EXISTS survival_sessions (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id       INTEGER NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
     start_balance REAL NOT NULL,
-    days_total    INTEGER NOT NULL,
-    created_at    TEXT NOT NULL,
+    days_total INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 )
 """)
@@ -40,16 +40,16 @@ CREATE TABLE IF NOT EXISTS survival_sessions (
 # Expense logs table
 cur.execute("""
 CREATE TABLE IF NOT EXISTS expense_logs (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id INTEGER NOT NULL,
-    amount     REAL NOT NULL,
-    label      TEXT NOT NULL,
-    logged_at  TEXT NOT NULL,
+    amount REAL NOT NULL,
+    label TEXT NOT NULL,
+    logged_at TEXT NOT NULL,
     FOREIGN KEY (session_id) REFERENCES survival_sessions(id)
 )
 """)
 
-# Seed food items
+# Food menu seeding
 food_items = [
 ("Nasi goreng", "Hajitapah Mamak", 4.50, "Carbs"),
 ("Nasi goreng double", "Hajitapah Mamak", 6.00, "Carbs"),
@@ -86,7 +86,16 @@ food_items = [
 ("Roti kaya", "Hajitapah Mamak", 2.50, "Carbs"),
 ("Roti madu", "Hajitapah Mamak", 2.50, "Carbs"),
 ("Roti pisang", "Hajitapah Mamak", 3.00, "Carbs"),
-
+("Tosai biasa", "Hajitapah Mamak", 2.00, "Carbs"),
+("Tosai telur", "Hajitapah Mamak", 3.00, "Carbs"),
+("Tosai bawang", "Hajitapah Mamak", 3.00, "Carbs"),
+("Tosai masala", "Hajitapah Mamak", 3.50, "Carbs"),
+("Tosai ghee", "Hajitapah Mamak", 3.00, "Carbs"),
+("Tosai murtabak", "Hajitapah Mamak", 4.50, "Carbs"),
+("Tosai capati", "Hajitapah Mamak", 2.00, "Carbs"),
+("Roti bakar", "Hajitapah Mamak", 1.50, "Carbs"),
+("Roti bakar telur", "Hajitapah Mamak", 3.00, "Carbs"),
+("Roti bakar sardin", "Hajitapah Mamak", 4.00, "Protein"),
 ]
 
 cur.executemany("""
