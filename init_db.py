@@ -74,6 +74,18 @@ food_items = [
 ("Rojak telur", "Hajitapah Mamak", 5.50, "Snack"),
 ("Rojak mee/mee", "Hajitapah Mamak", 5.50, "Snack"),
 ("Rojak mee + telur", "Hajitapah Mamak", 5.50, "Snack"),
+("Roti canai biasa", "Hajitapah Mamak", 1.20, "Carbs"),
+("Roti telur", "Hajitapah Mamak", 2.50, "Carbs"),
+("Roti telur bawang", "Hajitapah Mamak", 3.00, "Carbs"),
+("Roti bawang", "Hajitapah Mamak", 2.00, "Carbs"),
+("Roti planta", "Hajitapah Mamak", 2.50, "Carbs"),
+("Roti boom", "Hajitapah Mamak", 2.50, "Carbs"),
+("Roti cheese", "Hajitapah Mamak", 3.00, "Carbs"),
+("Roti telur cheese", "Hajitapah Mamak", 4.00, "Carbs"),
+("Roti sardine", "Hajitapah Mamak", 4.00, "Protein"),
+("Roti kaya", "Hajitapah Mamak", 2.50, "Carbs"),
+("Roti madu", "Hajitapah Mamak", 2.50, "Carbs"),
+("Roti pisang", "Hajitapah Mamak", 3.00, "Carbs"),
 
 ]
 
