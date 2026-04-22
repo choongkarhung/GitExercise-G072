@@ -68,6 +68,12 @@ food_items = [
 ("Rojak", "Hajitapah Mamak", 4.50, "Snack"),
 ("Telur mata", "Hajitapah Mamak", 1.00, "Protein"),
 ("Telur dadar", "Hajitapah Mamak", 1.50, "Protein"),
+("Mee/nasi goreng", "Hajitapah Mamak", 4.50, "Carbs"),
+("Kuey teow/bihun goreng", "Hajitapah Mamak", 4.50, "Carbs"),
+("Rojak biasa", "Hajitapah Mamak", 5.50, "Snack"),
+("Rojak telur", "Hajitapah Mamak", 5.50, "Snack"),
+("Rojak mee/mee", "Hajitapah Mamak", 5.50, "Snack"),
+("Rojak mee + telur", "Hajitapah Mamak", 5.50, "Snack"),
 
 ]
 
