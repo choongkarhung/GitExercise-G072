@@ -22,3 +22,8 @@ async function handleAuth(url, username, password) {
             messageBox.className = 'error';
             messageBox.innerText = data.error;
         }
+          } catch (error) {
+        messageBox.className = 'error';
+        messageBox.innerText = 'Network error occurred.';
+    }
+}
