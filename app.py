@@ -18,8 +18,8 @@ def home():
         return redirect(url_for('setup'))
     return render_template('index.html')
 
-@app.route('/dashboard')
-def dashboard():
+@app.route('/re')
+def re():
     # Redirect to login if user tries to access dashboard directly
     if 'username' not in session:
         return redirect(url_for('home'))
@@ -117,7 +117,7 @@ def setup_post():
 
     db.commit()
 
-    # Store balance and days in Flask session so dashboard can read them
+    # Store balance and days 
     session['balance'] = float(balance)
     session['days'] = int(days)
 

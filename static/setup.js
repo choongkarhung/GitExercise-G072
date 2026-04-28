@@ -26,7 +26,7 @@ document.getElementById('setup-form').addEventListener('submit', async (e) => {
     const data = await response.json();
 
     if (response.ok) {
-        window.location.href = '/dashboard';
+        window.location.href = '/re';
     } else {
         messageBox.textContent = data.error || 'Something went wrong.';
         messageBox.className = 'error';
