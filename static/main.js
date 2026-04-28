@@ -35,3 +35,10 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
     const pass = document.getElementById('login-pass').value;
     handleAuth('/login', user, pass);
 });
+
+document.getElementById('register-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = document.getElementById('reg-user').value;
+    const pass = document.getElementById('reg-pass').value;
+    handleAuth('/register', user, pass);
+});
