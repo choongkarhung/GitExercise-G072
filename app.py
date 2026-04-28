@@ -76,10 +76,11 @@ def login():
     
     return jsonify({'error': 'Invalid username or password'}), 401
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()
-    return jsonify({'message': 'Logged out successfully'}), 200
+    # Redirects the user back to the 'home' 
+    return redirect(url_for('home'))
 
 @app.route('/setup', methods=['GET'])
 def setup():
