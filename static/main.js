@@ -8,3 +8,17 @@ async function handleAuth(url, username, password) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
+
+         const data = await response.json();
+
+        if (response.ok) {
+            messageBox.className = 'success';
+            messageBox.innerText = data.message;
+            if (url === '/login') {
+                // Redirect to dashboard on successful login
+                window.location.href = '/dashboard'; 
+            }
+        } else {
+            messageBox.className = 'error';
+            messageBox.innerText = data.error;
+        }
