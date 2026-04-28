@@ -27,3 +27,11 @@ async function handleAuth(url, username, password) {
         messageBox.innerText = 'Network error occurred.';
     }
 }
+
+// Event Listeners for Forms
+document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = document.getElementById('login-user').value;
+    const pass = document.getElementById('login-pass').value;
+    handleAuth('/login', user, pass);
+});
