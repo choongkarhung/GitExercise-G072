@@ -94,3 +94,37 @@ def setup():
     if 'user_id' not in session:
         return redirect(url_for('index'))
     return render_template('setup.html')
+
+@app.route('/setup', methods=['POST'])
+def setup_post():
+    # Block logged-out users
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+
+    data = request.get_json()
+    balance = data.get('balance')
+    days = data.get('days')
+
+    # Server-side validation
+    if not balance or float(balance) <= 0:
+        return jsonify({'error': 'Invalid balance.'}), 400
+    if not days or int(days) <= 0:
+        return jsonify({'error': 'Invalid number of days.'}), 400
+
+    db = get_db()
+
+    # Save the new survival session to the database
+    db.execute("""
+        INSERT INTO survival_sessions (user_id, start_balance, days_total, created_at)
+        VALUES (?, ?, ?, ?)
+    """, (session['user_id'], float(balance), int(days), datetime.now().isoformat()))
+
+    db.commit()
+
+    # Store balance and days in Flask session so dashboard can read them
+    session['balance'] = float(balance)
+    session['days'] = int(days)
+
+    db.close()
+
+    return jsonify({'message': 'Session created.'}), 200
