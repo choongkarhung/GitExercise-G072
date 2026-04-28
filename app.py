@@ -5,27 +5,27 @@ from database import get_db
 
 app = Flask(__name__)
 
-# SECURE KEY: Essential for sessions to work
+# SECURE KEY
 app.secret_key = os.environ.get('SECRET_KEY', 'mmu_broke_student_secret_2024')
 
 # --- VIEW ROUTES ---
 
 @app.route('/')
 def home():
-    # Logic: If logged in, go to dashboard. If not, show login (index.html)
+    # If logged in, go to dashboard. If not, show login 
     if 'username' in session:
         return redirect(url_for('dashboard.html'))
     return render_template('index.html')
 
 @app.route('/dashboard')
 def dashboard():
-    # Protection: Redirect to login if user tries to access dashboard directly
+    # Redirect to login if user tries to access dashboard directly
     if 'username' not in session:
         return redirect(url_for('home'))
     return render_template('dashboard.html', username=session['username'])
 
 
-# --- AUTHENTICATION API ROUTES ---
+# AUTHENTICATION
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -44,7 +44,7 @@ def register():
         db.close()
         return jsonify({'error': 'Username already exists!'}), 400
 
-    # Secure Hashing (PBKDF2 is the default in newer Werkzeug)
+    # Secure Hashing 
     hashed_password = generate_password_hash(password)
     
     try:
