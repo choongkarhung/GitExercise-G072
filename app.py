@@ -13,14 +13,12 @@ app.secret_key = os.environ.get('SECRET_KEY', 'mmu_broke_student_secret_2024')
 
 @app.route('/')
 def home():
-    # If logged in, go to dashboard. If not, show login 
     if 'username' in session:
         return redirect(url_for('setup'))
-    return render_template('index.html')
+    return render_template('login.html')
 
-@app.route('/re')
-def re():
-    # Redirect to login if user tries to access dashboard directly
+@app.route('/reality')
+def reality():
     if 'username' not in session:
         return redirect(url_for('home'))
     return render_template('setup.html', username=session['username'])
@@ -87,7 +85,7 @@ def logout():
 def setup():
     # Block logged-out users from accessing this page
     if 'user_id' not in session:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
     return render_template('setup.html')
 
 

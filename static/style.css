@@ -64,3 +64,49 @@ hr {
     background-color: #d4edda;
     color: #155724;
 }
+
+/* Navigation Bar */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #333;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.logout-link {
+    background: transparent;
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+    width: auto; /* Overrides the 100% width in your existing button css */
+    padding: 5px 15px;
+}
+
+.logout-link:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
+/* Container Polish */
+.container {
+    margin-top: 60px; /* Space for the navbar */
+    border-top: 5px solid #28a745;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+label {
+    display: block;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: 15px;
+}
