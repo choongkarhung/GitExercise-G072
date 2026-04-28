@@ -87,3 +87,10 @@ def logout():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+    @app.route('/setup', methods=['GET'])
+def setup():
+    # Block logged-out users from accessing this page
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('setup.html')
