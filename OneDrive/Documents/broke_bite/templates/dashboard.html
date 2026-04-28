@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Broke Bites Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <h2>Broke Bites Dashboard</h2>
+
+    <canvas id="donutChart" width="300" height="300"></canvas>
+    <br><br>
+    <canvas id="gaugeChart" width="300" height="300"></canvas>
+
+    <script>
+        const remaining = {{ remaining_percentage }};
+        const categoryData = {{ category_spending | tojson }};
+    </script>
+
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+</body>
+</html>
