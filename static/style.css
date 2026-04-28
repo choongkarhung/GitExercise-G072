@@ -50,3 +50,7 @@ hr {
     margin-bottom: 15px;
     border-radius: 4px;
 }
+
+.hidden {
+    display: none;
+}
