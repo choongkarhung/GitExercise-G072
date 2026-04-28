@@ -15,7 +15,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'mmu_broke_student_secret_2024')
 def home():
     # If logged in, go to dashboard. If not, show login 
     if 'username' in session:
-        return redirect(url_for('setup.html'))
+        return redirect(url_for('setup'))
     return render_template('index.html')
 
 @app.route('/dashboard')
