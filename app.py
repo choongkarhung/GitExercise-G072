@@ -4,30 +4,29 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db
 from datetime import datetime
 
-
 app = Flask(__name__)
 
-# SECURE KEY: Essential for sessions to work
+# SECURE KEY
 app.secret_key = os.environ.get('SECRET_KEY', 'mmu_broke_student_secret_2024')
 
 # --- VIEW ROUTES ---
 
 @app.route('/')
 def home():
-    # Logic: If logged in, go to dashboard. If not, show login (index.html)
+    # If logged in, go to dashboard. If not, show login 
     if 'username' in session:
-        return redirect(url_for('dashboard.html'))
+        return redirect(url_for('setup.html'))
     return render_template('index.html')
 
 @app.route('/dashboard')
 def dashboard():
-    # Protection: Redirect to login if user tries to access dashboard directly
+    # Redirect to login if user tries to access dashboard directly
     if 'username' not in session:
         return redirect(url_for('home'))
-    return render_template('dashboard.html', username=session['username'])
+    return render_template('setup.html', username=session['username'])
 
 
-# --- AUTHENTICATION API ROUTES ---
+# AUTHENTICATION
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -46,7 +45,7 @@ def register():
         db.close()
         return jsonify({'error': 'Username already exists!'}), 400
 
-    # Secure Hashing (PBKDF2 is the default in newer Werkzeug)
+    # Secure Hashing 
     hashed_password = generate_password_hash(password)
     
     try:
@@ -84,15 +83,11 @@ def logout():
     session.clear()
     return jsonify({'message': 'Logged out successfully'}), 200
 
-
-if __name__ == "__main__":
-    app.run(debug=True)
-
 @app.route('/setup', methods=['GET'])
 def setup():
     # Block logged-out users from accessing this page
     if 'user_id' not in session:
-        return redirect(url_for('index.html'))
+        return redirect(url_for('index'))
     return render_template('setup.html')
 
 
@@ -129,3 +124,6 @@ def setup_post():
     db.close()
 
     return jsonify({'message': 'Session created.'}), 200
+
+if __name__ == "__main__":
+    app.run(debug=True)
