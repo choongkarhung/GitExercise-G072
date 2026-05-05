@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
+    <div class="grid-overlay"></div>
+
     <div class="container">
         <div class="brand">
-            <h1>🍜 BrokeBite</h1>
+            <h1>🍜 <span>Broke</span>Bite</h1>
             <p class="brand-sub">Survive the week. One meal at a time.</p>
         </div>
 
@@ -37,5 +40,25 @@
     </div>
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
+
+    <!-- Floating particles -->
+    <script>
+        const colors = ['rgba(16,185,129,0.5)', 'rgba(52,211,153,0.4)', 'rgba(5,150,105,0.6)'];
+        for (let i = 0; i < 18; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 5 + 2;
+            p.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                left: ${Math.random() * 100}vw;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                animation-duration: ${Math.random() * 12 + 8}s;
+                animation-delay: ${Math.random() * 8}s;
+                filter: blur(${Math.random() * 2}px);
+            `;
+            document.body.appendChild(p);
+        }
+    </script>
 </body>
 </html>
