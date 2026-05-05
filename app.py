@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, jsonify, session, render_template, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -12,17 +13,17 @@ app.secret_key = os.environ.get('SECRET_KEY', 'mmu_broke_student_secret_2024')
 
 @app.route('/')
 def home():
-    # If logged in, go to dashboard. If not, show login 
+    # Logic: If logged in, go to dashboard. If not, show login (index.html)
     if 'username' in session:
-        return redirect(url_for('dashboard.html'))
-    return render_template('index.html')
+        return redirect(url_for('setup'))
+    return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
-    # Redirect to login if user tries to access dashboard directly
+    # Protection: Redirect to login if user tries to access dashboard directly
     if 'username' not in session:
         return redirect(url_for('home'))
-    return render_template('dashboard.html', username=session['username'])
+    return render_template('setup.html', username=session['username'])
 
 
 # AUTHENTICATION
@@ -77,11 +78,53 @@ def login():
     
     return jsonify({'error': 'Invalid username or password'}), 401
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()
-    return jsonify({'message': 'Logged out successfully'}), 200
+    # Redirects the user back to the 'home' 
+    return redirect(url_for('home'))
 
+@app.route('/setup', methods=['GET'])
+def setup():
+    # Block logged-out users from accessing this page
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('setup.html')
+
+
+@app.route('/setup', methods=['POST'])
+def setup_post():
+    # Block logged-out users
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+
+    data = request.get_json()
+    balance = data.get('balance')
+    days = data.get('days')
+
+    # Server-side validation
+    if not balance or float(balance) <= 0:
+        return jsonify({'error': 'Invalid balance.'}), 400
+    if not days or int(days) <= 0:
+        return jsonify({'error': 'Invalid number of days.'}), 400
+
+    db = get_db()
+
+    # Save the new survival session to the database
+    db.execute("""
+        INSERT INTO survival_sessions (user_id, start_balance, days_total, created_at)
+        VALUES (?, ?, ?, ?)
+    """, (session['user_id'], float(balance), int(days), datetime.now().isoformat()))
+
+    db.commit()
+
+    # Store balance and days 
+    session['balance'] = float(balance)
+    session['days'] = int(days)
+
+    db.close()
+
+    return jsonify({'message': 'Session created.'}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -16,7 +16,7 @@ async function handleAuth(url, username, password) {
             messageBox.innerText = data.message;
             if (url === '/login') {
                 // Redirect to dashboard on successful login
-                window.location.href = '/dashboard'; 
+                window.location.href = '/reality'; 
             }
         } else {
             messageBox.className = 'error';
