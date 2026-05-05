@@ -5,7 +5,6 @@ document.getElementById('setup-form').addEventListener('submit', async (e) => {
     const days = parseInt(document.getElementById('days').value);
     const messageBox = document.getElementById('message-box');
 
-    // Basic front-end validation
     if (isNaN(balance) || balance <= 0) {
         messageBox.textContent = 'Please enter a valid balance.';
         messageBox.className = 'error';
@@ -26,7 +25,7 @@ document.getElementById('setup-form').addEventListener('submit', async (e) => {
     const data = await response.json();
 
     if (response.ok) {
-        window.location.href = '/reality';
+        window.location.href = '/dashboard'; // ← was '/reality', fixed to '/dashboard'
     } else {
         messageBox.textContent = data.error || 'Something went wrong.';
         messageBox.className = 'error';
