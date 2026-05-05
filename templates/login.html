@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Auth</title>
+    <title>BrokeBite - Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
+        <div class="brand">
+            <h1>🍜 BrokeBite</h1>
+            <p class="brand-sub">Survive the week. One meal at a time.</p>
+        </div>
+
         <div id="message-box" class="hidden"></div>
-        
+
         <h2>Login</h2>
         <form id="login-form">
-            <input type="text" id="login-user" placeholder="Username" required>
-            <input type="password" id="login-pass" placeholder="Password" required>
+            <label for="login-user">Username</label>
+            <input type="text" id="login-user" placeholder="Enter your username" required>
+            <label for="login-pass">Password</label>
+            <input type="password" id="login-pass" placeholder="Enter your password" required>
             <button type="submit">Login</button>
         </form>
 
@@ -21,9 +28,11 @@
 
         <h2>Register</h2>
         <form id="register-form">
-            <input type="text" id="reg-user" placeholder="Choose Username" required>
-            <input type="password" id="reg-pass" placeholder="Choose Password" required>
-            <button type="submit">Register</button>
+            <label for="reg-user">Username</label>
+            <input type="text" id="reg-user" placeholder="Choose a username" required>
+            <label for="reg-pass">Password</label>
+            <input type="password" id="reg-pass" placeholder="Choose a password" required>
+            <button type="submit" class="btn-register">Register</button>
         </form>
     </div>
 
