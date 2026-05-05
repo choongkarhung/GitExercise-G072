@@ -1,7 +1,6 @@
- // Utility function to handle API requests
 async function handleAuth(url, username, password) {
     const messageBox = document.getElementById('message-box');
-    
+
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -15,8 +14,7 @@ async function handleAuth(url, username, password) {
             messageBox.className = 'success';
             messageBox.innerText = data.message;
             if (url === '/login') {
-                // Redirect to dashboard on successful login
-                window.location.href = '/reality'; 
+                window.location.href = '/setup'; // ← was '/reality', fixed to '/setup'
             }
         } else {
             messageBox.className = 'error';
@@ -28,7 +26,6 @@ async function handleAuth(url, username, password) {
     }
 }
 
-// Event Listeners for Forms
 document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const user = document.getElementById('login-user').value;
