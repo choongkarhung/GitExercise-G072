@@ -1,9 +1,20 @@
-// Locate your form submission event listener
 document.getElementById('setup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const balance = document.getElementById('balance').value;
-    const days = document.getElementById('days').value;
+    const balance = parseFloat(document.getElementById('balance').value);
+    const days = parseInt(document.getElementById('days').value);
+    const messageBox = document.getElementById('message-box');
+
+    if (isNaN(balance) || balance <= 0) {
+        messageBox.textContent = 'Please enter a valid balance.';
+        messageBox.className = 'error';
+        return;
+    }
+    if (isNaN(days) || days <= 0) {
+        messageBox.textContent = 'Please enter a valid number of days.';
+        messageBox.className = 'error';
+        return;
+    }
 
     const response = await fetch('/setup', {
         method: 'POST',
@@ -11,13 +22,12 @@ document.getElementById('setup-form').addEventListener('submit', async (e) => {
         body: JSON.stringify({ balance, days })
     });
 
+    const data = await response.json();
+
     if (response.ok) {
-        // This is the fix: manually redirect to the dashboard route
         window.location.href = '/dashboard'; 
     } else {
-        const error = await response.json();
-        const msgBox = document.getElementById('message-box');
-        msgBox.textContent = error.error;
-        msgBox.classList.remove('hidden');
+        messageBox.textContent = data.error || 'Something went wrong.';
+        messageBox.className = 'error';
     }
 });

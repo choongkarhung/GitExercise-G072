@@ -5,528 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - BrokeBite</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        /* ── DASHBOARD LAYOUT ── */
-        body {
-            align-items: flex-start;
-            padding-top: 80px;
-            padding-bottom: 48px;
-        }
-
-        .dashboard-wrap {
-            width: 100%;
-            max-width: 860px;
-            padding: 0 20px;
-            margin: 0 auto;
-        }
-
-        /* ── PAGE HEADER ── */
-        .dash-header {
-            margin-bottom: 28px;
-            animation: card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        .dash-header .pill-tag { margin-bottom: 8px; }
-
-        .dash-header h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            color: var(--ink);
-            margin-bottom: 4px;
-        }
-
-        .dash-header p {
-            font-size: 0.83rem;
-            color: var(--ink-muted);
-        }
-
-        /* ── STAT CARDS GRID ── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--cream-border);
-            border-radius: 16px;
-            padding: 22px 20px 18px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
-            animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            border-radius: 16px 16px 0 0;
-        }
-
-        .stat-card.green::before  { background: linear-gradient(90deg, var(--green), var(--green-mid)); }
-        .stat-card.yellow::before { background: linear-gradient(90deg, #c9a84c, #e3c06a); }
-        .stat-card.red::before    { background: linear-gradient(90deg, #c0615c, #d98080); }
-
-        .stat-card:nth-child(1) { animation-delay: 0.05s; }
-        .stat-card:nth-child(2) { animation-delay: 0.1s; }
-        .stat-card:nth-child(3) { animation-delay: 0.15s; }
-
-        .stat-icon {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-            display: block;
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--ink-faint);
-            margin-bottom: 6px;
-        }
-
-        .stat-value {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.65rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            color: var(--ink);
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-
-        .stat-value .unit {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--ink-muted);
-            margin-right: 2px;
-        }
-
-        .stat-sub {
-            font-size: 0.72rem;
-            color: var(--ink-soft);
-        }
-
-        /* ── PROGRESS STRIP ── */
-        .progress-card {
-            background: var(--surface);
-            border: 1px solid var(--cream-border);
-            border-radius: 16px;
-            padding: 20px 22px;
-            margin-bottom: 18px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
-            animation: card-in 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        .progress-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 12px;
-        }
-
-        .progress-top .label {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.63rem;
-            text-transform: uppercase;
-            letter-spacing: 0.09em;
-            color: var(--ink-soft);
-        }
-
-        .progress-top .pct {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--ink);
-        }
-
-        .progress-track {
-            height: 8px;
-            background: var(--cream-strong);
-            border-radius: 99px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 99px;
-            background: linear-gradient(90deg, var(--green), var(--green-mid));
-            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .progress-fill.warning { background: linear-gradient(90deg, #c9a84c, #e3c06a); }
-        .progress-fill.danger  { background: linear-gradient(90deg, #c0615c, #d98080); }
-
-        .progress-legend {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-        }
-
-        .progress-legend span {
-            font-size: 0.7rem;
-            color: var(--ink-faint);
-            font-family: 'DM Mono', monospace;
-        }
-
-        /* ── BOTTOM ROW ── */
-        .bottom-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        /* ── EXPENSE LOG ── */
-        .panel {
-            background: var(--surface);
-            border: 1px solid var(--cream-border);
-            border-radius: 16px;
-            padding: 20px 22px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
-            animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        .panel:nth-child(1) { animation-delay: 0.25s; }
-        .panel:nth-child(2) { animation-delay: 0.3s; }
-
-        .panel-title {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.62rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--ink-faint);
-            margin-bottom: 16px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--cream-strong);
-        }
-
-        /* Log a spend */
-        .spend-form .spend-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 6px;
-        }
-
-        .spend-form input[type="text"],
-        .spend-form input[type="number"] {
-            flex: 1;
-            margin-top: 0;
-            font-size: 0.82rem;
-            padding: 9px 12px;
-        }
-
-        .spend-form .amount-wrap {
-            position: relative;
-            flex: 0 0 110px;
-        }
-
-        .spend-form .amount-wrap .prefix {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.75rem;
-            color: var(--ink-muted);
-            font-family: 'DM Mono', monospace;
-            pointer-events: none;
-        }
-
-        .spend-form .amount-wrap input {
-            padding-left: 34px;
-        }
-
-        .spend-form select {
-            width: 100%;
-            padding: 9px 12px;
-            background: var(--surface);
-            border: 1px solid var(--cream-border);
-            border-radius: 10px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.82rem;
-            color: var(--ink);
-            outline: none;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .spend-form select:focus {
-            border-color: var(--green-border);
-            box-shadow: 0 0 0 3px rgba(45, 122, 87, 0.08);
-        }
-
-        .spend-form button {
-            margin-top: 10px;
-            padding: 10px 14px;
-            font-size: 0.82rem;
-        }
-
-        /* Expense list */
-        .expense-list {
-            max-height: 280px;
-            overflow-y: auto;
-        }
-
-        .expense-list::-webkit-scrollbar { width: 4px; }
-        .expense-list::-webkit-scrollbar-track { background: transparent; }
-        .expense-list::-webkit-scrollbar-thumb { background: var(--cream-border); border-radius: 99px; }
-
-        .expense-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--cream-strong);
-            animation: msg-in 0.2s ease both;
-        }
-
-        .expense-item:last-child { border-bottom: none; }
-
-        .expense-emoji {
-            font-size: 1.1rem;
-            width: 28px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .expense-info { flex: 1; min-width: 0; }
-
-        .expense-name {
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--ink);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .expense-meta {
-            font-size: 0.68rem;
-            color: var(--ink-faint);
-            font-family: 'DM Mono', monospace;
-        }
-
-        .expense-amount {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--red-text);
-            flex-shrink: 0;
-        }
-
-        .expense-delete {
-            background: none;
-            border: none;
-            color: var(--ink-faint);
-            font-size: 0.75rem;
-            cursor: pointer;
-            padding: 2px 4px;
-            border-radius: 4px;
-            width: auto;
-            margin: 0;
-            transition: color 0.15s, background 0.15s;
-            line-height: 1;
-        }
-
-        .expense-delete:hover {
-            color: var(--red-text);
-            background: var(--red-bg);
-            transform: none;
-            box-shadow: none;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 28px 0;
-            color: var(--ink-faint);
-            font-size: 0.8rem;
-        }
-
-        .empty-state .icon { font-size: 1.8rem; margin-bottom: 8px; display: block; }
-
-        /* ── MEAL SUGGESTION ── */
-        .meal-card {
-            background: var(--green-light);
-            border: 1px solid var(--green-border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.15s;
-        }
-
-        .meal-card:hover {
-            background: #d8eedf;
-            transform: translateY(-1px);
-        }
-
-        .meal-emoji { font-size: 1.6rem; flex-shrink: 0; line-height: 1; }
-
-        .meal-info { flex: 1; }
-
-        .meal-name {
-            font-family: 'Syne', sans-serif;
-            font-size: 0.92rem;
-            font-weight: 700;
-            color: var(--ink);
-            margin-bottom: 2px;
-        }
-
-        .meal-desc {
-            font-size: 0.72rem;
-            color: var(--ink-soft);
-            line-height: 1.45;
-        }
-
-        .meal-price {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--green);
-            flex-shrink: 0;
-            padding-top: 2px;
-        }
-
-        .meal-refresh {
-            background: transparent;
-            border: 1.5px solid var(--green-border);
-            color: var(--green);
-            font-size: 0.78rem;
-            padding: 8px 12px;
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 500;
-        }
-
-        .meal-refresh:hover {
-            background: var(--green-light);
-            border-color: var(--green);
-            box-shadow: none;
-            transform: none;
-        }
-
-        /* ── ALERT BANNER ── */
-        .alert-banner {
-            border-radius: 12px;
-            padding: 10px 14px;
-            font-size: 0.8rem;
-            margin-bottom: 16px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: msg-in 0.25s ease both;
-        }
-
-        .alert-banner.warning {
-            background: var(--yellow-bg);
-            border: 1px solid var(--yellow-border);
-            color: var(--yellow-text);
-        }
-
-        .alert-banner.danger {
-            background: var(--red-bg);
-            border: 1px solid var(--red-border);
-            color: var(--red-text);
-        }
-
-        /* ── TODAY'S BUDGET RING ── */
-        .budget-ring-wrap {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            margin-bottom: 16px;
-        }
-
-        .ring-svg { flex-shrink: 0; }
-
-        .ring-info .big {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--ink);
-            letter-spacing: -0.02em;
-        }
-
-        .ring-info .small {
-            font-size: 0.72rem;
-            color: var(--ink-muted);
-        }
-
-        .ring-info .spent-tag {
-            display: inline-block;
-            margin-top: 6px;
-            background: var(--red-bg);
-            border: 1px solid var(--red-border);
-            color: var(--red-text);
-            font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-family: 'DM Mono', monospace;
-        }
-
-        .ring-info .safe-tag {
-            display: inline-block;
-            margin-top: 6px;
-            background: var(--green-light);
-            border: 1px solid var(--green-border);
-            color: var(--green);
-            font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-family: 'DM Mono', monospace;
-        }
-
-        /* ── CATEGORY CHIP ── */
-        .cat-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .cat-chip {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.68rem;
-            font-family: 'DM Mono', monospace;
-            border: 1px solid var(--cream-border);
-            background: var(--cream-mid);
-            color: var(--ink-soft);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .cat-chip.active, .cat-chip:hover {
-            background: var(--green-light);
-            border-color: var(--green-border);
-            color: var(--green);
-        }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 680px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .stats-grid .stat-card:last-child { grid-column: span 2; }
-            .bottom-grid { grid-template-columns: 1fr; }
-        }
-
-        @media (max-width: 420px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .stats-grid .stat-card:last-child { grid-column: unset; }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
-<body>
+<body class="dashboard-body">
 
     <div class="blob-canvas">
         <div class="blob blob-1"></div>
@@ -537,133 +18,115 @@
     </div>
     <div class="grid-overlay"></div>
 
+    <!-- NAVBAR -->
     <nav class="navbar">
         <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
-        <span class="user-greeting">Hey, {{ session['username'] }}!</span>
+        <span class="user-greeting">Hey, {{ username }}! 👋</span>
         <button class="logout-btn" id="logout-btn">Logout</button>
     </nav>
 
-    <div class="dashboard-wrap">
+    <!-- MAIN DASHBOARD -->
+    <div class="dashboard-wrapper">
 
-        <!-- Header -->
+        <!-- ── HEADER ROW ── -->
         <div class="dash-header">
-            <span class="pill-tag">Dashboard</span>
-            <h2>Hang in there. 💪</h2>
-            <p>Here's where you stand — and how to make it to payday.</p>
+            <div>
+                <span class="pill-tag">Survival Mode</span>
+                <h2 class="dash-title">Your Wallet Report 💸</h2>
+                <p class="dash-sub">Here's the damage. Let's make it work.</p>
+            </div>
+            <button class="btn-new-session" id="new-session-btn">+ New Session</button>
         </div>
 
-        <!-- Alert banner (shown conditionally) -->
-        <div id="alert-banner" class="alert-banner" style="display:none;"></div>
-
-        <!-- Stat cards -->
-        <div class="stats-grid">
-            <div class="stat-card green">
-                <span class="stat-icon">💰</span>
+        <!-- ── STAT CARDS ROW ── -->
+        <div class="stats-row">
+            <div class="stat-card stat-balance">
+                <div class="stat-icon">💰</div>
                 <div class="stat-label">Remaining Balance</div>
-                <div class="stat-value"><span class="unit">RM</span><span id="stat-balance">–</span></div>
-                <div class="stat-sub">as of today</div>
+                <div class="stat-value" id="stat-balance">RM —</div>
+                <div class="stat-note" id="stat-balance-note">loading...</div>
             </div>
-            <div class="stat-card yellow">
-                <span class="stat-icon">📅</span>
-                <div class="stat-label">Days Until Payday</div>
-                <div class="stat-value"><span id="stat-days">–</span></div>
-                <div class="stat-sub" id="stat-days-sub">days to go</div>
+            <div class="stat-card stat-days">
+                <div class="stat-icon">📅</div>
+                <div class="stat-label">Days Remaining</div>
+                <div class="stat-value" id="stat-days">—</div>
+                <div class="stat-note" id="stat-days-note">loading...</div>
             </div>
-            <div class="stat-card" id="budget-card">
-                <span class="stat-icon">🎯</span>
+            <div class="stat-card stat-daily">
+                <div class="stat-icon">🍽️</div>
                 <div class="stat-label">Budget Per Day</div>
-                <div class="stat-value"><span class="unit">RM</span><span id="stat-daily">–</span></div>
-                <div class="stat-sub" id="budget-status">per day</div>
+                <div class="stat-value" id="stat-daily">RM —</div>
+                <div class="stat-note" id="stat-daily-note">loading...</div>
+            </div>
+            <div class="stat-card stat-spent">
+                <div class="stat-icon">📊</div>
+                <div class="stat-label">Spent Today</div>
+                <div class="stat-value" id="stat-spent">RM —</div>
+                <div class="stat-note" id="stat-spent-note">loading...</div>
             </div>
         </div>
 
-        <!-- Balance progress bar -->
-        <div class="progress-card">
-            <div class="progress-top">
-                <span class="label">Balance remaining</span>
-                <span class="pct" id="balance-pct">–%</span>
+        <!-- ── PROGRESS BAR ── -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <span class="progress-label">Budget Used</span>
+                <span class="progress-pct" id="progress-pct">0%</span>
             </div>
             <div class="progress-track">
-                <div class="progress-fill" id="balance-bar" style="width: 0%;"></div>
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
             </div>
-            <div class="progress-legend">
-                <span>RM 0</span>
-                <span id="balance-bar-label">–</span>
+            <div class="progress-footer">
+                <span id="progress-spent-label">RM 0.00 spent</span>
+                <span id="progress-left-label">RM 0.00 left</span>
             </div>
         </div>
 
-        <!-- Bottom panels -->
-        <div class="bottom-grid">
+        <!-- ── BOTTOM ROW ── -->
+        <div class="bottom-row">
 
-            <!-- Left: Log a Spend + Expense List -->
-            <div class="panel">
-                <div class="panel-title">📝 Log a spend</div>
-
-                <div class="spend-form">
-                    <div class="cat-chips" id="cat-chips">
-                        <span class="cat-chip active" data-cat="🍚 Food">🍚 Food</span>
-                        <span class="cat-chip" data-cat="🚌 Transport">🚌 Transport</span>
-                        <span class="cat-chip" data-cat="🛒 Groceries">🛒 Groceries</span>
-                        <span class="cat-chip" data-cat="☕ Coffee">☕ Coffee</span>
-                        <span class="cat-chip" data-cat="💊 Health">💊 Health</span>
-                        <span class="cat-chip" data-cat="📦 Other">📦 Other</span>
-                    </div>
-                    <div class="spend-row">
-                        <input type="text" id="spend-name" placeholder="What did you spend on?" maxlength="40">
-                        <div class="amount-wrap">
-                            <span class="prefix">RM</span>
-                            <input type="number" id="spend-amount" placeholder="0.00" step="0.01" min="0.01">
-                        </div>
-                    </div>
-                    <button id="log-btn">Add expense ➕</button>
+            <!-- LOG EXPENSE -->
+            <div class="panel log-panel">
+                <div class="panel-header">
+                    <h3>Log Expense</h3>
+                    <span class="panel-sub">What did you spend on?</span>
                 </div>
+                <div id="log-msg" class="hidden"></div>
+                <div class="log-form">
+                    <label>Description</label>
+                    <input type="text" id="log-label" placeholder="e.g. Nasi goreng + teh o ais" maxlength="80">
+                    <label>Amount (RM)</label>
+                    <div class="input-prefix-wrap">
+                        <span class="prefix">RM</span>
+                        <input type="number" id="log-amount" placeholder="0.00" step="0.01" min="0.01">
+                    </div>
+                    <button id="log-btn">Add Expense ✚</button>
+                </div>
+            </div>
 
-                <hr style="margin: 16px 0;">
-                <div class="panel-title" style="margin-bottom: 10px;">📋 Today's expenses</div>
-
+            <!-- RECENT EXPENSES -->
+            <div class="panel expense-panel">
+                <div class="panel-header">
+                    <h3>Recent Expenses</h3>
+                    <span class="panel-sub">Today's spending</span>
+                </div>
                 <div class="expense-list" id="expense-list">
-                    <div class="empty-state">
-                        <span class="icon">🧾</span>
-                        No expenses yet.<br>Stay strong!
-                    </div>
-                </div>
-
-                <hr style="margin: 14px 0 10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:0.72rem; color:var(--ink-muted);">Today's total</span>
-                    <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; color:var(--red-text);">RM <span id="today-total">0.00</span></span>
+                    <div class="expense-empty">No expenses logged yet.<br>Start tracking above! 👆</div>
                 </div>
             </div>
 
-            <!-- Right: Today's budget ring + Meal suggestions -->
-            <div class="panel">
-                <div class="panel-title">🍽️ What can you eat today?</div>
-
-                <!-- Budget ring -->
-                <div class="budget-ring-wrap">
-                    <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
-                        <circle cx="36" cy="36" r="28" fill="none" stroke="#e8e2d9" stroke-width="7"/>
-                        <circle id="ring-circle" cx="36" cy="36" r="28" fill="none"
-                            stroke="var(--green)" stroke-width="7"
-                            stroke-linecap="round"
-                            stroke-dasharray="175.9"
-                            stroke-dashoffset="175.9"
-                            transform="rotate(-90 36 36)"
-                            style="transition: stroke-dashoffset 1s cubic-bezier(0.16,1,0.3,1), stroke 0.3s;"/>
-                    </svg>
-                    <div class="ring-info">
-                        <div class="big">RM <span id="ring-left">–</span> left</div>
-                        <div class="small">of RM <span id="ring-budget">–</span> today</div>
-                        <span id="ring-tag" class="safe-tag">On track ✓</span>
-                    </div>
+            <!-- MEAL SUGGESTIONS -->
+            <div class="panel meal-panel">
+                <div class="panel-header">
+                    <h3>Meal Ideas 🍜</h3>
+                    <span class="panel-sub">Fits your daily budget</span>
                 </div>
-
-                <!-- Meal suggestions -->
-                <div id="meal-list"></div>
-                <button class="meal-refresh" id="meal-refresh">🔀 Suggest different meals</button>
+                <div class="meal-list" id="meal-list">
+                    <div class="meal-loading">Calculating your options...</div>
+                </div>
             </div>
 
         </div>
+
     </div>
 
     <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
@@ -671,6 +134,9 @@
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await fetch('/logout', { method: 'POST' });
             window.location.href = '/';
+        });
+        document.getElementById('new-session-btn').addEventListener('click', () => {
+            window.location.href = '/setup';
         });
     </script>
 
