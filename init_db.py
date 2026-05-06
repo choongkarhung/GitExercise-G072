@@ -146,6 +146,8 @@ food_items = [
 ("Nasi goreng kambing", "Dapo Sahang", 9.50, "Carbs"),
 ("Nasi goreng ikan masin", "Dapo Sahang", 7.00, "Carbs"),
 ("Kuey teow goreng", "Dapo Sahang", 5.00, "Carbs"),
+("Crispy chicken chop", "Dapo Sahang", 10.00, "Protein"),
+("Spaghetti aglio olio", "Dapo Sahang", 12.00, "Carbs"),
 
 ]
 
