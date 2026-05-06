@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS expense_logs (
 )
 """)
 
+
 # Food menu seeding
 food_items = [
     ("Nasi goreng", "Hajitapah Mamak", 4.50, "Carbs"),
@@ -133,7 +134,7 @@ food_items = [
     ("Jus belimbing", "Hajitapah Mamak", 3.50, "Juice"),
     ("Jus mangga/karot", "Hajitapah Mamak", 3.50, "Juice"),
     ("Jus asam jawa", "Hajitapah Mamak", 2.80, "Juice"),
-    ("Jus barli", "Hajitapah Mamak", 2.80, "Juice")
+    ("Jus barli", "Hajitapah Mamak", 2.80, "Juice"),
     ("Nasi goreng biasa", "Dapo Sahang", 5.00, "Carbs"),
     ("Nasi goreng cina", "Dapo Sahang", 6.00, "Carbs"),
     ("Nasi goreng kampung", "Dapo Sahang", 6.50, "Carbs"),

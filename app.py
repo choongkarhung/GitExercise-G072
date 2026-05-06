@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, session, render_template, redirect, u
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db
 from datetime import datetime, date
+import subprocess
 
 app = Flask(__name__)
 
@@ -293,6 +294,13 @@ def api_meals():
     db.close()
     return jsonify([dict(m) for m in meals])
 
+def setup_database():
+    subprocess.run(["python", "init_db.py"])
+    print("Database synced automatically!")
+
+# Run the setup before the first request or at startup
+with app.app_context():
+    setup_database()
 
 if __name__ == "__main__":
     app.run(debug=True)
