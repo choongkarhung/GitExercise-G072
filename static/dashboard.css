@@ -315,3 +315,74 @@
     line-height: 1.7;
 }
  
+/* MEAL LIST */
+.meal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+ 
+.meal-list::-webkit-scrollbar {
+    width: 4px;
+}
+.meal-list::-webkit-scrollbar-track { background: transparent; }
+.meal-list::-webkit-scrollbar-thumb {
+    background: var(--cream-border);
+    border-radius: 4px;
+}
+ 
+.meal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--green-light);
+    border: 1px solid var(--green-border);
+    border-radius: 10px;
+    padding: 10px 13px;
+    gap: 10px;
+    animation: msg-in 0.2s ease both;
+    cursor: default;
+    transition: background 0.15s ease;
+}
+ 
+.meal-item:hover {
+    background: #ddf0e6;
+}
+ 
+.meal-item-info {
+    text-align: left;
+    flex: 1;
+    overflow: hidden;
+}
+ 
+.meal-item-name {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+ 
+.meal-item-stall {
+    font-size: 0.68rem;
+    color: var(--ink-muted);
+}
+ 
+.meal-item-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--green);
+    white-space: nowrap;
+}
+ 
+.meal-loading, .meal-empty {
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    padding: 28px 0;
+    line-height: 1.7;
+}
