@@ -60,7 +60,7 @@
     box-shadow: none;
 }
  
-/* ── STAT CARDS ── */
+/* STAT CARDS */
 .stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -123,6 +123,62 @@
 }
  
 .stat-note {
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+}
+
+/* ── PROGRESS BAR ── */
+.progress-section {
+    background: var(--surface);
+    border: 1px solid var(--cream-border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+ 
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+ 
+.progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+ 
+.progress-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+ 
+.progress-track {
+    background: var(--cream-mid);
+    border-radius: 100px;
+    height: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+ 
+.progress-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--green) 0%, var(--green-mid) 100%);
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease;
+}
+ 
+.progress-fill.warn  { background: linear-gradient(90deg, #d4813a, #e89a56); }
+.progress-fill.danger { background: linear-gradient(90deg, #b35c5c, #cc7777); }
+ 
+.progress-footer {
+    display: flex;
+    justify-content: space-between;
     font-size: 0.72rem;
     color: var(--ink-muted);
 }
