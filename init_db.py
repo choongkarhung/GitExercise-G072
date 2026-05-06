@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS expense_logs (
 )
 """)
 
-
 # Food menu seeding
 food_items = [
     ("Nasi goreng", "Hajitapah Mamak", 4.50, "Carbs"),
