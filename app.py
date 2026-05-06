@@ -126,3 +126,12 @@ def setup_post():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+@app.route('/dashboard')
+def dashboard():
+    # Security check: If no user is in session, kick them to login[cite: 5]
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    # Render the dashboard and pass the username for the navbar greeting
+    return render_template('dashboard.html')
