@@ -253,6 +253,7 @@ def api_meals():
     sess = db.execute("""
         SELECT id, start_balance, days_total, created_at FROM survival_sessions
         WHERE user_id = ?
+                      
         ORDER BY created_at DESC
         LIMIT 1
     """, (user_id,)).fetchone()

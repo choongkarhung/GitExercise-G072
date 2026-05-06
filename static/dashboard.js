@@ -115,6 +115,7 @@ async function loadMeals() {
             `<div class="meal-empty">Couldn't load meals.</div>`;
     }
 }
+
 function renderMeals(meals) {
     const list = document.getElementById('meal-list');
     const dailyLimit = dashData.daily_budget - dashData.spent_today; // Calculate current limit
