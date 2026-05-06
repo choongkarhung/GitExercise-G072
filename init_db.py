@@ -138,6 +138,9 @@ food_items = [
 ("Nasi goreng cina", "Dapo Sahang", 6.00, "Carbs"),
 ("Nasi goreng kampung", "Dapo Sahang", 6.50, "Carbs"),
 ("Nasi goreng cili padi", "Dapo Sahang", 6.00, "Carbs"),
+("Nasi goreng ayam", "Dapo Sahang", 8.50, "Carbs"),
+("Nasi goreng tomyam", "Dapo Sahang", 7.00, "Carbs"),
+
 ]
 
 cur.executemany("""
