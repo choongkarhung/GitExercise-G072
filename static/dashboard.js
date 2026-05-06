@@ -183,5 +183,15 @@ function escHtml(str) {
         .replace(/"/g, '&quot;');
 }
  
+// Function to refresh all dashboard data
+async function refreshDashboard() {
+    console.log('Auto-refreshing dashboard data...');
+    await loadDashboard();
+    await loadMeals();
+}
+
 // START 
 init();
+
+// AUTO-UPDATE: Run refreshEvery 30 seconds 
+setInterval(refreshDashboard, 30000);
