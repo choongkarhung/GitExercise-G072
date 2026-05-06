@@ -13,11 +13,116 @@
     animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
  
-/* ── HEADER ── */
+/* HEADER */
 .dash-header {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: 16px;
     flex-wrap: wrap;
+}
+
+.dash-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 4px 0 2px;
+    letter-spacing: -0.03em;
+    text-align: left;
+}
+ 
+.dash-sub {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    text-align: left;
+}
+ 
+.btn-new-session {
+    width: auto;
+    padding: 9px 20px;
+    margin-top: 0;
+    background: transparent;
+    border: 1.5px solid var(--green-border);
+    color: var(--green);
+    font-size: 0.82rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    border-radius: 10px;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+ 
+.btn-new-session:hover {
+    background: var(--green-light);
+    border-color: var(--green);
+    transform: none;
+    box-shadow: none;
+}
+ 
+/* ── STAT CARDS ── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+ 
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--cream-border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
+}
+ 
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+}
+ 
+.stat-balance::before { background: linear-gradient(90deg, #2d7a57, #3a9268); }
+.stat-days::before    { background: linear-gradient(90deg, #6b8fd6, #89a8e8); }
+.stat-daily::before   { background: linear-gradient(90deg, #d4813a, #e89a56); }
+.stat-spent::before   { background: linear-gradient(90deg, #b35c5c, #cc7777); }
+ 
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+}
+ 
+.stat-icon {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    display: block;
+    line-height: 1;
+}
+ 
+.stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+ 
+.stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+ 
+.stat-note {
+    font-size: 0.72rem;
+    color: var(--ink-muted);
 }
