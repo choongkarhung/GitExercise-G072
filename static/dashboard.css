@@ -1,0 +1,23 @@
+.dashboard-body {
+    align-items: flex-start;
+    justify-content: center;
+    padding: 80px 24px 48px;
+}
+ 
+.dashboard-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+ 
+/* ── HEADER ── */
+.dash-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
