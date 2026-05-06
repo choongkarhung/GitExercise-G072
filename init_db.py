@@ -159,6 +159,13 @@ food_items = [
     ("Nasi Goreng Tomyam", "Starbees(Tuas anas)", 8.00, "Carbs"),
 ]
 
+query = """
+    SELECT * FROM food_items 
+    WHERE price <= ? AND is_active = 1 
+    ORDER BY price DESC 
+    LIMIT 5
+"""
+
 cur.executemany("""
 INSERT OR REPLACE INTO food_items (name, stall, price, category)
 VALUES (?, ?, ?, ?)

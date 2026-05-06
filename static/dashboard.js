@@ -115,22 +115,24 @@ async function loadMeals() {
             `<div class="meal-empty">Couldn't load meals.</div>`;
     }
 }
- 
 function renderMeals(meals) {
     const list = document.getElementById('meal-list');
-    if (!meals || meals.length === 0) {
-        list.innerHTML = `<div class="meal-empty">No meals fit your budget.<br>Hang tight 😬</div>`;
-        return;
-    }
-    list.innerHTML = meals.map(m => `
+    const dailyLimit = dashData.daily_budget - dashData.spent_today; // Calculate current limit
+
+    list.innerHTML = meals.map(m => {
+        // Highlight items that are close to the limit
+        const isLuxury = m.price > (dailyLimit * 0.7); 
+        const tag = isLuxury ? '<span class="status-badge status-warn">Top Choice</span>' : '';
+
+        return `
         <div class="meal-item">
             <div class="meal-item-info">
-                <div class="meal-item-name">${escHtml(m.name)}</div>
+                <div class="meal-item-name">${escHtml(m.name)} ${tag}</div>
                 <div class="meal-item-stall">${escHtml(m.stall)}</div>
             </div>
             <span class="meal-item-price">RM ${parseFloat(m.price).toFixed(2)}</span>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 // LOG EXPENSE
