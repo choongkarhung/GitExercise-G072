@@ -386,3 +386,41 @@
     padding: 28px 0;
     line-height: 1.7;
 }
+
+/* STATUS BADGE */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    padding: 2px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.status-ok     { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+.status-warn   { background: var(--yellow-bg); color: #7a6e50; border: 1px solid var(--yellow-border); }
+.status-danger { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
+ 
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .bottom-row {
+        grid-template-columns: 1fr;
+    }
+}
+ 
+@media (max-width: 500px) {
+    .stats-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    .dash-title {
+        font-size: 1.3rem;
+    }
+    .stat-value {
+        font-size: 1.3rem;
+    }
+}
