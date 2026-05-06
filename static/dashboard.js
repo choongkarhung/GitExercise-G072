@@ -132,3 +132,56 @@ function renderMeals(meals) {
         </div>
     `).join('');
 }
+
+// LOG EXPENSE
+document.getElementById('log-btn').addEventListener('click', async () => {
+    const label  = document.getElementById('log-label').value.trim();
+    const amount = document.getElementById('log-amount').value;
+    const msgBox = document.getElementById('log-msg');
+ 
+    if (!label) return showMsg(msgBox, 'error', 'Please enter a description.');
+    if (!amount || parseFloat(amount) <= 0) return showMsg(msgBox, 'error', 'Enter a valid amount.');
+ 
+    try {
+        const res = await fetch('/api/log_expense', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ label, amount: parseFloat(amount) })
+        });
+        const data = await res.json();
+ 
+        if (res.ok) {
+            showMsg(msgBox, 'success', `Logged: ${label} (RM ${parseFloat(amount).toFixed(2)})`);
+            document.getElementById('log-label').value  = '';
+            document.getElementById('log-amount').value = '';
+            // Refresh dashboard data
+            await loadDashboard();
+            await loadMeals(); // Budget may have changed
+        } else {
+            showMsg(msgBox, 'error', data.error || 'Something went wrong.');
+        }
+    } catch (e) {
+        showMsg(msgBox, 'error', 'Network error.');
+    }
+});
+ 
+// HELPERS 
+function showMsg(el, type, text) {
+    el.className = type;
+    el.textContent = text;
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => {
+        el.className = 'hidden';
+    }, 4000);
+}
+ 
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+ 
+// START 
+init();
