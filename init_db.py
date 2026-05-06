@@ -154,6 +154,8 @@ food_items = [
 ("Dry wantan noodles", "Starbees(Home Sweet Home)", 6.50, "Carbs"),
 ("Curry wantan noodles", "Starbees(Home Sweet Home)", 8.50, "Carbs"),
 ("Maggi Goreng", "Starbees(Tuas anas)", 5.00, "Carbs"),
+("Nasi Goreng Kampung", "Starbees(Tuas anas)", 6.00, "Carbs"),
+("Nasi Goreng Ikan Masin", "Starbees(Tuas anas)", 6.00, "Carbs"),
 ]
 
 cur.executemany("""
