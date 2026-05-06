@@ -148,6 +148,8 @@ food_items = [
 ("Kuey teow goreng", "Dapo Sahang", 5.00, "Carbs"),
 ("Crispy chicken chop", "Dapo Sahang", 10.00, "Protein"),
 ("Spaghetti aglio olio", "Dapo Sahang", 12.00, "Carbs"),
+("Yee mee", "Starbees(Home Sweet Home)", 6.50, "Carbs"),
+("Spiced fried chicken rice", "Starbees(Home Sweet Home)", 7.50, "Carbs"),
 
 ]
 
