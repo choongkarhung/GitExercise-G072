@@ -1,16 +1,11 @@
-// ══════════════════════════════════════
-//   BrokeBite — Dashboard JS
-// ══════════════════════════════════════
+let dashData = null;
 
-let dashData = null; // cached from /api/dashboard
-
-// ── INIT ──────────────────────────────
 async function init() {
     await loadDashboard();
     await loadMeals();
 }
 
-// ── LOAD DASHBOARD DATA ───────────────
+// LOAD DASHBOARD DATA 
 async function loadDashboard() {
     try {
         const res = await fetch('/api/dashboard');
@@ -27,7 +22,7 @@ async function loadDashboard() {
     }
 }
 
-// ENDER STAT CARDS
+// STAT CARDS
 function renderStats(d) {
     const remaining = d.remaining_balance;
     const days      = d.days_remaining;
@@ -68,3 +63,72 @@ function renderStats(d) {
             : `RM ${leftToday.toFixed(2)} left today`;
 }
  
+// PROGRESS BAR 
+function renderProgress(d) {
+    const totalSpent  = d.total_spent;
+    const startBal    = d.start_balance;
+    const remaining   = d.remaining_balance;
+    const pct         = startBal > 0 ? Math.min((totalSpent / startBal) * 100, 100) : 0;
+ 
+    document.getElementById('progress-pct').textContent    = `${Math.round(pct)}%`;
+    document.getElementById('progress-fill').style.width   = `${pct}%`;
+    document.getElementById('progress-spent-label').textContent = `RM ${totalSpent.toFixed(2)} spent`;
+    document.getElementById('progress-left-label').textContent  = `RM ${remaining.toFixed(2)} left`;
+ 
+    const fill = document.getElementById('progress-fill');
+    fill.classList.remove('warn', 'danger');
+    if (pct >= 85) fill.classList.add('danger');
+    else if (pct >= 60) fill.classList.add('warn');
+}
+ 
+// EXPENSE LIST 
+function renderExpenses(expenses) {
+    const list = document.getElementById('expense-list');
+ 
+    if (!expenses || expenses.length === 0) {
+        list.innerHTML = `<div class="expense-empty">No expenses logged yet.<br>Start tracking above! 👆</div>`;
+        return;
+    }
+ 
+    list.innerHTML = expenses.map(e => {
+        const time = new Date(e.logged_at).toLocaleTimeString('en-MY', {
+            hour: '2-digit', minute: '2-digit', hour12: true
+        });
+        return `
+        <div class="expense-item">
+            <span class="expense-item-label">${escHtml(e.label)}</span>
+            <span class="expense-item-time">${time}</span>
+            <span class="expense-item-amount">-RM ${parseFloat(e.amount).toFixed(2)}</span>
+        </div>`;
+    }).join('');
+}
+ 
+// MEAL SUGGESTIONS
+async function loadMeals() {
+    try {
+        const res = await fetch('/api/meals');
+        if (!res.ok) throw new Error('Meals load failed');
+        const meals = await res.json();
+        renderMeals(meals);
+    } catch (e) {
+        document.getElementById('meal-list').innerHTML =
+            `<div class="meal-empty">Couldn't load meals.</div>`;
+    }
+}
+ 
+function renderMeals(meals) {
+    const list = document.getElementById('meal-list');
+    if (!meals || meals.length === 0) {
+        list.innerHTML = `<div class="meal-empty">No meals fit your budget.<br>Hang tight 😬</div>`;
+        return;
+    }
+    list.innerHTML = meals.map(m => `
+        <div class="meal-item">
+            <div class="meal-item-info">
+                <div class="meal-item-name">${escHtml(m.name)}</div>
+                <div class="meal-item-stall">${escHtml(m.stall)}</div>
+            </div>
+            <span class="meal-item-price">RM ${parseFloat(m.price).toFixed(2)}</span>
+        </div>
+    `).join('');
+}
