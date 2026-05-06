@@ -150,7 +150,8 @@ food_items = [
 ("Spaghetti aglio olio", "Dapo Sahang", 12.00, "Carbs"),
 ("Yee mee", "Starbees(Home Sweet Home)", 6.50, "Carbs"),
 ("Spiced fried chicken rice", "Starbees(Home Sweet Home)", 7.50, "Carbs"),
-
+("Braised chicken rice", "Starbees(Home Sweet Home)", 7.50, "Carbs"),
+("Yee mee", "Starbees(Home Sweet Home)", 6.50, "Carbs"),
 ]
 
 cur.executemany("""
