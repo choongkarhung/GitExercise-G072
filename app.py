@@ -303,5 +303,117 @@ def setup_database():
 with app.app_context():
     setup_database()
 
+@app.route('/mealplan')
+def mealplan():
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+    return render_template('mealplan.html', username=session.get('username', ''))
+ 
+ 
+@app.route('/api/mealplan')
+def api_mealplan():
+    """
+    Returns a 3-meal plan (breakfast, lunch, dinner) for today.
+    Each meal contains at least one Carbs/Protein item + one Beverage.
+    Items are picked randomly from those fitting the per-meal budget slice.
+    The plan is seeded by today's date + user_id so it stays stable
+    within the same day but changes daily & on regenerate (uses a random salt).
+    """
+    import random
+ 
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+ 
+    user_id = session['user_id']
+    db = get_db()
+ 
+    # Get the active session
+    sess = db.execute("""
+        SELECT id, start_balance, days_total, created_at
+        FROM survival_sessions
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT 1
+    """, (user_id,)).fetchone()
+ 
+    if not sess:
+        db.close()
+        return jsonify({'error': 'No session found.'}), 404
+ 
+    session_id    = sess['id']
+    start_balance = float(sess['start_balance'])
+    days_total    = int(sess['days_total'])
+ 
+    try:
+        session_start = datetime.fromisoformat(sess['created_at']).date()
+    except Exception:
+        session_start = date.today()
+ 
+    days_elapsed   = (date.today() - session_start).days
+    days_remaining = max(days_total - days_elapsed, 0)
+ 
+    total_spent_row = db.execute("""
+        SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ?
+    """, (session_id,)).fetchone()
+    total_spent = float(total_spent_row['total'])
+ 
+    remaining_balance = start_balance - total_spent
+    daily_budget      = remaining_balance / max(days_remaining, 1)
+ 
+    # Fetch all affordable active food items
+    all_items = db.execute("""
+        SELECT name, stall, price, category
+        FROM food_items
+        WHERE is_active = 1 AND price <= ?
+        ORDER BY price ASC
+    """, (daily_budget,)).fetchall()
+    db.close()
+ 
+    items_list = [dict(i) for i in all_items]
+ 
+    # Separate by category
+    carbs_protein = [i for i in items_list if i['category'] in ('Carbs', 'Protein')]
+    beverages     = [i for i in items_list if i['category'] == 'Beverage']
+ 
+    # Budget slices (40% breakfast, 35% lunch, 25% dinner)
+    slices = [0.33, 0.34, 0.33]
+ 
+    meal_labels = ['Breakfast', 'Lunch', 'Dinner']
+    meals_out   = []
+ 
+    rng = random.Random()  # fresh random each call = regenerate works
+ 
+    for i, (label, pct) in enumerate(zip(meal_labels, slices)):
+        budget_slice = daily_budget * pct
+ 
+        # Pick affordable carbs/protein
+        affordable_cp  = [x for x in carbs_protein if x['price'] <= budget_slice * 0.80]
+        affordable_bev = [x for x in beverages     if x['price'] <= budget_slice * 0.40]
+ 
+        if not affordable_cp:
+            affordable_cp = sorted(carbs_protein, key=lambda x: x['price'])[:1]
+        if not affordable_bev:
+            affordable_bev = sorted(beverages, key=lambda x: x['price'])[:1]
+ 
+        main = rng.choice(affordable_cp) if affordable_cp else None
+        bev  = rng.choice(affordable_bev) if affordable_bev else None
+ 
+        items_chosen = []
+        if main: items_chosen.append(main)
+        if bev:  items_chosen.append(bev)
+ 
+        total = sum(x['price'] for x in items_chosen)
+ 
+        meals_out.append({
+            'label': label,
+            'items': items_chosen,
+            'total': round(total, 2),
+        })
+ 
+    return jsonify({
+        'daily_budget': round(daily_budget, 2),
+        'meals': meals_out,
+    })
+
 if __name__ == "__main__":
     app.run(debug=True)
