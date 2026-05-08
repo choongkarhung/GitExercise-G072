@@ -111,3 +111,59 @@
 .ribbon-badge.ok     { background: var(--green-light);  color: var(--green);    border: 1px solid var(--green-border); }
 .ribbon-badge.warn   { background: var(--yellow-bg);    color: #7a6e50;         border: 1px solid var(--yellow-border); }
 .ribbon-badge.danger { background: var(--red-bg);       color: var(--red-text); border: 1px solid var(--red-border); }
+
+/* MEAL CARDS ROW */
+.meals-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    min-height: 360px;
+}
+
+/* LOADING */
+.mp-loading {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+    padding: 60px 0;
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--cream-border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* MEAL CARD */
+.meal-card {
+    background: var(--surface);
+    border: 1px solid var(--cream-border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    animation: card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.meal-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 28px rgba(0,0,0,0.1);
+}
+
+.meal-card:nth-child(1) { animation-delay: 0.05s; }
+.meal-card:nth-child(2) { animation-delay: 0.10s; }
+.meal-card:nth-child(3) { animation-delay: 0.15s; }
