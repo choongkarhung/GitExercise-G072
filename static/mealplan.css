@@ -48,3 +48,66 @@
 .btn-regenerate:hover .regen-icon {
     transform: rotate(180deg);
 }
+
+/* BUDGET RIBBON */
+.budget-ribbon {
+    background: var(--surface);
+    border: 1px solid var(--cream-border);
+    border-radius: 16px;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.ribbon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 28px;
+    flex: 1;
+    min-width: 100px;
+}
+
+.ribbon-item:first-child { padding-left: 0; }
+.ribbon-item:last-child  { padding-right: 0; }
+
+.ribbon-divider {
+    width: 1px;
+    height: 36px;
+    background: var(--cream-border);
+    flex-shrink: 0;
+}
+
+.ribbon-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+}
+
+.ribbon-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+}
+
+.ribbon-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 3px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.ribbon-badge.ok     { background: var(--green-light);  color: var(--green);    border: 1px solid var(--green-border); }
+.ribbon-badge.warn   { background: var(--yellow-bg);    color: #7a6e50;         border: 1px solid var(--yellow-border); }
+.ribbon-badge.danger { background: var(--red-bg);       color: var(--red-text); border: 1px solid var(--red-border); }
