@@ -21,8 +21,14 @@
     <!-- NAVBAR -->
     <nav class="navbar">
         <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
-        <span class="user-greeting">Hey, {{ username }}! 👋</span>
-        <button class="logout-btn" id="logout-btn">Logout</button>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="/mealplan" class="nav-link nav-link-active">🍽️ Meal Plan</a>
+        </div>
+        <div class="nav-right">
+            <span class="user-greeting">Hey, {{ username }}! 👋</span>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
     </nav>
 
     <!-- MAIN DASHBOARD -->
