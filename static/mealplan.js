@@ -130,3 +130,102 @@ function renderMeals(meals) {
         card.querySelector(`#log-meal-${idx}`).addEventListener('click', () => logMeal(idx));
     });
 }
+
+// LOG A SINGLE MEAL 
+async function logMeal(idx) {
+    if (loggedMeals.has(idx)) return;
+
+    const meal  = planData.meals[idx];
+    const meta  = MEAL_META[idx];
+    const items = meal.items;
+    const total = items.reduce((s, i) => s + i.price, 0);
+
+    // Build a combined label
+    const label = `[${meta.label}] ${items.map(i => i.name).join(' + ')}`;
+
+    try {
+        const res = await fetch('/api/log_expense', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)) })
+        });
+
+        if (res.ok) {
+            loggedMeals.add(idx);
+            const btn = document.getElementById(`log-meal-${idx}`);
+            btn.textContent = '✅ Logged!';
+            btn.classList.add('logged');
+            btn.disabled = true;
+        } else {
+            const data = await res.json();
+            alert(data.error || 'Failed to log meal.');
+        }
+    } catch (e) {
+        alert('Network error. Please try again.');
+    }
+}
+
+// LOG ALL MEALS 
+document.getElementById('log-all-btn').addEventListener('click', async () => {
+    const msgBox = document.getElementById('log-all-msg');
+    const btn    = document.getElementById('log-all-btn');
+    btn.disabled = true;
+    btn.textContent = 'Logging...';
+
+    try {
+        let successCount = 0;
+        for (let idx = 0; idx < planData.meals.length; idx++) {
+            if (loggedMeals.has(idx)) { successCount++; continue; }
+
+            const meal  = planData.meals[idx];
+            const meta  = MEAL_META[idx];
+            const total = meal.items.reduce((s, i) => s + i.price, 0);
+            const label = `[${meta.label}] ${meal.items.map(i => i.name).join(' + ')}`;
+
+            const res = await fetch('/api/log_expense', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)) })
+            });
+
+            if (res.ok) {
+                loggedMeals.add(idx);
+                const logBtn = document.getElementById(`log-meal-${idx}`);
+                if (logBtn) {
+                    logBtn.textContent = '✅ Logged!';
+                    logBtn.classList.add('logged');
+                    logBtn.disabled = true;
+                }
+                successCount++;
+            }
+        }
+
+        const grandTotal = planData.meals.reduce((s, m) =>
+            s + m.items.reduce((ms, i) => ms + i.price, 0), 0);
+
+        msgBox.className = 'success';
+        msgBox.textContent =
+            `✅ ${successCount} meals logged! RM ${grandTotal.toFixed(2)} added to your dashboard.`;
+        btn.textContent = '✅ All Logged!';
+
+    } catch (e) {
+        msgBox.className = 'error';
+        msgBox.textContent = 'Something went wrong. Please try again.';
+        btn.disabled = false;
+        btn.textContent = '✅ Log All Meals to Dashboard';
+    }
+});
+
+// REGENERATE 
+document.getElementById('regen-btn').addEventListener('click', generatePlan);
+
+// HELPERS 
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+init();
