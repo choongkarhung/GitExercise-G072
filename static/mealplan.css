@@ -304,3 +304,140 @@
     white-space: nowrap;
     flex-shrink: 0;
 }
+
+/* MEAL CARD FOOTER */
+.meal-card-footer {
+    padding: 12px 20px 16px;
+    border-top: 1px solid var(--cream-strong);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.meal-total-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.meal-total-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--ink);
+}
+
+/* Individual log buttons */
+.btn-log-meal {
+    width: auto;
+    padding: 7px 14px;
+    margin-top: 0;
+    background: transparent;
+    border: 1.5px solid var(--green-border);
+    color: var(--green);
+    font-size: 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    border-radius: 8px;
+    letter-spacing: 0;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.btn-log-meal:hover {
+    background: var(--green-light);
+    border-color: var(--green);
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-log-meal.logged {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green);
+    cursor: default;
+    opacity: 0.7;
+}
+
+/* LOG ALL SECTION */
+.log-all-section {
+    background: var(--surface);
+    border: 1.5px solid var(--green-border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(45, 122, 87, 0.08);
+}
+
+.log-all-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.log-all-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 2px;
+    text-align: left;
+}
+
+.log-all-sub {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    text-align: left;
+}
+
+.btn-log-all {
+    width: auto;
+    margin-top: 0;
+    padding: 12px 28px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-log-all:hover {
+    background: var(--green-mid);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(45, 122, 87, 0.3);
+}
+
+.btn-log-all:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+#log-all-msg {
+    margin-top: 12px;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+}
+
+#log-all-msg.success {
+    display: block;
+    background: var(--green-light);
+    color: var(--green);
+    border: 1px solid var(--green-border);
+}
+
+#log-all-msg.error {
+    display: block;
+    background: var(--red-bg);
+    color: var(--red-text);
+    border: 1px solid var(--red-border);
+}
