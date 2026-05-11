@@ -6,6 +6,7 @@
     <title>Dashboard - BrokeBite</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dashboard-body">
 
@@ -18,17 +19,14 @@
     </div>
     <div class="grid-overlay"></div>
 
-    <!-- NAVBAR -->
     <nav class="navbar">
         <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
         <span class="user-greeting">Hey, {{ username }}! 👋</span>
         <button class="logout-btn" id="logout-btn">Logout</button>
     </nav>
 
-    <!-- MAIN DASHBOARD -->
     <div class="dashboard-wrapper">
 
-        <!-- ── HEADER ROW ── -->
         <div class="dash-header">
             <div>
                 <span class="pill-tag">Survival Mode</span>
@@ -38,7 +36,6 @@
             <button class="btn-new-session" id="new-session-btn">+ New Session</button>
         </div>
 
-        <!-- ── STAT CARDS ROW ── -->
         <div class="stats-row">
             <div class="stat-card stat-balance">
                 <div class="stat-icon">💰</div>
@@ -66,7 +63,6 @@
             </div>
         </div>
 
-        <!-- ── PROGRESS BAR ── -->
         <div class="progress-section">
             <div class="progress-header">
                 <span class="progress-label">Budget Used</span>
@@ -81,10 +77,18 @@
             </div>
         </div>
 
-        <!-- ── BOTTOM ROW ── -->
+        <div class="panel chart-panel" style="margin-bottom: 24px; padding: 25px;">
+            <div class="panel-header">
+                <h3>Spending Analysis 📊</h3>
+                <span class="panel-sub">Visual breakdown of your categories</span>
+            </div>
+            <div style="max-height: 250px; display: flex; justify-content: center; margin-top: 15px;">
+                <canvas id="survivalChart"></canvas>
+            </div>
+        </div>
+
         <div class="bottom-row">
 
-            <!-- LOG EXPENSE -->
             <div class="panel log-panel">
                 <div class="panel-header">
                     <h3>Log Expense</h3>
@@ -103,7 +107,6 @@
                 </div>
             </div>
 
-            <!-- RECENT EXPENSES -->
             <div class="panel expense-panel">
                 <div class="panel-header">
                     <h3>Recent Expenses</h3>
@@ -114,7 +117,6 @@
                 </div>
             </div>
 
-            <!-- MEAL SUGGESTIONS -->
             <div class="panel meal-panel">
                 <div class="panel-header">
                     <h3>Meal Ideas 🍜</h3>
@@ -131,6 +133,7 @@
 
     <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
     <script>
+      
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await fetch('/logout', { method: 'POST' });
             window.location.href = '/';
@@ -138,7 +141,31 @@
         document.getElementById('new-session-btn').addEventListener('click', () => {
             window.location.href = '/setup';
         });
-    </script>
 
+       
+        const ctx = document.getElementById('survivalChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Food', 'Transport', 'Study', 'Extra'],
+                datasets: [{
+                    data: [40, 20, 25, 15],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                    hoverOffset: 15,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#64748b', padding: 20 }
+                    }
+                },
+                cutout: '75%'
+            }
+        });
+    </script>
 </body>
 </html>
