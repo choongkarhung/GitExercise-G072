@@ -1,4 +1,3 @@
-brokebite.db
 __pycache__/
 *.pyc
 *.pyo
@@ -6,4 +5,4 @@ __pycache__/
 venv/
 env/
 .vscode/
-Thumbs.db
+brokebite.db

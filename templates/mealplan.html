@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Plan - BrokeBite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mealplan.css') }}">
+</head>
+<body class="dashboard-body">
+
+    <div class="blob-canvas">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="/mealplan" class="nav-link nav-link-active">🍽️ Meal Plan</a>
+        </div>
+        <div class="nav-right">
+            <span class="user-greeting">Hey, {{ username }}! 👋</span>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="mealplan-wrapper">
+
+        <!-- HEADER -->
+        <div class="mp-header">
+            <div>
+                <span class="pill-tag">Daily Meal Plan</span>
+                <h2 class="dash-title">What should I eat today? 🍜</h2>
+                <p class="dash-sub">We'll build you a breakfast, lunch and dinner that fits your daily budget.</p>
+            </div>
+            <button class="btn-regenerate" id="regen-btn">
+                <span class="regen-icon">🎲</span> Regenerate Plan
+            </button>
+        </div>
+
+        <!-- BUDGET BAR -->
+        <div class="budget-ribbon" id="budget-ribbon">
+            <div class="ribbon-item">
+                <span class="ribbon-label">Daily Budget</span>
+                <span class="ribbon-val" id="rb-budget">RM —</span>
+            </div>
+            <div class="ribbon-divider"></div>
+            <div class="ribbon-item">
+                <span class="ribbon-label">Plan Cost</span>
+                <span class="ribbon-val" id="rb-cost">RM —</span>
+            </div>
+            <div class="ribbon-divider"></div>
+            <div class="ribbon-item">
+                <span class="ribbon-label">You'll Save</span>
+                <span class="ribbon-val" id="rb-save">RM —</span>
+            </div>
+            <div class="ribbon-divider"></div>
+            <div class="ribbon-item">
+                <span class="ribbon-label">Status</span>
+                <span class="ribbon-badge" id="rb-status">—</span>
+            </div>
+        </div>
+
+        <!-- MEAL CARDS ROW -->
+        <div class="meals-row" id="meals-row">
+            <!-- JS renders meal cards here -->
+            <div class="mp-loading" id="mp-loading">
+                <div class="loading-spinner"></div>
+                <p>Calculating your meals...</p>
+            </div>
+        </div>
+
+        <!-- LOG ALL BUTTON -->
+        <div class="log-all-section" id="log-all-section" style="display:none;">
+            <div class="log-all-inner">
+                <div>
+                    <p class="log-all-title">Happy with this plan?</p>
+                    <p class="log-all-sub">Log all 3 meals as today's expenses with one tap.</p>
+                </div>
+                <button class="btn-log-all" id="log-all-btn">
+                    ✅ Log All Meals 
+                </button>
+            </div>
+            <div id="log-all-msg" class="hidden"></div>
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='mealplan.js') }}"></script>
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>
