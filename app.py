@@ -111,7 +111,7 @@ def setup_post():
     db.close()
     return jsonify({'message': 'Session created.'}), 200
 
-# DASHBOARD DATA 
+# DASHBOARD DATA (UPDATED WITH NUTRITION ANALYSIS)
 
 @app.route('/api/dashboard')
 def api_dashboard():
@@ -136,15 +136,13 @@ def api_dashboard():
     session_id   = sess['id']
     start_balance = float(sess['start_balance'])
     days_total   = int(sess['days_total'])
-    created_at   = sess['created_at']  # ISO string
+    created_at   = sess['created_at']
 
-    # Parse session start date
     try:
         session_start = datetime.fromisoformat(created_at).date()
     except Exception:
         session_start = date.today()
 
-    # Days elapsed since session start
     days_elapsed = (date.today() - session_start).days
     days_remaining = max(days_total - days_elapsed, 0)
 
@@ -157,7 +155,7 @@ def api_dashboard():
     total_spent = float(total_spent_row['total'])
 
     # Spent today only
-    today_str = date.today().isoformat()  # "YYYY-MM-DD"
+    today_str = date.today().isoformat()
     spent_today_row = db.execute("""
         SELECT COALESCE(SUM(amount), 0) as total
         FROM expense_logs
@@ -166,14 +164,20 @@ def api_dashboard():
     """, (session_id, today_str + '%')).fetchone()
     spent_today = float(spent_today_row['total'])
 
-    remaining_balance = start_balance - total_spent
+    # --- CALCULATE REAL NUTRITION DATABASE NUMBERS ---
+    # Sums up expense values dynamically filtering by category matched rules
+    carbs_row = db.execute("SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ? AND category = 'Carbs'", (session_id,)).fetchone()
+    protein_row = db.execute("SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ? AND category = 'Protein'", (session_id,)).fetchone()
+    vitamin_row = db.execute("SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ? AND category = 'Vitamin'", (session_id,)).fetchone()
+    fat_row = db.execute("SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ? AND category = 'Fat'", (session_id,)).fetchone()
+    beverage_row = db.execute("SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ? AND category = 'Beverages'", (session_id,)).fetchone()
 
-    # Daily budget = remaining balance / remaining days (fallback to 1 day)
+    remaining_balance = start_balance - total_spent
     daily_budget = remaining_balance / max(days_remaining, 1)
 
     # Today's expenses (last 20, most recent first)
     expenses_today = db.execute("""
-        SELECT label, amount, logged_at
+        SELECT label, amount, logged_at, COALESCE(category, 'Carbs') as category
         FROM expense_logs
         WHERE session_id = ?
         AND logged_at LIKE ?
@@ -194,6 +198,13 @@ def api_dashboard():
         'remaining_balance': round(remaining_balance, 2),
         'daily_budget':      round(daily_budget, 2),
         'expenses_today':    [dict(e) for e in expenses_today],
+        
+        # Injected nutrition fields passed directly into the JS Chart engine
+        'carbs_total':       float(carbs_row['total']),
+        'protein_total':     float(protein_row['total']),
+        'vitamin_total':     float(vitamin_row['total']),
+        'fat_total':         float(fat_row['total']),
+        'beverage_total':    float(beverage_row['total'])
     })
 
 # LOG EXPENSE 
@@ -206,6 +217,7 @@ def api_log_expense():
     data   = request.get_json()
     label  = data.get('label', '').strip()
     amount = data.get('amount')
+    category = data.get('category', 'Carbs').strip() # Default fallback to Carbs
 
     if not label:
         return jsonify({'error': 'Description is required.'}), 400
@@ -214,7 +226,6 @@ def api_log_expense():
 
     db = get_db()
 
-    # Get the latest session for this user
     sess = db.execute("""
         SELECT id FROM survival_sessions
         WHERE user_id = ?
@@ -228,9 +239,9 @@ def api_log_expense():
 
     try:
         db.execute("""
-            INSERT INTO expense_logs (session_id, amount, label, logged_at)
-            VALUES (?, ?, ?, ?)
-        """, (sess['id'], float(amount), label, datetime.now().isoformat()))
+            INSERT INTO expense_logs (session_id, amount, label, category, logged_at)
+            VALUES (?, ?, ?, ?, ?)
+        """, (sess['id'], float(amount), label, category, datetime.now().isoformat()))
         db.commit()
     except Exception as e:
         db.close()
@@ -249,11 +260,9 @@ def api_meals():
     user_id = session['user_id']
     db = get_db()
 
-    # Get remaining balance and days to compute daily budget
     sess = db.execute("""
         SELECT id, start_balance, days_total, created_at FROM survival_sessions
         WHERE user_id = ?
-                      
         ORDER BY created_at DESC
         LIMIT 1
     """, (user_id,)).fetchone()
@@ -282,8 +291,6 @@ def api_meals():
     remaining_balance = start_balance - total_spent
     daily_budget      = remaining_balance / max(days_remaining, 1)
 
-    # Recommend meals that fits the daily budget
-    # Prioritise cheap and varied categories
     meals = db.execute("""
         SELECT name, stall, price, category
         FROM food_items
@@ -309,16 +316,8 @@ def mealplan():
         return redirect(url_for('home'))
     return render_template('mealplan.html', username=session.get('username', ''))
  
- 
 @app.route('/api/mealplan')
 def api_mealplan():
-    """
-    Returns a 3-meal plan (breakfast, lunch, dinner) for today.
-    Each meal contains at least one Carbs/Protein item + one Beverage.
-    Items are picked randomly from those fitting the per-meal budget slice.
-    The plan is seeded by today's date + user_id so it stays stable
-    within the same day but changes daily & on regenerate (uses a random salt).
-    """
     import random
  
     if 'user_id' not in session:
@@ -327,7 +326,6 @@ def api_mealplan():
     user_id = session['user_id']
     db = get_db()
  
-    # Get the active session
     sess = db.execute("""
         SELECT id, start_balance, days_total, created_at
         FROM survival_sessions
@@ -360,7 +358,6 @@ def api_mealplan():
     remaining_balance = start_balance - total_spent
     daily_budget      = remaining_balance / max(days_remaining, 1)
  
-    # Fetch all affordable active food items
     all_items = db.execute("""
         SELECT name, stall, price, category
         FROM food_items
@@ -371,22 +368,19 @@ def api_mealplan():
  
     items_list = [dict(i) for i in all_items]
  
-    # Separate by category
     carbs_protein = [i for i in items_list if i['category'] in ('Carbs', 'Protein')]
     beverages     = [i for i in items_list if i['category'] == 'Beverage']
  
-    # Budget slices (40% breakfast, 35% lunch, 25% dinner)
     slices = [0.33, 0.34, 0.33]
  
     meal_labels = ['Breakfast', 'Lunch', 'Dinner']
     meals_out   = []
  
-    rng = random.Random()  # fresh random each call = regenerate works
+    rng = random.Random()
  
     for i, (label, pct) in enumerate(zip(meal_labels, slices)):
         budget_slice = daily_budget * pct
  
-        # Pick affordable carbs/protein
         affordable_cp  = [x for x in carbs_protein if x['price'] <= budget_slice * 0.80]
         affordable_bev = [x for x in beverages     if x['price'] <= budget_slice * 0.40]
  

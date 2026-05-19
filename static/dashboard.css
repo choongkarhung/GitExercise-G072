@@ -183,6 +183,37 @@
     color: var(--ink-muted);
 }
 
+/* NUTRITION ANALYSIS CHART CONTAINER */
+.chart-panel {
+    grid-column: 1 / -1; 
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background: var(--surface);
+}
+
+.chart-container {
+    width: 100%;
+    height: 240px; 
+    position: relative;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#survivalChart {
+    display: block;
+    max-height: 240px !important;
+    width: 100% !important;
+}
+
+.chart-panel .panel-sub {
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 /* BOTTOM ROW */
 .bottom-row {
     display: grid;
@@ -350,8 +381,7 @@
 .meal-item:hover {
     background: #ddf0e6;
 }
- 
-.meal-item-info {
+ .meal-item-info {
     text-align: left;
     flex: 1;
     overflow: hidden;
@@ -460,31 +490,7 @@
     .stat-value {
         font-size: 1.3rem;
     }
-   
-.chart-panel {
-    grid-column: 1 / -1; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: var(--surface);
-}
-
-.chart-container {
-    width: 100%;
-    height: 240px; 
-    position: relative;
-    margin-top: 10px;
-}
-
-.chart-panel .panel-sub {
-    font-family: 'DM Mono', monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-@media (max-width: 500px) {
     .chart-container {
         height: 200px;
     }
-}
 }

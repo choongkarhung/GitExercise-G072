@@ -3,7 +3,6 @@ import sqlite3
 conn = sqlite3.connect("brokebite.db")
 cur = conn.cursor()
 
-
 # 1. Users table 
 cur.execute("""
 CREATE TABLE IF NOT EXISTS users (
@@ -14,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 
-# Food items table 
+# 2. Food items table 
 cur.execute("""
 CREATE TABLE IF NOT EXISTS food_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,6 +25,7 @@ CREATE TABLE IF NOT EXISTS food_items (
 )
 """)
 
+# 3. Survival sessions table
 cur.execute("""
 CREATE TABLE IF NOT EXISTS survival_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,13 +37,14 @@ CREATE TABLE IF NOT EXISTS survival_sessions (
 )
 """)
 
-# Expense logs table
+# 4. Expense logs table (UPDATED WITH CATEGORY COLUMN)
 cur.execute("""
 CREATE TABLE IF NOT EXISTS expense_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id INTEGER NOT NULL,
     amount REAL NOT NULL,
     label TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'Carbs',
     logged_at TEXT NOT NULL,
     FOREIGN KEY (session_id) REFERENCES survival_sessions(id)
 )
@@ -157,17 +158,8 @@ food_items = [
     ("Nasi Goreng Kampung", "Starbees(Tuas anas)", 6.00, "Carbs"),
     ("Nasi Goreng Ikan Masin", "Starbees(Tuas anas)", 6.00, "Carbs"),
     ("Nasi Goreng Tomyam", "Starbees(Tuas anas)", 8.00, "Carbs"),
-    ("Nothing", "How Poor Are You? Even BrokeBite can't save your miserable life.", 0.01, "Carbs"),
-    ("Nothing", "How Poor Are You? Even BrokeBite can't save your miserable life.", 0.01, "Carbs"),
-    ("Nothing", "How Poor Are You? Even BrokeBite can't save your miserable life.", 0.01, "Carbs"),
+    ("Nothing", "How Poor Are You? Even BrokeBite can't save your miserable life.", 0.01, "Carbs")
 ]
-
-query = """
-    SELECT * FROM food_items 
-    WHERE price <= ? AND is_active = 1 
-    ORDER BY price DESC 
-    LIMIT 5
-"""
 
 cur.executemany("""
 INSERT OR REPLACE INTO food_items (name, stall, price, category)
