@@ -1,0 +1,65 @@
+/* ── CALORIE PAGE LAYOUT ── */
+.calorie-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+ 
+/* HEADER */
+.cal-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+ 
+/* TWO-COLUMN LAYOUT */
+.cal-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+ 
+/* ── PANELS ── */
+.cal-form-panel,
+.cal-results-panel {
+    background: var(--surface);
+    border: 1px solid var(--cream-border);
+    border-radius: 18px;
+    padding: 26px 26px 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
+}
+ 
+/* ── FORM ── */
+.cal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+ 
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+ 
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+ 
+.form-group label {
+    margin: 0;
+}
+ 
+.form-hint {
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    margin-top: 2px;
+}
