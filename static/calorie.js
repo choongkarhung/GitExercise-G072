@@ -43,3 +43,61 @@ async function loadSavedProfile() {
         // Silently ignore — no saved profile is fine
     }
 }
+
+// ── GENDER TOGGLE ──
+document.querySelectorAll('.gender-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedGender = btn.dataset.gender;
+    });
+});
+ 
+// ── ACTIVITY SELECTOR ──
+document.querySelectorAll('.activity-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+        document.querySelectorAll('.activity-opt').forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selectedActivity = parseFloat(opt.dataset.val);
+    });
+});
+ 
+// ── SPEED SELECTOR ──
+document.querySelectorAll('.speed-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+        document.querySelectorAll('.speed-opt').forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selectedSpeed = parseInt(opt.dataset.kcal);
+    });
+});
+ 
+// ── CALCULATE BUTTON ──
+document.getElementById('cal-btn').addEventListener('click', calculate);
+ 
+function calculate() {
+    const age        = parseInt(document.getElementById('cal-age').value);
+    const height     = parseFloat(document.getElementById('cal-height').value);
+    const weight     = parseFloat(document.getElementById('cal-weight').value);
+    const goalWeight = parseFloat(document.getElementById('cal-goal-weight').value);
+ 
+    if (!age || age < 10 || age > 100)
+        return showCalMsg('error', 'Please enter a valid age (10–100).');
+    if (!height || height < 100 || height > 250)
+        return showCalMsg('error', 'Please enter a valid height (100–250 cm).');
+    if (!weight || weight < 30 || weight > 300)
+        return showCalMsg('error', 'Please enter a valid weight (30–300 kg).');
+    if (!goalWeight || goalWeight < 30 || goalWeight > 300)
+        return showCalMsg('error', 'Please enter a valid goal weight.');
+ 
+    document.getElementById('cal-msg').className = 'hidden';
+    calculateFromValues(age, height, weight, goalWeight);
+}
+ 
+function calculateFromValues(age, height, weight, goalWeight) {
+    // ── BMR (Mifflin-St Jeor) ──
+    let bmr;
+    if (selectedGender === 'male') {
+        bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+    } else {
+        bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+    }
