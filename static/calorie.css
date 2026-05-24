@@ -63,3 +63,115 @@
     color: var(--ink-faint);
     margin-top: 2px;
 }
+
+/* suffix-style inputs */
+.input-suffix {
+    padding-left: 42px !important;
+}
+ 
+/* GENDER TOGGLE */
+.gender-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 2px;
+}
+ 
+.gender-btn {
+    width: 100%;
+    margin-top: 0;
+    padding: 10px 0;
+    background: var(--cream-mid);
+    color: var(--ink-soft);
+    border: 1.5px solid var(--cream-border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    letter-spacing: 0;
+}
+ 
+.gender-btn:hover {
+    background: var(--green-light);
+    border-color: var(--green-border);
+    color: var(--green);
+    transform: none;
+    box-shadow: none;
+}
+ 
+.gender-btn.active {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green);
+    font-weight: 600;
+    transform: none;
+    box-shadow: none;
+}
+ 
+/* ACTIVITY OPTIONS */
+.activity-options {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 2px;
+}
+ 
+.activity-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--cream-mid);
+    border: 1.5px solid var(--cream-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+ 
+.activity-opt:hover {
+    background: var(--green-light);
+    border-color: var(--green-border);
+}
+ 
+.activity-opt.active {
+    background: var(--green-light);
+    border-color: var(--green);
+}
+ 
+.act-icon {
+    font-size: 1.2rem;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+ 
+.act-text {
+    flex: 1;
+}
+ 
+.act-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+ 
+.act-sub {
+    font-size: 0.68rem;
+    color: var(--ink-muted);
+}
+ 
+.act-mult {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--ink-faint);
+    background: var(--cream-strong);
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+ 
+.activity-opt.active .act-mult {
+    background: var(--green-border);
+    color: var(--green);
+}
