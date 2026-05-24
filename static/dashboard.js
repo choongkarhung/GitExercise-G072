@@ -3,7 +3,7 @@ let dashData = null;
 async function init() {
     await loadDashboard();
     await loadMeals();
-    await loadCalorieWidget();   // NEW — load calorie data from saved profile
+    await loadCalorieWidget();  
 }
 
 // LOAD DASHBOARD DATA
@@ -146,7 +146,7 @@ function renderMeals(meals) {
     }).join('');
 }
 
-// ── CALORIE WIDGET (NEW) ─────────────────────────────────────────────────────
+// CALORIE WIDGET 
 async function loadCalorieWidget() {
     try {
         const res = await fetch('/api/calorie_today');

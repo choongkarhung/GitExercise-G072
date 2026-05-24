@@ -1,10 +1,10 @@
-// ── STATE ──
+// STATE 
 let selectedGender   = 'male';
 let selectedActivity = 1.2;
 let selectedSpeed    = 250;
 let lastResult       = null;   // holds the last calculated result for saving
 
-// ── ON LOAD: restore saved profile if it exists ──
+// restore saved profile if it exists 
 async function loadSavedProfile() {
     try {
         const res = await fetch('/api/calorie_profile');
@@ -40,11 +40,11 @@ async function loadSavedProfile() {
  
         showSaveBadge('✅ Profile loaded from last session');
     } catch (e) {
-        // Silently ignore — no saved profile is fine
+        // no saved profile is fine
     }
 }
 
-// ── GENDER TOGGLE ──
+// GENDER TOGGLE 
 document.querySelectorAll('.gender-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
@@ -53,7 +53,7 @@ document.querySelectorAll('.gender-btn').forEach(btn => {
     });
 });
  
-// ── ACTIVITY SELECTOR ──
+// ACTIVITY SELECTOR 
 document.querySelectorAll('.activity-opt').forEach(opt => {
     opt.addEventListener('click', () => {
         document.querySelectorAll('.activity-opt').forEach(o => o.classList.remove('active'));
@@ -62,7 +62,7 @@ document.querySelectorAll('.activity-opt').forEach(opt => {
     });
 });
  
-// ── SPEED SELECTOR ──
+//  SPEED SELECTOR 
 document.querySelectorAll('.speed-opt').forEach(opt => {
     opt.addEventListener('click', () => {
         document.querySelectorAll('.speed-opt').forEach(o => o.classList.remove('active'));
@@ -71,7 +71,7 @@ document.querySelectorAll('.speed-opt').forEach(opt => {
     });
 });
  
-// ── CALCULATE BUTTON ──
+// CALCULATE BUTTON 
 document.getElementById('cal-btn').addEventListener('click', calculate);
  
 function calculate() {
@@ -94,7 +94,7 @@ function calculate() {
 }
  
 function calculateFromValues(age, height, weight, goalWeight) {
-    // ── BMR (Mifflin-St Jeor) ──
+    // BMR (Mifflin-St Jeor) 
     let bmr;
     if (selectedGender === 'male') {
         bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
@@ -102,7 +102,7 @@ function calculateFromValues(age, height, weight, goalWeight) {
         bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
     }
 
-       // ── TDEE ──
+       // TDEE 
     const tdee = bmr * selectedActivity;
  
     // ── Goal direction ──
@@ -123,16 +123,16 @@ function calculateFromValues(age, height, weight, goalWeight) {
  
     const targetCalories = Math.round(tdee + adjustment);
  
-    // ── BMI ──
+    // BMI 
     const heightM = height / 100;
     const bmi     = weight / (heightM * heightM);
  
-    // ── Macros (30/40/30) ──
+    //  Macros (30/40/30) 
     const proteinG = Math.round((targetCalories * 0.30) / 4);
     const carbsG   = Math.round((targetCalories * 0.40) / 4);
     const fatG     = Math.round((targetCalories * 0.30) / 9);
  
-    // ── Timeline ──
+    //  Timeline 
     let timelineStr = 'Already at your goal! 🎉';
     if (Math.abs(weightDiff) >= 0.5 && selectedSpeed > 0) {
         const kgPerWeek   = selectedSpeed / 7700 * 7;
@@ -238,7 +238,7 @@ function renderResults(d) {
     document.getElementById('save-profile-btn').style.display = 'flex';
 }
  
-// ── SAVE PROFILE ──
+// SAVE PROFILE 
 document.getElementById('save-profile-btn').addEventListener('click', async () => {
     if (!lastResult) return;
  
@@ -273,7 +273,7 @@ document.getElementById('save-profile-btn').addEventListener('click', async () =
     }
 });
  
-// ── HELPERS ──
+// HELPERS
 function showCalMsg(type, text) {
     const el = document.getElementById('cal-msg');
     el.className   = type;

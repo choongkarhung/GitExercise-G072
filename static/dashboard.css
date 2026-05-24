@@ -183,7 +183,7 @@
     color: var(--ink-muted);
 }
 
-/* ── CALORIE WIDGET (NEW) ─────────────────────────────────────────────────── */
+/*  CALORIE WIDGET  */
 .calorie-widget {
     background: var(--surface);
     border: 1.5px solid #f0e8d0;
@@ -389,8 +389,6 @@
 
 .cta-btn:hover { background: #e8b030; }
 
-/* ── END CALORIE WIDGET ───────────────────────────────────────────────────── */
-
 /* BOTTOM ROW */
 .bottom-row {
     display: grid;
@@ -486,8 +484,6 @@
     gap: 10px;
     animation: msg-in 0.2s ease both;
 }
-
-/* NEW: left column in expense item */
 .expense-item-left {
     display: flex;
     flex-direction: column;
@@ -519,7 +515,6 @@
     white-space: nowrap;
 }
 
-/* NEW: calorie badge on expense items */
 .cal-badge {
     font-family: 'DM Mono', monospace;
     font-size: 0.58rem;
@@ -600,7 +595,6 @@
     color: var(--ink-muted);
 }
 
-/* NEW: right column in meal item (price + calories) */
 .meal-item-right {
     display: flex;
     flex-direction: column;
