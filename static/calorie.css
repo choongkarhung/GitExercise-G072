@@ -532,3 +532,108 @@
     font-weight: 700;
     color: var(--ink);
 }
+
+/* MACROS */
+.macro-section {
+    background: var(--cream-mid);
+    border: 1px solid var(--cream-border);
+    border-radius: 14px;
+    padding: 16px 18px;
+}
+ 
+.macro-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+}
+ 
+.macro-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+ 
+.macro-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--cream-border);
+    background: var(--surface);
+    text-align: center;
+}
+ 
+.macro-protein { border-top: 3px solid #e87878; }
+.macro-carbs   { border-top: 3px solid #e8c050; }
+.macro-fat     { border-top: 3px solid #78b87a; }
+ 
+.macro-icon { font-size: 1.1rem; }
+ 
+.macro-label {
+    font-size: 0.68rem;
+    color: var(--ink-muted);
+    font-weight: 500;
+}
+ 
+.macro-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--ink);
+}
+ 
+.macro-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--ink-faint);
+}
+ 
+/* SAVE PROFILE BUTTON */
+.btn-save-profile {
+    width: 100%;
+    padding: 11px;
+    margin-top: 0;
+    background: transparent;
+    border: 1.5px solid var(--green-border);
+    color: var(--green);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    letter-spacing: 0;
+}
+ 
+.btn-save-profile:hover {
+    background: var(--green-light);
+    border-color: var(--green);
+    transform: none;
+    box-shadow: none;
+}
+ 
+.btn-save-profile:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+ 
+.save-badge {
+    background: var(--green-light);
+    color: var(--green);
+    border: 1px solid var(--green-border);
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-align: left;
+    animation: msg-in 0.25s ease both;
+}
