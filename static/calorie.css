@@ -637,3 +637,69 @@
     text-align: left;
     animation: msg-in 0.25s ease both;
 }
+
+/* NAV LINKS (same as mealplan.css pattern) */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+ 
+.nav-link {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+ 
+.nav-link:hover {
+    background: var(--cream-mid);
+    color: var(--ink);
+    border-color: var(--cream-border);
+}
+ 
+.nav-link-active {
+    background: var(--green-light);
+    color: var(--green);
+    border-color: var(--green-border);
+    font-weight: 600;
+}
+ 
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+ 
+/* MESSAGE BOX */
+#cal-msg {
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    margin-bottom: 4px;
+}
+ 
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .cal-layout {
+        grid-template-columns: 1fr;
+    }
+    .result-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+ 
+@media (max-width: 600px) {
+    .form-row-2 {
+        grid-template-columns: 1fr;
+    }
+    .speed-options {
+        grid-template-columns: 1fr;
+    }
+    .nav-links { display: none; }
+}
