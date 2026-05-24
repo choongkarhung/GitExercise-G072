@@ -101,3 +101,49 @@ function calculateFromValues(age, height, weight, goalWeight) {
     } else {
         bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
     }
+
+       // ── TDEE ──
+    const tdee = bmr * selectedActivity;
+ 
+    // ── Goal direction ──
+    const weightDiff = goalWeight - weight;
+    let adjustment   = 0;
+    let goalMode     = 'maintain';
+ 
+    if (Math.abs(weightDiff) < 0.5) {
+        goalMode   = 'maintain';
+        adjustment = 0;
+    } else if (weightDiff < 0) {
+        goalMode   = 'deficit';
+        adjustment = -selectedSpeed;
+    } else {
+        goalMode   = 'surplus';
+        adjustment = +selectedSpeed;
+    }
+ 
+    const targetCalories = Math.round(tdee + adjustment);
+ 
+    // ── BMI ──
+    const heightM = height / 100;
+    const bmi     = weight / (heightM * heightM);
+ 
+    // ── Macros (30/40/30) ──
+    const proteinG = Math.round((targetCalories * 0.30) / 4);
+    const carbsG   = Math.round((targetCalories * 0.40) / 4);
+    const fatG     = Math.round((targetCalories * 0.30) / 9);
+ 
+    // ── Timeline ──
+    let timelineStr = 'Already at your goal! 🎉';
+    if (Math.abs(weightDiff) >= 0.5 && selectedSpeed > 0) {
+        const kgPerWeek   = selectedSpeed / 7700 * 7;
+        const weeksNeeded = Math.abs(weightDiff) / kgPerWeek;
+        const months      = Math.floor(weeksNeeded / 4.33);
+        const weeks       = Math.round(weeksNeeded % 4.33);
+        if (months === 0) {
+            timelineStr = `About ${Math.round(weeksNeeded)} week${Math.round(weeksNeeded) !== 1 ? 's' : ''}`;
+        } else if (weeks === 0) {
+            timelineStr = `About ${months} month${months !== 1 ? 's' : ''}`;
+        } else {
+            timelineStr = `About ${months} month${months !== 1 ? 's' : ''} and ${weeks} week${weeks !== 1 ? 's' : ''}`;
+        }
+    }
