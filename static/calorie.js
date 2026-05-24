@@ -238,3 +238,57 @@ function renderResults(d) {
     document.getElementById('save-profile-btn').style.display = 'flex';
 }
  
+// ── SAVE PROFILE ──
+document.getElementById('save-profile-btn').addEventListener('click', async () => {
+    if (!lastResult) return;
+ 
+    const btn = document.getElementById('save-profile-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Saving...';
+ 
+    try {
+        const res = await fetch('/api/calorie_profile', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(lastResult),
+        });
+ 
+        if (res.ok) {
+            showSaveBadge('✅ Profile saved! Dashboard will now show your calorie target.');
+            btn.textContent = '✅ Saved!';
+            setTimeout(() => {
+                btn.textContent = '💾 Save Profile';
+                btn.disabled    = false;
+            }, 3000);
+        } else {
+            const data = await res.json();
+            showCalMsg('error', data.error || 'Failed to save profile.');
+            btn.textContent = '💾 Save Profile';
+            btn.disabled    = false;
+        }
+    } catch (e) {
+        showCalMsg('error', 'Network error. Please try again.');
+        btn.textContent = '💾 Save Profile';
+        btn.disabled    = false;
+    }
+});
+ 
+// ── HELPERS ──
+function showCalMsg(type, text) {
+    const el = document.getElementById('cal-msg');
+    el.className   = type;
+    el.textContent = text;
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => { el.className = 'hidden'; }, 5000);
+}
+ 
+function showSaveBadge(text) {
+    const badge = document.getElementById('save-badge');
+    badge.textContent   = text;
+    badge.style.display = 'block';
+    clearTimeout(badge._timer);
+    badge._timer = setTimeout(() => { badge.style.display = 'none'; }, 5000);
+}
+ 
+// ── INIT ──
+loadSavedProfile();
