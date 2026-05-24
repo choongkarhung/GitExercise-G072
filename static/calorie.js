@@ -147,3 +147,94 @@ function calculateFromValues(age, height, weight, goalWeight) {
             timelineStr = `About ${months} month${months !== 1 ? 's' : ''} and ${weeks} week${weeks !== 1 ? 's' : ''}`;
         }
     }
+
+        // Store for saving
+    lastResult = {
+        gender:               selectedGender,
+        age:                  age,
+        height_cm:            height,
+        weight_kg:            weight,
+        goal_weight_kg:       goalWeight,
+        activity_multiplier:  selectedActivity,
+        speed_kcal:           selectedSpeed,
+        bmr:                  Math.round(bmr),
+        tdee:                 Math.round(tdee),
+        target_calories:      targetCalories,
+        goal_mode:            goalMode,
+    };
+ 
+    renderResults({
+        bmr: Math.round(bmr),
+        tdee: Math.round(tdee),
+        adjustment,
+        targetCalories,
+        goalMode,
+        goalWeight,
+        weightDiff,
+        bmi,
+        proteinG,
+        carbsG,
+        fatG,
+        timelineStr,
+    });
+}
+ 
+function renderResults(d) {
+    document.getElementById('results-placeholder').classList.add('hidden');
+    const content = document.getElementById('results-content');
+    content.classList.remove('hidden');
+    content.classList.add('visible');
+ 
+    // Goal banner
+    const banner = document.getElementById('goal-banner');
+    banner.className = 'goal-banner';
+    if (d.goalMode === 'deficit') {
+        banner.classList.add('deficit');
+        document.getElementById('goal-icon').textContent  = '🔥';
+        document.getElementById('goal-label').textContent = 'Weight Loss Mode';
+        document.getElementById('goal-sub').textContent   =
+            `Eating ${Math.abs(d.adjustment)} kcal below TDEE daily to lose weight`;
+    } else if (d.goalMode === 'surplus') {
+        banner.classList.add('surplus');
+        document.getElementById('goal-icon').textContent  = '💪';
+        document.getElementById('goal-label').textContent = 'Weight Gain Mode';
+        document.getElementById('goal-sub').textContent   =
+            `Eating ${d.adjustment} kcal above TDEE daily to gain weight`;
+    } else {
+        document.getElementById('goal-icon').textContent  = '⚖️';
+        document.getElementById('goal-label').textContent = 'Maintaining Weight';
+        document.getElementById('goal-sub').textContent   = 'Your goal weight matches your current weight!';
+    }
+ 
+    document.getElementById('target-value').textContent = d.targetCalories.toLocaleString();
+    document.getElementById('res-bmr').textContent      = d.bmr.toLocaleString();
+    document.getElementById('res-tdee').textContent     = d.tdee.toLocaleString();
+    const adjustStr = d.adjustment === 0 ? '±0'
+        : d.adjustment > 0 ? `+${d.adjustment}` : `${d.adjustment}`;
+    document.getElementById('res-adjust').textContent   = adjustStr;
+    document.getElementById('res-goalwt').textContent   = `${d.goalWeight} kg`;
+ 
+    // BMI
+    const bmiVal = d.bmi.toFixed(1);
+    document.getElementById('bmi-value').textContent = bmiVal;
+    let bmiCat, bmiClass;
+    if (d.bmi < 18.5)    { bmiCat = 'Underweight'; bmiClass = 'bmi-under'; }
+    else if (d.bmi < 25) { bmiCat = 'Normal';       bmiClass = 'bmi-normal'; }
+    else if (d.bmi < 30) { bmiCat = 'Overweight';   bmiClass = 'bmi-over'; }
+    else                 { bmiCat = 'Obese';         bmiClass = 'bmi-obese'; }
+    const bmiCatEl = document.getElementById('bmi-category');
+    bmiCatEl.textContent = bmiCat;
+    bmiCatEl.className   = `bmi-category ${bmiClass}`;
+ 
+    const bmiPct = Math.min(Math.max((d.bmi - 10) / (40 - 10) * 100, 2), 98);
+    document.getElementById('bmi-marker').style.left = `${bmiPct}%`;
+ 
+    document.getElementById('timeline-val').textContent  = d.timelineStr;
+    document.getElementById('macro-protein').textContent = `${d.proteinG}g`;
+    document.getElementById('macro-carbs').textContent   = `${d.carbsG}g`;
+    document.getElementById('macro-fat').textContent     = `${d.fatG}g`;
+ 
+    // Show save button once we have results
+    document.getElementById('save-profile-btn').style.display = 'flex';
+}
+ 
