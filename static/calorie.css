@@ -25,7 +25,7 @@
     align-items: start;
 }
  
-/* ── PANELS ── */
+/* PANELS */
 .cal-form-panel,
 .cal-results-panel {
     background: var(--surface);
@@ -35,7 +35,7 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
 }
  
-/* ── FORM ── */
+/* FORM */
 .cal-form {
     display: flex;
     flex-direction: column;
