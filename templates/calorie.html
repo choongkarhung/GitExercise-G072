@@ -226,4 +226,74 @@
                             <div class="rs-sub">Your target</div>
                         </div>
                     </div>
+
+                    <!-- BMI Card -->
+                    <div class="bmi-card">
+                        <div class="bmi-left">
+                            <div class="bmi-title">Your BMI</div>
+                            <div class="bmi-value" id="bmi-value">—</div>
+                            <div class="bmi-category" id="bmi-category">—</div>
+                        </div>
+                        <div class="bmi-bar-wrap">
+                            <div class="bmi-bar-track">
+                                <div class="bmi-bar-fill" id="bmi-bar"></div>
+                                <div class="bmi-marker" id="bmi-marker"></div>
+                            </div>
+                            <div class="bmi-bar-labels">
+                                <span>Underweight</span>
+                                <span>Normal</span>
+                                <span>Overweight</span>
+                                <span>Obese</span>
+                            </div>
+                        </div>
+                    </div>
  
+                    <!-- Time Estimate -->
+                    <div class="timeline-card" id="timeline-card">
+                        <div class="timeline-icon">📅</div>
+                        <div>
+                            <div class="timeline-label">Estimated time to reach your goal</div>
+                            <div class="timeline-val" id="timeline-val">—</div>
+                        </div>
+                    </div>
+ 
+                    <!-- Macro Split -->
+                    <div class="macro-section">
+                        <div class="macro-header">Suggested Daily Macros</div>
+                        <div class="macro-row">
+                            <div class="macro-item macro-protein">
+                                <div class="macro-icon">🥩</div>
+                                <div class="macro-label">Protein</div>
+                                <div class="macro-val" id="macro-protein">—g</div>
+                                <div class="macro-pct">30%</div>
+                            </div>
+                            <div class="macro-item macro-carbs">
+                                <div class="macro-icon">🍚</div>
+                                <div class="macro-label">Carbs</div>
+                                <div class="macro-val" id="macro-carbs">—g</div>
+                                <div class="macro-pct">40%</div>
+                            </div>
+                            <div class="macro-item macro-fat">
+                                <div class="macro-icon">🥑</div>
+                                <div class="macro-label">Fat</div>
+                                <div class="macro-val" id="macro-fat">—g</div>
+                                <div class="macro-pct">30%</div>
+                            </div>
+                        </div>
+                    </div>
+ 
+                </div>
+            </div>
+ 
+        </div>
+    </div>
+ 
+    <script src="{{ url_for('static', filename='calorie.js') }}"></script>
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>
