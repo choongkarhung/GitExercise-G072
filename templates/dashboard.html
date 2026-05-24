@@ -88,6 +88,53 @@
             </div>
         </div>
 
+        <!-- ── CALORIE WIDGET (NEW) ── -->
+        <!-- Hidden until /api/calorie_today confirms a saved profile exists -->
+        <div class="calorie-widget" id="calorie-widget" style="display:none;">
+            <div class="cw-header">
+                <div class="cw-header-left">
+                    <span class="cw-fire">🔥</span>
+                    <div>
+                        <div class="cw-title-text">Calorie Tracker</div>
+                        <div class="cw-mode-badge" id="cw-mode-badge">—</div>
+                    </div>
+                </div>
+                <div class="cw-nums">
+                    <div class="cw-num-group">
+                        <div class="cw-num" id="cw-consumed">0</div>
+                        <div class="cw-num-lbl">consumed</div>
+                    </div>
+                    <div class="cw-slash">/</div>
+                    <div class="cw-num-group">
+                        <div class="cw-num" id="cw-target">—</div>
+                        <div class="cw-num-lbl">target kcal</div>
+                    </div>
+                </div>
+                <div class="cw-right">
+                    <div class="cw-remaining-label">Remaining</div>
+                    <div class="cw-remaining-val" id="cw-remaining">— kcal</div>
+                    <a href="/calorie" class="cw-link">Update Profile →</a>
+                </div>
+            </div>
+            <div class="cw-bar-track">
+                <div class="cw-bar-fill" id="cw-fill" style="width:0%"></div>
+            </div>
+            <div class="cw-bar-footer">
+                <span id="cw-pct-label">0% of daily goal</span>
+                <span id="cw-status-label">—</span>
+            </div>
+        </div>
+
+        <!-- Prompt shown when no calorie profile is set up yet -->
+        <div class="calorie-cta" id="calorie-cta" style="display:none;">
+            <span class="cta-icon">🔥</span>
+            <div class="cta-text">
+                <strong>Track your calories too!</strong>
+                Set up your calorie profile to see your daily target alongside your budget.
+            </div>
+            <a href="/calorie" class="cta-btn">Set Up Now →</a>
+        </div>
+
         <!-- ── BOTTOM ROW ── -->
         <div class="bottom-row">
 
@@ -101,10 +148,15 @@
                 <div class="log-form">
                     <label>Description</label>
                     <input type="text" id="log-label" placeholder="e.g. Nasi goreng + teh o ais" maxlength="80">
-                    <label>Amount (RM)</label>
+<label>Amount (RM)</label>
                     <div class="input-prefix-wrap">
                         <span class="prefix">RM</span>
                         <input type="number" id="log-amount" placeholder="0.00" step="0.01" min="0.01">
+                    </div>
+                    <label>Calories <span style="font-weight:400; color: var(--ink-faint);">(optional)</span></label>
+                    <div class="input-prefix-wrap">
+                        <span class="prefix">kcal</span>
+                        <input type="number" id="log-calories" placeholder="e.g. 450" min="0" step="1">
                     </div>
                     <button id="log-btn">Add Expense ✚</button>
                 </div>

@@ -202,40 +202,40 @@ def api_dashboard():
 def api_log_expense():
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in.'}), 401
-
-    data   = request.get_json()
-    label  = data.get('label', '').strip()
-    amount = data.get('amount')
-
+ 
+    data     = request.get_json()
+    label    = data.get('label', '').strip()
+    amount   = data.get('amount')
+    calories = int(data.get('calories', 0))   # ← NEW: default 0 for manual entries
+ 
     if not label:
         return jsonify({'error': 'Description is required.'}), 400
     if not amount or float(amount) <= 0:
         return jsonify({'error': 'Amount must be greater than 0.'}), 400
-
+ 
     db = get_db()
-
-    # Get the latest session for this user
+ 
     sess = db.execute("""
         SELECT id FROM survival_sessions
         WHERE user_id = ?
         ORDER BY created_at DESC
         LIMIT 1
     """, (session['user_id'],)).fetchone()
-
+ 
     if not sess:
         db.close()
         return jsonify({'error': 'No active session. Please set up first.'}), 404
-
+ 
     try:
         db.execute("""
-            INSERT INTO expense_logs (session_id, amount, label, logged_at)
-            VALUES (?, ?, ?, ?)
-        """, (sess['id'], float(amount), label, datetime.now().isoformat()))
+            INSERT INTO expense_logs (session_id, amount, label, logged_at, calories)
+            VALUES (?, ?, ?, ?, ?)
+        """, (sess['id'], float(amount), label, datetime.now().isoformat(), calories))
         db.commit()
     except Exception as e:
         db.close()
         return jsonify({'error': 'Database error.'}), 500
-
+ 
     db.close()
     return jsonify({'message': 'Expense logged!'}), 201
 
@@ -285,7 +285,7 @@ def api_meals():
     # Recommend meals that fits the daily budget
     # Prioritise cheap and varied categories
     meals = db.execute("""
-        SELECT name, stall, price, category
+        SELECT name, stall, price, category, calories
         FROM food_items
         WHERE is_active = 1 AND price <= ?
         ORDER BY price ASC
@@ -362,7 +362,7 @@ def api_mealplan():
  
     # Fetch all affordable active food items
     all_items = db.execute("""
-        SELECT name, stall, price, category
+        SELECT name, stall, price, category, calories
         FROM food_items
         WHERE is_active = 1 AND price <= ?
         ORDER BY price ASC
@@ -420,6 +420,134 @@ def calorie():
     if 'user_id' not in session:
         return redirect(url_for('home'))
     return render_template('calorie.html', username=session.get('username', ''))
+
+@app.route('/api/calorie_profile', methods=['GET'])
+def get_calorie_profile():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+ 
+    db = get_db()
+    profile = db.execute(
+        "SELECT * FROM calorie_profiles WHERE user_id = ?",
+        (session['user_id'],)
+    ).fetchone()
+    db.close()
+ 
+    if not profile:
+        return jsonify({'error': 'No profile found.'}), 404
+ 
+    return jsonify(dict(profile))
+ 
+ 
+# CALORIE PROFILE — save / update profile
+@app.route('/api/calorie_profile', methods=['POST'])
+def save_calorie_profile():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+ 
+    data = request.get_json()
+    required = [
+        'gender', 'age', 'height_cm', 'weight_kg', 'goal_weight_kg',
+        'activity_multiplier', 'speed_kcal', 'bmr', 'tdee',
+        'target_calories', 'goal_mode',
+    ]
+    for field in required:
+        if field not in data:
+            return jsonify({'error': f'Missing field: {field}'}), 400
+ 
+    db = get_db()
+    try:
+        # Upsert — insert on first save, update on subsequent saves
+        db.execute("""
+            INSERT INTO calorie_profiles
+                (user_id, gender, age, height_cm, weight_kg, goal_weight_kg,
+                 activity_multiplier, speed_kcal, bmr, tdee,
+                 target_calories, goal_mode, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET
+                gender              = excluded.gender,
+                age                 = excluded.age,
+                height_cm           = excluded.height_cm,
+                weight_kg           = excluded.weight_kg,
+                goal_weight_kg      = excluded.goal_weight_kg,
+                activity_multiplier = excluded.activity_multiplier,
+                speed_kcal          = excluded.speed_kcal,
+                bmr                 = excluded.bmr,
+                tdee                = excluded.tdee,
+                target_calories     = excluded.target_calories,
+                goal_mode           = excluded.goal_mode,
+                updated_at          = excluded.updated_at
+        """, (
+            session['user_id'],
+            data['gender'],
+            int(data['age']),
+            float(data['height_cm']),
+            float(data['weight_kg']),
+            float(data['goal_weight_kg']),
+            float(data['activity_multiplier']),
+            int(data['speed_kcal']),
+            int(data['bmr']),
+            int(data['tdee']),
+            int(data['target_calories']),
+            data['goal_mode'],
+            datetime.now().isoformat(),
+        ))
+        db.commit()
+    except Exception:
+        db.close()
+        return jsonify({'error': 'Database error.'}), 500
+ 
+    db.close()
+    return jsonify({'message': 'Profile saved!'}), 200
+ 
+ 
+# CALORIE TODAY — used by dashboard widget
+@app.route('/api/calorie_today')
+def api_calorie_today():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+ 
+    user_id = session['user_id']
+    db = get_db()
+ 
+    # Get saved calorie profile
+    profile = db.execute(
+        "SELECT target_calories, goal_mode, weight_kg, goal_weight_kg FROM calorie_profiles WHERE user_id = ?",
+        (user_id,)
+    ).fetchone()
+ 
+    if not profile:
+        db.close()
+        return jsonify({'has_profile': False}), 200
+ 
+    # Get active session to look up today's logged calories
+    sess = db.execute("""
+        SELECT id FROM survival_sessions
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT 1
+    """, (user_id,)).fetchone()
+ 
+    calories_today = 0
+    if sess:
+        today_str = date.today().isoformat()
+        row = db.execute("""
+            SELECT COALESCE(SUM(calories), 0) AS total
+            FROM expense_logs
+            WHERE session_id = ? AND logged_at LIKE ?
+        """, (sess['id'], today_str + '%')).fetchone()
+        calories_today = int(row['total'])
+ 
+    db.close()
+ 
+    return jsonify({
+        'has_profile':      True,
+        'target_calories':  profile['target_calories'],
+        'goal_mode':        profile['goal_mode'],
+        'calories_today':   calories_today,
+        'weight_kg':        profile['weight_kg'],
+        'goal_weight_kg':   profile['goal_weight_kg'],
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
