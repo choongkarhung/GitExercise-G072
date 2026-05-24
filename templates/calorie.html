@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Calculator - BrokeBite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='calorie.css') }}">
+</head>
+<body class="dashboard-body">
+ 
+    <div class="blob-canvas">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+    </div>
+    <div class="grid-overlay"></div>
+ 
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
+            <a href="/calorie" class="nav-link nav-link-active">🔥 Calories</a>
+        </div>
+        <div class="nav-right">
+            <span class="user-greeting">Hey, {{ username }}! 👋</span>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+    </nav>
