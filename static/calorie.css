@@ -255,7 +255,7 @@
     box-shadow: 0 4px 16px rgba(45, 122, 87, 0.28);
 }
  
-/* ── RESULTS PANEL ── */
+/* RESULTS PANEL */
 .results-placeholder {
     display: flex;
     flex-direction: column;
