@@ -222,6 +222,9 @@ food_items = [
 ("Maggi Goreng", "Deen Cafe", 5.00, "Carbs", 540),
 ("Yee Mee Goreng", "Deen Cafe", 6.00, "Carbs", 570),
 ("Hokkien Mee", "Deen Cafe", 6.00, "Carbs", 610),
+("Maggi Goreng XL", "Deen Cafe", 7.00, "Carbs", 790),
+("Nasi Butter Chicken", "Deen Cafe", 8.00, "Carbs", 760),
+
 ]
 
 cur.executemany("""
