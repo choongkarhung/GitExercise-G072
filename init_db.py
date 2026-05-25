@@ -297,6 +297,11 @@ food_items = [
 ("Nasi Udang Sambal", "Deen Cafe", 7.50, "Carbs", 560),
 ("Nasi Udang Kicap", "Deen Cafe", 7.50, "Carbs", 550),
 ("Nasi Udang Black Pepper", "Deen Cafe", 7.50, "Carbs", 530),
+("Nasi Sea Food Kunyit", "Deen Cafe", 7.50, "Carbs", 570),
+("Nasi Sea Food Merah", "Deen Cafe", 7.50, "Carbs", 590),
+("Nasi Sea Food Sweet and Sour", "Deen Cafe", 7.50, "Carbs", 590),
+("Nasi Putih Kari Ayam", "Deen Cafe", 7.50, "Carbs", 610),
+("Nasi Telur Bungkus", "Deen Cafe", 8.00, "Carbs", 640),
 ]
 
 cur.executemany("""
