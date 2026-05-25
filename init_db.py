@@ -234,7 +234,8 @@ food_items = [
 ("Daging Tom Yam Soup+Rice", "Deen Cafe", 8.00, "Carbs", 540),
 ("Sea F0od Tom Yam Soup+Rice", "Deen Cafe", 8.00, "Carbs", 520),
 ("Campur Tom Yam Soup+Rice", "Deen Cafe", 8.50, "Carbs", 560),
-
+("Maggi Soup", "Deen Cafe", 5.00, "Carbs", 390),
+("Kuey Tiau Soup", "Deen Cafe", 5.00, "Carbs", 380),
 ]
 
 cur.executemany("""
