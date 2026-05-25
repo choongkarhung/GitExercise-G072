@@ -12,14 +12,42 @@ app.secret_key = os.environ.get('SECRET_KEY', 'mmu_broke_student_secret_2024')
 
 @app.route('/')
 def home():
-    if 'username' in session:
-        return redirect(url_for('setup'))
+    if 'username' in session and 'user_id' in session:
+        db = get_db()
+        sess = db.execute("""
+            SELECT id FROM survival_sessions
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (session['user_id'],)).fetchone()
+        db.close()
+
+        if sess:
+            return redirect(url_for('dashboard'))  # Send straight to dashboard if saved
+        return redirect(url_for('setup'))          
+        
     return render_template('login.html')
 
 @app.route('/setup', methods=['GET'])
 def setup():
     if 'user_id' not in session:
         return redirect(url_for('home'))
+        
+    force_new = request.args.get('new') == 'true'
+    
+    if not force_new:
+        db = get_db()
+        sess = db.execute("""
+            SELECT id FROM survival_sessions
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (session['user_id'],)).fetchone()
+        db.close()
+
+        if sess:
+            return redirect(url_for('dashboard'))
+        
     return render_template('setup.html', username=session.get('username', ''))
 
 @app.route('/dashboard')
