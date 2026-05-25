@@ -232,6 +232,8 @@ food_items = [
 ("Cendawan Tom Yam Soup+Rice", "Deen Cafe", 7.00, "Carbs", 410),
 ("Ayam Tom Yam Soup+Rice", "Deen Cafe", 7.00, "Carbs", 510),
 ("Daging Tom Yam Soup+Rice", "Deen Cafe", 8.00, "Carbs", 540),
+("Sea F0od Tom Yam Soup+Rice", "Deen Cafe", 8.00, "Carbs", 520),
+("Campur Tom Yam Soup+Rice", "Deen Cafe", 8.50, "Carbs", 560),
 
 ]
 
