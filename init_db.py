@@ -316,6 +316,11 @@ food_items = [
 ("Milo", "Deen Cafe", 2.00, "Drink", 180),
 ("Milo O", "Deen Cafe", 2.00, "Drink", 120),
 ("Barley", "Deen Cafe", 1.50, "Drink", 80),
+("Horlicks", "Deen Cafe", 2.50, "Drink", 190),
+("Limau Panas", "Deen Cafe", 1.50, "Drink", 60),
+("Teh O Ais", "Deen Cafe", 1.50, "Drink", 85),
+("Teh Tarik Ais", "Deen Cafe", 2.00, "Drink", 160),
+
 ]
 
 cur.executemany("""
