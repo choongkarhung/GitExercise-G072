@@ -337,6 +337,9 @@ food_items = [
 ("Sirap Bandung", "Deen Cafe", 2.00, "Drink", 150),
 ("Orange Juice", "Deen Cafe", 4.00, "Drink", 120),
 ("Apple Juice", "Deen Cafe", 4.00, "Drink", 110),
+("Watermelon Juice", "Deen Cafe", 4.00, "Drink", 90),
+("Extra Joss", "Deen Cafe", 4.00, "Drink", 30),
+("Carrot Juice", "Deen Cafe", 3.50, "Drink", 90),
 ]
 
 cur.executemany("""
