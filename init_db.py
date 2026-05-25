@@ -323,6 +323,9 @@ food_items = [
 ("Teh O Limau Ais", "Deen Cafe", 2.00, "Drink", 90),
 ("Teh O Laici Ais", "Deen Cafe", 3.00, "Drink", 150),
 ("Nescafe Ais", "Deen Cafe", 2.50, "Drink", 180),
+("Nescafe O Ais", "Deen Cafe", 2.00, "Drink", 90),
+("Neslo Ais", "Deen Cafe", 3.00, "Drink", 240),
+("White Coffee Ais", "Deen Cafe", 3.00, "Drink", 210),
 ]
 
 cur.executemany("""
