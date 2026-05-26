@@ -193,7 +193,6 @@ def api_dashboard():
     spent_today = float(spent_today_row['total'])
 
     # --- CALCULATE REAL NUTRITION DATABASE NUMBERS ---
-    # Sums up expense values dynamically filtering by category matched rules
     carbs_row = db.execute("SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ? AND category = 'Carbs'", (session_id,)).fetchone()
     protein_row = db.execute("SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ? AND category = 'Protein'", (session_id,)).fetchone()
     vitamin_row = db.execute("SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ? AND category = 'Vitamin'", (session_id,)).fetchone()
@@ -241,32 +240,19 @@ def api_dashboard():
 def api_log_expense():
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in.'}), 401
-<<<<<<< HEAD
-
-    data   = request.get_json()
-    label  = data.get('label', '').strip()
-    amount = data.get('amount')
-    category = data.get('category', 'Carbs').strip() # Default fallback to Carbs
-
-=======
  
     data     = request.get_json()
     label    = data.get('label', '').strip()
     amount   = data.get('amount')
-    calories = int(data.get('calories', 0))   # ← NEW: default 0 for manual entries
+    calories = int(data.get('calories', 0))   
  
->>>>>>> 066b26e5d82ea91e348b34ba0c4dac03b8efb33d
     if not label:
         return jsonify({'error': 'Description is required.'}), 400
     if not amount or float(amount) <= 0:
         return jsonify({'error': 'Amount must be greater than 0.'}), 400
  
     db = get_db()
-<<<<<<< HEAD
-
-=======
  
->>>>>>> 066b26e5d82ea91e348b34ba0c4dac03b8efb33d
     sess = db.execute("""
         SELECT id FROM survival_sessions
         WHERE user_id = ?
@@ -280,24 +266,15 @@ def api_log_expense():
  
     try:
         db.execute("""
-<<<<<<< HEAD
-            INSERT INTO expense_logs (session_id, amount, label, category, logged_at)
-            VALUES (?, ?, ?, ?, ?)
-        """, (sess['id'], float(amount), label, category, datetime.now().isoformat()))
-=======
             INSERT INTO expense_logs (session_id, amount, label, logged_at, calories)
             VALUES (?, ?, ?, ?, ?)
         """, (sess['id'], float(amount), label, datetime.now().isoformat(), calories))
->>>>>>> 066b26e5d82ea91e348b34ba0c4dac03b8efb33d
         db.commit()
+        return jsonify({'success': True}), 200
     except Exception as e:
-        db.close()
         return jsonify({'error': 'Database error.'}), 500
- 
-    db.close()
-    return jsonify({'message': 'Expense logged!'}), 201
-
-# MEAL SUGGESTIONS
+    finally:
+        db.close()
 
 @app.route('/api/meals')
 def api_meals():
@@ -479,7 +456,6 @@ def get_calorie_profile():
  
     return jsonify(dict(profile))
  
- 
 # CALORIE PROFILE — save / update profile
 @app.route('/api/calorie_profile', methods=['POST'])
 def save_calorie_profile():
@@ -498,7 +474,6 @@ def save_calorie_profile():
  
     db = get_db()
     try:
-        # Upsert — insert on first save, update on subsequent saves
         db.execute("""
             INSERT INTO calorie_profiles
                 (user_id, gender, age, height_cm, weight_kg, goal_weight_kg,
@@ -541,7 +516,6 @@ def save_calorie_profile():
     db.close()
     return jsonify({'message': 'Profile saved!'}), 200
  
- 
 # CALORIE TODAY — used by dashboard widget
 @app.route('/api/calorie_today')
 def api_calorie_today():
@@ -551,7 +525,6 @@ def api_calorie_today():
     user_id = session['user_id']
     db = get_db()
  
-    # Get saved calorie profile
     profile = db.execute(
         "SELECT target_calories, goal_mode, weight_kg, goal_weight_kg FROM calorie_profiles WHERE user_id = ?",
         (user_id,)
@@ -561,7 +534,6 @@ def api_calorie_today():
         db.close()
         return jsonify({'has_profile': False}), 200
  
-    # Get active session to look up today's logged calories
     sess = db.execute("""
         SELECT id FROM survival_sessions
         WHERE user_id = ?
@@ -592,4 +564,3 @@ def api_calorie_today():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
