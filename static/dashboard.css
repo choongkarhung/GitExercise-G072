@@ -127,7 +127,7 @@
     color: var(--ink-muted);
 }
 
-/* PROGRESS BAR  */
+/* PROGRESS BAR */
 .progress-section {
     background: var(--surface);
     border: 1px solid var(--cream-border);
@@ -173,7 +173,7 @@
     transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease;
 }
  
-.progress-fill.warn  { background: linear-gradient(90deg, #d4813a, #e89a56); }
+.progress-fill.warn   { background: linear-gradient(90deg, #d4813a, #e89a56); }
 .progress-fill.danger { background: linear-gradient(90deg, #b35c5c, #cc7777); }
  
 .progress-footer {
@@ -183,36 +183,211 @@
     color: var(--ink-muted);
 }
 
-/* NUTRITION ANALYSIS CHART CONTAINER */
-.chart-panel {
-    grid-column: 1 / -1; 
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+/*  CALORIE WIDGET  */
+.calorie-widget {
     background: var(--surface);
-}
-
-.chart-container {
-    width: 100%;
-    height: 240px; 
+    border: 1.5px solid #f0e8d0;
+    border-radius: 16px;
+    padding: 18px 24px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(220,160,40,0.08);
     position: relative;
-    margin-top: 15px;
+    overflow: hidden;
+    animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Subtle warm top accent */
+.calorie-widget::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #e89a30, #f5c040, #e89a30);
+    border-radius: 16px 16px 0 0;
+}
+
+.cw-header {
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
 }
 
-#survivalChart {
-    display: block;
-    max-height: 240px !important;
-    width: 100% !important;
+.cw-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
 }
 
-.chart-panel .panel-sub {
+.cw-fire {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.cw-title-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+}
+
+.cw-mode-badge {
+    display: inline-block;
     font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    padding: 2px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    margin-top: 3px;
+    font-weight: 500;
 }
+
+.cw-badge-deficit  { background: #fff8e6; color: #8a6e20; border: 1px solid #f0e0a0; }
+.cw-badge-surplus  { background: #eef4ff; color: #4a6abf; border: 1px solid #c8d8f8; }
+.cw-badge-maintain { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+
+.cw-nums {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.cw-num-group {
+    text-align: center;
+}
+
+.cw-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.cw-num-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+}
+
+.cw-slash {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    color: var(--cream-border);
+    font-weight: 300;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.cw-right {
+    flex: 0 0 auto;
+    text-align: right;
+}
+
+.cw-remaining-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 2px;
+}
+
+.cw-remaining-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.cw-link {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--green);
+    text-decoration: none;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.cw-link:hover { text-decoration: underline; }
+
+/* Calorie bar */
+.cw-bar-track {
+    background: var(--cream-mid);
+    border-radius: 100px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 7px;
+}
+
+.cw-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, #e89a30, #f5c040);
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cw-fill-warn  { background: linear-gradient(90deg, #e87030, #f59040); }
+.cw-fill-over  { background: linear-gradient(90deg, #b35c5c, #cc7777); }
+
+.cw-bar-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+}
+
+/* Calorie CTA (shown if no profile saved yet) */
+.calorie-cta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fffbf0;
+    border: 1.5px dashed #f0e0a0;
+    border-radius: 14px;
+    padding: 14px 20px;
+    flex-wrap: wrap;
+}
+
+.cta-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+
+.cta-text {
+    flex: 1;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    text-align: left;
+}
+
+.cta-text strong {
+    color: var(--ink);
+}
+
+.cta-btn {
+    flex-shrink: 0;
+    display: inline-block;
+    padding: 8px 18px;
+    background: #f5c040;
+    color: #5a4a10;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.cta-btn:hover { background: #e8b030; }
 
 /* BOTTOM ROW */
 .bottom-row {
@@ -291,9 +466,7 @@
     overflow-y: auto;
 }
  
-.expense-list::-webkit-scrollbar {
-    width: 4px;
-}
+.expense-list::-webkit-scrollbar { width: 4px; }
 .expense-list::-webkit-scrollbar-track { background: transparent; }
 .expense-list::-webkit-scrollbar-thumb {
     background: var(--cream-border);
@@ -311,22 +484,45 @@
     gap: 10px;
     animation: msg-in 0.2s ease both;
 }
+.expense-item-left {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.expense-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 2px;
+}
  
 .expense-item-label {
     font-size: 0.82rem;
     color: var(--ink);
     font-weight: 500;
-    flex: 1;
-    text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align: left;
 }
  
 .expense-item-time {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     color: var(--ink-faint);
     font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+}
+
+.cal-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: #fff8e6;
+    color: #8a6e20;
+    border: 1px solid #f0e0a0;
     white-space: nowrap;
 }
  
@@ -336,6 +532,7 @@
     font-weight: 700;
     color: var(--red-text);
     white-space: nowrap;
+    flex-shrink: 0;
 }
  
 .expense-empty {
@@ -355,9 +552,7 @@
     overflow-y: auto;
 }
  
-.meal-list::-webkit-scrollbar {
-    width: 4px;
-}
+.meal-list::-webkit-scrollbar { width: 4px; }
 .meal-list::-webkit-scrollbar-track { background: transparent; }
 .meal-list::-webkit-scrollbar-thumb {
     background: var(--cream-border);
@@ -378,10 +573,9 @@
     transition: background 0.15s ease;
 }
  
-.meal-item:hover {
-    background: #ddf0e6;
-}
- .meal-item-info {
+.meal-item:hover { background: #ddf0e6; }
+ 
+.meal-item-info {
     text-align: left;
     flex: 1;
     overflow: hidden;
@@ -399,6 +593,25 @@
 .meal-item-stall {
     font-size: 0.68rem;
     color: var(--ink-muted);
+}
+
+.meal-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.meal-kcal {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: #8a6e20;
+    background: #fff8e6;
+    border: 1px solid #f0e0a0;
+    padding: 1px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
 }
  
 .meal-item-price {
@@ -478,6 +691,12 @@
     .bottom-row {
         grid-template-columns: 1fr;
     }
+    .cw-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .cw-right { text-align: left; }
 }
  
 @media (max-width: 500px) {
@@ -489,8 +708,5 @@
     }
     .stat-value {
         font-size: 1.3rem;
-    }
-    .chart-container {
-        height: 200px;
     }
 }

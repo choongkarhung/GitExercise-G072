@@ -139,6 +139,7 @@ async function logMeal(idx) {
     const meta  = MEAL_META[idx];
     const items = meal.items;
     const total = items.reduce((s, i) => s + i.price, 0);
+    const totalCalories = items.reduce((s, i) => s + (i.calories || 0), 0);
 
     // Build a combined label
     const label = `[${meta.label}] ${items.map(i => i.name).join(' + ')}`;
@@ -147,7 +148,7 @@ async function logMeal(idx) {
         const res = await fetch('/api/log_expense', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)) })
+            body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)), calories: totalCalories })
         });
 
         if (res.ok) {
@@ -180,12 +181,13 @@ document.getElementById('log-all-btn').addEventListener('click', async () => {
             const meal  = planData.meals[idx];
             const meta  = MEAL_META[idx];
             const total = meal.items.reduce((s, i) => s + i.price, 0);
+            const totalCalories = meal.items.reduce((s, i) => s + (i.calories || 0), 0);
             const label = `[${meta.label}] ${meal.items.map(i => i.name).join(' + ')}`;
 
             const res = await fetch('/api/log_expense', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)) })
+                body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)), calories: totalCalories })
             });
 
             if (res.ok) {

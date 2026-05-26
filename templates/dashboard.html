@@ -6,7 +6,6 @@
     <title>Dashboard - BrokeBite</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dashboard-body">
 
@@ -19,11 +18,13 @@
     </div>
     <div class="grid-overlay"></div>
 
+    <!-- NAVBAR -->
     <nav class="navbar">
         <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
         <div class="nav-links">
             <a href="/dashboard" class="nav-link nav-link-active">📊 Dashboard</a>
             <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
+            <a href="/calorie" class="nav-link">🔥 Calories</a>
         </div>
         <div class="nav-right">
             <span class="user-greeting">Hey, {{ username }}! 👋</span>
@@ -31,8 +32,10 @@
         </div>
     </nav>
 
+    <!-- MAIN DASHBOARD -->
     <div class="dashboard-wrapper">
 
+        <!-- ── HEADER ROW ── -->
         <div class="dash-header">
             <div>
                 <span class="pill-tag">Survival Mode</span>
@@ -42,6 +45,7 @@
             <button class="btn-new-session" id="new-session-btn">+ New Session</button>
         </div>
 
+        <!-- ── STAT CARDS ROW ── -->
         <div class="stats-row">
             <div class="stat-card stat-balance">
                 <div class="stat-icon">💰</div>
@@ -69,6 +73,7 @@
             </div>
         </div>
 
+        <!-- ── PROGRESS BAR ── -->
         <div class="progress-section">
             <div class="progress-header">
                 <span class="progress-label">Budget Used</span>
@@ -83,18 +88,57 @@
             </div>
         </div>
 
-        <!-- ── NUTRITION ANALYSIS: The Circle Chart ── -->
-        <div class="panel chart-panel" style="margin-bottom: 24px; padding: 25px;">
-            <div class="panel-header">
-                <h3>Nutrition Analysis 📊</h3>
-                <span class="panel-sub">Carbs | Protein | Vitamin | Fat | Beverages</span>
+        <!-- ── CALORIE WIDGET (NEW) ── -->
+        <!-- Hidden until /api/calorie_today confirms a saved profile exists -->
+        <div class="calorie-widget" id="calorie-widget" style="display:none;">
+            <div class="cw-header">
+                <div class="cw-header-left">
+                    <span class="cw-fire">🔥</span>
+                    <div>
+                        <div class="cw-title-text">Calorie Tracker</div>
+                        <div class="cw-mode-badge" id="cw-mode-badge">—</div>
+                    </div>
+                </div>
+                <div class="cw-nums">
+                    <div class="cw-num-group">
+                        <div class="cw-num" id="cw-consumed">0</div>
+                        <div class="cw-num-lbl">consumed</div>
+                    </div>
+                    <div class="cw-slash">/</div>
+                    <div class="cw-num-group">
+                        <div class="cw-num" id="cw-target">—</div>
+                        <div class="cw-num-lbl">target kcal</div>
+                    </div>
+                </div>
+                <div class="cw-right">
+                    <div class="cw-remaining-label">Remaining</div>
+                    <div class="cw-remaining-val" id="cw-remaining">— kcal</div>
+                    <a href="/calorie" class="cw-link">Update Profile →</a>
+                </div>
             </div>
-            <div style="max-height: 250px; display: flex; justify-content: center; margin-top: 15px;">
-                <canvas id="survivalChart"></canvas>
+            <div class="cw-bar-track">
+                <div class="cw-bar-fill" id="cw-fill" style="width:0%"></div>
+            </div>
+            <div class="cw-bar-footer">
+                <span id="cw-pct-label">0% of daily goal</span>
+                <span id="cw-status-label">—</span>
             </div>
         </div>
 
+        <!-- Prompt shown when no calorie profile is set up yet -->
+        <div class="calorie-cta" id="calorie-cta" style="display:none;">
+            <span class="cta-icon">🔥</span>
+            <div class="cta-text">
+                <strong>Track your calories too!</strong>
+                Set up your calorie profile to see your daily target alongside your budget.
+            </div>
+            <a href="/calorie" class="cta-btn">Set Up Now →</a>
+        </div>
+
+        <!-- ── BOTTOM ROW ── -->
         <div class="bottom-row">
+
+            <!-- LOG EXPENSE -->
             <div class="panel log-panel">
                 <div class="panel-header">
                     <h3>Log Expense</h3>
@@ -103,26 +147,33 @@
                 <div id="log-msg" class="hidden"></div>
                 <div class="log-form">
                     <label>Description</label>
-                    <input type="text" id="log-label" placeholder="e.g. Chicken Rice" maxlength="80">
-                    <label>Amount (RM)</label>
+                    <input type="text" id="log-label" placeholder="e.g. Nasi goreng + teh o ais" maxlength="80">
+<label>Amount (RM)</label>
                     <div class="input-prefix-wrap">
                         <span class="prefix">RM</span>
                         <input type="number" id="log-amount" placeholder="0.00" step="0.01" min="0.01">
+                    </div>
+                    <label>Calories <span style="font-weight:400; color: var(--ink-faint);">(optional)</span></label>
+                    <div class="input-prefix-wrap">
+                        <span class="prefix">kcal</span>
+                        <input type="number" id="log-calories" placeholder="    e.g. 450" min="0" step="1">
                     </div>
                     <button id="log-btn">Add Expense ✚</button>
                 </div>
             </div>
 
+            <!-- RECENT EXPENSES -->
             <div class="panel expense-panel">
                 <div class="panel-header">
                     <h3>Recent Expenses</h3>
                     <span class="panel-sub">Today's spending</span>
                 </div>
                 <div class="expense-list" id="expense-list">
-                    <div class="expense-empty">No expenses logged yet.</div>
+                    <div class="expense-empty">No expenses logged yet.<br>Start tracking above! 👆</div>
                 </div>
             </div>
 
+            <!-- MEAL SUGGESTIONS -->
             <div class="panel meal-panel">
                 <div class="panel-header">
                     <h3>Meal Ideas 🍜</h3>
@@ -132,7 +183,9 @@
                     <div class="meal-loading">Calculating your options...</div>
                 </div>
             </div>
+
         </div>
+
     </div>
 
     <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
@@ -142,8 +195,9 @@
             window.location.href = '/';
         });
         document.getElementById('new-session-btn').addEventListener('click', () => {
-            window.location.href = '/setup';
+            window.location.href = '/setup?new=true'; // Add ?new=true here
         });
     </script>
+
 </body>
 </html>
