@@ -31,36 +31,24 @@ function renderStats(d) {
     const spent     = d.spent_today;
 
     document.getElementById('stat-balance').textContent = `RM ${remaining.toFixed(2)}`;
-    const balNote = remaining < 10
-        ? '⚠️ Almost empty!'
-        : remaining < 30
-            ? '😬 Getting low'
-            : '✅ Looking okay';
+    const balNote = remaining < 10 ? '⚠️ Almost empty!' : remaining < 30 ? '😬 Getting low' : '✅ Looking okay';
     document.getElementById('stat-balance-note').textContent = balNote;
 
     document.getElementById('stat-days').textContent = days;
     document.getElementById('stat-days-note').textContent =
-        days === 1 ? 'Last day — hang in there!'
-        : days === 0 ? 'Payday today! 🎉'
-        : `${days} more days to go`;
+        days === 1 ? 'Last day — hang in there!' : days === 0 ? 'Payday today! 🎉' : `${days} more days to go`;
 
     document.getElementById('stat-daily').textContent = `RM ${daily.toFixed(2)}`;
-    const dailyNote = daily < 5
-        ? '😬 Very tight'
-        : daily < 10
-            ? '🍜 Budget meals only'
-            : '😊 Not bad!';
+    const dailyNote = daily < 5 ? '😬 Very tight' : daily < 10 ? '🍜 Budget meals only' : '😊 Not bad!';
     document.getElementById('stat-daily-note').textContent = dailyNote;
 
     document.getElementById('stat-spent').textContent = `RM ${spent.toFixed(2)}`;
     const leftToday = daily - spent;
     document.getElementById('stat-spent-note').textContent =
-        leftToday < 0
-            ? `⚠️ RM ${Math.abs(leftToday).toFixed(2)} over budget!`
-            : `RM ${leftToday.toFixed(2)} left today`;
+        leftToday < 0 ? `⚠️ RM ${Math.abs(leftToday).toFixed(2)} over budget!` : `RM ${leftToday.toFixed(2)} left today`;
 }
 
-// PROGRESS BAR
+// FINANCIAL PROGRESS LINEAR TRACK
 function renderProgress(d) {
     const totalSpent = d.total_spent;
     const startBal   = d.start_balance;
@@ -78,6 +66,45 @@ function renderProgress(d) {
     else if (pct >= 60) fill.classList.add('warn');
 }
 
+// DYNAMIC NUTRITION BREAKDOWN DONUT (Chart.js)
+function buildProgressChart(consumed, target) {
+    const chartCanvas = document.getElementById("progressChart");
+    if (!chartCanvas) return;
+
+    const ctx = chartCanvas.getContext("2d");
+    
+    // Fallback default target if user hasn't initialized their profile parameters yet
+    const maxTarget = target > 0 ? target : 2000;
+    const remaining = Math.max(maxTarget - consumed, 0);
+
+    if (window.myProgressChart) {
+        window.myProgressChart.destroy();
+    }
+
+    window.myProgressChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["Consumed (kcal)", "Remaining Target"],
+            datasets: [{
+                data: [consumed, remaining],
+                backgroundColor: ["#D97706", "#E5E7EB"], // Classic Amber Orange vs Clean Light Gray
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: "bottom",
+                    labels: { boxWidth: 10, font: { size: 11, weight: '500' } }
+                }
+            },
+            cutout: "75%"
+        }
+    });
+}
+
 // EXPENSE LIST
 function renderExpenses(expenses) {
     const list = document.getElementById('expense-list');
@@ -91,10 +118,7 @@ function renderExpenses(expenses) {
         const time = new Date(e.logged_at).toLocaleTimeString('en-MY', {
             hour: '2-digit', minute: '2-digit', hour12: true
         });
-        // Show calorie badge if the logged entry has calories (from meal plan)
-        const calBadge = e.calories > 0
-            ? `<span class="cal-badge">${e.calories} kcal</span>`
-            : '';
+        const calBadge = e.calories > 0 ? `<span class="cal-badge">${e.calories} kcal</span>` : '';
         return `
         <div class="expense-item">
             <div class="expense-item-left">
@@ -117,19 +141,17 @@ async function loadMeals() {
         const meals = await res.json();
         renderMeals(meals);
     } catch (e) {
-        document.getElementById('meal-list').innerHTML =
-            `<div class="meal-empty">Couldn't load meals.</div>`;
+        document.getElementById('meal-list').innerHTML = `<div class="meal-empty">Couldn't load meals.</div>`;
     }
 }
 
 function renderMeals(meals) {
     const list = document.getElementById('meal-list');
-    const dailyLimit = dashData.daily_budget - dashData.spent_today;
+    const dailyLimit = dashData ? (dashData.daily_budget - dashData.spent_today) : 0;
 
     list.innerHTML = meals.map(m => {
         const isLuxury = m.price > (dailyLimit * 0.7);
         const tag = isLuxury ? '<span class="status-badge status-warn">Top Choice</span>' : '';
-        // Show calorie count if available
         const calStr = m.calories > 0 ? `${m.calories} kcal` : '';
 
         return `
@@ -146,24 +168,31 @@ function renderMeals(meals) {
     }).join('');
 }
 
-// CALORIE WIDGET 
+// CALORIE DATA INTEGRATION & UNIFIED INVOCATION
 async function loadCalorieWidget() {
     try {
         const res = await fetch('/api/calorie_today');
-        if (!res.ok) return;
+        if (!res.ok) {
+            buildProgressChart(0, 2000); // Fail-safe default render
+            return;
+        }
         const data = await res.json();
 
         if (!data.has_profile) {
-            // Show a gentle CTA to set up their calorie profile
             document.getElementById('calorie-cta').style.display = 'flex';
+            buildProgressChart(0, 2000);
             return;
         }
 
         renderCalorieWidget(data);
         document.getElementById('calorie-widget').style.display = 'block';
+        
+        // Correctly maps actual calorie data parameters to Chart layout
+        buildProgressChart(data.calories_today, data.target_calories);
+
     } catch (e) {
-        // Silently ignore — calorie widget is optional
         console.warn('Calorie widget load failed:', e);
+        buildProgressChart(0, 2000);
     }
 }
 
@@ -173,10 +202,9 @@ function renderCalorieWidget(data) {
     const remaining = Math.max(target - consumed, 0);
     const pct       = target > 0 ? Math.min((consumed / target) * 100, 100) : 0;
 
-    // Goal mode badge
     const modeMap = {
-        deficit:  { label: '🔥 Cutting',      cls: 'cw-badge-deficit'  },
-        surplus:  { label: '💪 Bulking',       cls: 'cw-badge-surplus'  },
+        deficit:  { label: '🔥 Cutting',       cls: 'cw-badge-deficit'  },
+        surplus:  { label: '💪 Bulking',        cls: 'cw-badge-surplus'  },
         maintain: { label: '⚖️ Maintaining', cls: 'cw-badge-maintain' },
     };
     const mode = modeMap[data.goal_mode] || modeMap.maintain;
@@ -188,18 +216,14 @@ function renderCalorieWidget(data) {
     document.getElementById('cw-target').textContent    = target.toLocaleString();
     document.getElementById('cw-remaining').textContent = remaining > 0
         ? `${remaining.toLocaleString()} kcal left`
-        : consumed > target
-            ? `${(consumed - target).toLocaleString()} kcal over`
-            : 'Goal reached! 🎉';
+        : consumed > target ? `${(consumed - target).toLocaleString()} kcal over` : 'Goal reached! 🎉';
 
-    // Progress bar
     const fill = document.getElementById('cw-fill');
     fill.style.width = `${pct}%`;
     fill.className = 'cw-bar-fill';
     if (pct >= 100) fill.classList.add('cw-fill-over');
     else if (pct >= 80) fill.classList.add('cw-fill-warn');
 
-    // Footer labels
     document.getElementById('cw-pct-label').textContent = `${Math.round(pct)}% of daily goal`;
 
     let statusText = '';
@@ -236,7 +260,7 @@ document.getElementById('log-btn').addEventListener('click', async () => {
             document.getElementById('log-calories').value = '';
             await loadDashboard();
             await loadMeals();
-            await loadCalorieWidget();   // Refresh calorie widget too
+            await loadCalorieWidget();
         } else {
             showMsg(msgBox, 'error', data.error || 'Something went wrong.');
         }
@@ -250,17 +274,11 @@ function showMsg(el, type, text) {
     el.className = type;
     el.textContent = text;
     clearTimeout(el._timer);
-    el._timer = setTimeout(() => {
-        el.className = 'hidden';
-    }, 4000);
+    el._timer = setTimeout(() => { el.className = 'hidden'; }, 4000);
 }
 
 function escHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 async function refreshDashboard() {
@@ -269,8 +287,5 @@ async function refreshDashboard() {
     await loadCalorieWidget();
 }
 
-// START
 init();
-
-// AUTO-UPDATE every 30 seconds
 setInterval(refreshDashboard, 30000);
