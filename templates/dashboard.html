@@ -10,24 +10,16 @@
 </head>
 <body class="dashboard-body">
 
-    <div class="blob-canvas">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-        <div class="blob blob-4"></div>
-        <div class="blob blob-5"></div>
-    </div>
-    <div class="grid-overlay"></div>
-
     <nav class="navbar">
         <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
         <div class="nav-links">
             <a href="/dashboard" class="nav-link nav-link-active">📊 Dashboard</a>
             <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
             <a href="/calorie" class="nav-link">🔥 Calories</a>
+            <a href="/game" class="nav-link">🎰 Spin the Wheel</a>
         </div>
         <div class="nav-right">
-            <span class="user-greeting">Hey, {{ username }}! 👋</span>
+            <span class="user-greeting">Hey, {{ username if username else 'Choco!' }} 👋</span>
             <button class="logout-btn" id="logout-btn">Logout</button>
         </div>
     </nav>
@@ -47,26 +39,26 @@
             <div class="stat-card stat-balance">
                 <div class="stat-icon">💰</div>
                 <div class="stat-label">Remaining Balance</div>
-                <div class="stat-value" id="stat-balance">RM —</div>
-                <div class="stat-note" id="stat-balance-note">loading...</div>
+                <div class="stat-value" id="stat-balance">RM 20.00</div>
+                <div class="stat-note" id="stat-balance-note">Getting low</div>
             </div>
             <div class="stat-card stat-days">
                 <div class="stat-icon">📅</div>
                 <div class="stat-label">Days Remaining</div>
-                <div class="stat-value" id="stat-days">—</div>
-                <div class="stat-note" id="stat-days-note">loading...</div>
+                <div class="stat-value" id="stat-days">3</div>
+                <div class="stat-note" id="stat-days-note">3 more days to go</div>
             </div>
             <div class="stat-card stat-daily">
                 <div class="stat-icon">🍽️</div>
                 <div class="stat-label">Budget Per Day</div>
-                <div class="stat-value" id="stat-daily">RM —</div>
-                <div class="stat-note" id="stat-daily-note">loading...</div>
+                <div class="stat-value" id="stat-daily">RM 6.67</div>
+                <div class="stat-note" id="stat-daily-note">Budget meals only</div>
             </div>
             <div class="stat-card stat-spent">
                 <div class="stat-icon">📊</div>
                 <div class="stat-label">Spent Today</div>
-                <div class="stat-value" id="stat-spent">RM —</div>
-                <div class="stat-note" id="stat-spent-note">loading...</div>
+                <div class="stat-value" id="stat-spent">RM 0.00</div>
+                <div class="stat-note" id="stat-spent-note">RM 6.67 left today</div>
             </div>
         </div>
 
@@ -80,125 +72,82 @@
             </div>
             <div class="progress-footer">
                 <span id="progress-spent-label">RM 0.00 spent</span>
-                <span id="progress-left-label">RM 0.00 left</span>
+                <span id="progress-left-label">RM 20.00 left</span>
             </div>
         </div>
 
-        <div class="calorie-widget" id="calorie-widget" style="display:none;">
-            <div class="cw-header">
-                <div class="cw-header-left">
-                    <span class="cw-fire">🔥</span>
-                    <div>
-                        <div class="cw-title-text">Calorie Tracker</div>
-                        <div class="cw-mode-badge" id="cw-mode-badge">—</div>
-                    </div>
-                </div>
-                <div class="cw-nums">
-                    <div class="cw-num-group">
-                        <div class="cw-num" id="cw-consumed">0</div>
-                        <div class="cw-num-lbl">consumed</div>
-                    </div>
-                    <div class="cw-slash">/</div>
-                    <div class="cw-num-group">
-                        <div class="cw-num" id="cw-target">—</div>
-                        <div class="cw-num-lbl">target kcal</div>
-                    </div>
-                </div>
-                <div class="cw-right">
-                    <div class="cw-remaining-label">Remaining</div>
-                    <div class="cw-remaining-val" id="cw-remaining">— kcal</div>
-                    <a href="/calorie" class="cw-link">Update Profile →</a>
-                </div>
-            </div>
-            <div class="cw-bar-track">
-                <div class="cw-bar-fill" id="cw-fill" style="width:0%"></div>
-            </div>
-            <div class="cw-bar-footer">
-                <span id="cw-pct-label">0% of daily goal</span>
-                <span id="cw-status-label">—</span>
-            </div>
+        <div id="calorie-widget" style="display: none;">
+            <span id="cw-mode-badge"></span>
+            <span id="cw-consumed"></span>
+            <span id="cw-target"></span>
+            <span id="cw-remaining"></span>
+            <div id="cw-fill"></div>
+            <span id="cw-pct-label"></span>
+            <span id="cw-status-label"></span>
         </div>
 
-        <div class="calorie-cta" id="calorie-cta" style="display:none;">
-            <span class="cta-icon">🔥</span>
-            <div class="cta-text">
-                <strong>Track your calories too!</strong>
-                Set up your calorie profile to see your daily target alongside your budget.
+        <div class="calorie-cta" id="calorie-cta">
+            <div class="cta-message">
+                <span>🔥</span>
+                <span><strong>Track your calories too!</strong> Set up your calorie profile to see your daily target alongside your budget.</span>
             </div>
-            <a href="/calorie" class="cta-btn">Set Up Now →</a>
+            <a href="/calorie" class="cta-btn" style="background-color: #f5b041; color: black; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: bold;">Set Up Now ›</a>
         </div>
 
-        <div class="bottom-row" style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.5rem;">
+        <div class="bottom-row">
             
-            <div class="panel chart-panel" style="flex: 1; min-width: 300px; display: flex; flex-direction: column;">
+            <div class="panel">
                 <div class="panel-header">
                     <h3>Nutrition Breakdown 📊</h3>
-                    <span class="panel-sub">Survival mode targets</span>
+                    <p class="panel-sub">Survival mode targets</p>
                 </div>
-                <div style="flex: 1; min-height: 220px; position: relative; margin-top: 1.5rem; display: flex; align-items: center; justify-content: center;">
+                <div class="chart-wrapper" style="position: relative; display: flex; justify-content: center; align-items: center; min-height: 200px; width: 100%; margin-top: 10px;">
                     <canvas id="progressChart"></canvas>
                 </div>
             </div>
 
-            <div class="forms-wrapper-grid" style="flex: 2; min-width: 450px; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Log Expense</h3>
+                    <p class="panel-sub">What did you spend on?</p>
+                </div>
                 
-                <div class="panel log-panel">
-                    <div class="panel-header">
-                        <h3>Log Expense</h3>
-                        <span class="panel-sub">What did you spend on?</span>
+                <div class="log-form">
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 12px; text-align: left;">
+                        <label style="font-size: 0.8rem; color: var(--ink-soft); font-weight: 500; margin-bottom: 4px;">Description</label>
+                        <input type="text" id="log-label" placeholder="e.g. Nasi goreng + teh o ais" style="padding: 10px; border: 1px solid var(--cream-border); border-radius: 8px; width: 100%; box-sizing: border-box;">
                     </div>
+                    
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 12px; text-align: left;">
+                        <label style="font-size: 0.8rem; color: var(--ink-soft); font-weight: 500; margin-bottom: 4px;">Amount (RM)</label>
+                        <input type="number" id="log-amount" placeholder="RM 0.00" step="0.01" style="padding: 10px; border: 1px solid var(--cream-border); border-radius: 8px; width: 100%; box-sizing: border-box;">
+                    </div>
+                    
+                    <div class="form-group" style="display: flex; flex-direction: column; margin-bottom: 16px; text-align: left;">
+                        <label style="font-size: 0.8rem; color: var(--ink-soft); font-weight: 500; margin-bottom: 4px;">Calories <span style="font-weight:normal; color: var(--ink-faint);">(optional)</span></label>
+                        <input type="number" id="log-calories" placeholder="kcal e.g. 450" style="padding: 10px; border: 1px solid var(--cream-border); border-radius: 8px; width: 100%; box-sizing: border-box;">
+                    </div>
+                    
                     <div id="log-msg" class="hidden"></div>
-                    <div class="log-form">
-                        <label>Description</label>
-                        <input type="text" id="log-label" placeholder="e.g. Nasi goreng + teh o ais" maxlength="80">
-                        <label>Amount (RM)</label>
-                        <div class="input-prefix-wrap">
-                            <span class="prefix">RM</span>
-                            <input type="number" id="log-amount" placeholder="0.00" step="0.01" min="0.01">
-                        </div>
-                        <label>Calories <span style="font-weight:400; color: var(--ink-faint);">(optional)</span></label>
-                        <div class="input-prefix-wrap">
-                            <span class="prefix">kcal</span>
-                            <input type="number" id="log-calories" placeholder="   e.g. 450" min="0" step="1">
-                        </div>
-                        <button id="log-btn">Add Expense ✚</button>
-                    </div>
+                    <button id="log-btn" class="submit-expense-btn" style="width: 100%; background: #2d7a57; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">Add Expense ＋</button>
                 </div>
-
-                <div class="panel expense-panel">
-                    <div class="panel-header">
-                        <h3>Recent Expenses</h3>
-                        <span class="panel-sub">Today's spending</span>
-                    </div>
-                    <div class="expense-list" id="expense-list">
-                        <div class="expense-empty">No expenses logged yet.<br>Start tracking above! 👆</div>
-                    </div>
-                </div>
-
-                <div class="panel meal-panel" style="grid-column: span 2;">
-                    <div class="panel-header">
-                        <h3>Meal Ideas 🍜</h3>
-                        <span class="panel-sub">Fits your daily budget</span>
-                    </div>
-                    <div class="meal-list" id="meal-list">
-                        <div class="meal-loading">Calculating your options...</div>
-                    </div>
-                </div>
-
             </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Recent Expenses</h3>
+                    <p class="panel-sub">Today's spending</p>
+                </div>
+                
+                <div id="expense-list" class="expense-list">
+                    <div class="expense-empty">No expenses logged yet.</div>
+                </div>
+            </div>
+
         </div>
 
     </div>
 
     <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
-    <script>
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            await fetch('/logout', { method: 'POST' });
-            window.location.href = '/';
-        });
-        document.getElementById('new-session-btn').addEventListener('click', () => {
-            window.location.href = '/setup?new=true';
-        });
-    </script>
 </body>
 </html>
