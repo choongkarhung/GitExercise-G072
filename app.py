@@ -202,9 +202,9 @@ def api_dashboard():
     remaining_balance = start_balance - total_spent
     daily_budget = remaining_balance / max(days_remaining, 1)
 
-    # Today's expenses (last 20, most recent first)
+    # Today's expenses (last 20, most recent first) with calories and accurate category tracking
     expenses_today = db.execute("""
-        SELECT label, amount, logged_at, COALESCE(category, 'Carbs') as category
+        SELECT label, amount, logged_at, COALESCE(category, 'Carbs') as category, calories
         FROM expense_logs
         WHERE session_id = ?
         AND logged_at LIKE ?
@@ -245,6 +245,7 @@ def api_log_expense():
     label    = data.get('label', '').strip()
     amount   = data.get('amount')
     calories = int(data.get('calories', 0))   
+    category = data.get('category', 'Carbs') # Captures explicit selection from interface form
  
     if not label:
         return jsonify({'error': 'Description is required.'}), 400
@@ -265,16 +266,6 @@ def api_log_expense():
         return jsonify({'error': 'No active session. Please set up first.'}), 404
  
     try:
-        # Deduce basic category to avoid breaking dashboard chart fields
-        category = 'Carbs'
-        lbl_lower = label.lower()
-        if 'water' in lbl_lower or 'teh' in lbl_lower or 'kopi' in lbl_lower or 'juice' in lbl_lower or 'ais' in lbl_lower:
-            category = 'Beverages'
-        elif 'chicken' in lbl_lower or 'egg' in lbl_lower or 'daging' in lbl_lower or 'fish' in lbl_lower:
-            category = 'Protein'
-        elif 'sayur' in lbl_lower or 'fruit' in lbl_lower or 'salad' in lbl_lower:
-            category = 'Vitamin'
-
         db.execute("""
             INSERT INTO expense_logs (session_id, amount, label, logged_at, calories, category)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -492,7 +483,7 @@ def save_calorie_profile():
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(user_id) DO UPDATE SET
                 gender              = excluded.gender,
-                age                  = excluded.age,
+                age                 = excluded.age,
                 height_cm           = excluded.height_cm,
                 weight_kg           = excluded.weight_kg,
                 goal_weight_kg      = excluded.goal_weight_kg,

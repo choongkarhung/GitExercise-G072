@@ -26,7 +26,7 @@
     font-family: 'Syne', sans-serif;
     font-size: 1.6rem;
     font-weight: 800;
-    color: var(--ink);
+    color: #1a252c;
     margin: 4px 0 2px;
     letter-spacing: -0.03em;
     text-align: left;
@@ -34,7 +34,7 @@
  
 .dash-sub {
     font-size: 0.82rem;
-    color: var(--ink-muted);
+    color: #556670;
     text-align: left;
 }
  
@@ -219,3 +219,70 @@
     font-size: 0.8rem;
     padding: 40px 0;
 }
+
+.expense-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8faf9;
+    border: 1px solid #e1e8e4;
+    border-radius: 10px;
+    padding: 10px 13px;
+    gap: 10px;
+}
+
+.expense-item-left {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.expense-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 3px;
+}
+ 
+.expense-item-label {
+    font-size: 0.85rem;
+    color: #1a252c;
+    font-weight: 600;
+}
+ 
+.expense-item-time {
+    font-size: 0.68rem;
+    color: #888;
+}
+
+.cal-badge {
+    font-size: 0.62rem;
+    font-weight: bold;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: #fff3e0;
+    color: #d4813a;
+}
+
+.category-badge {
+    font-size: 0.62rem;
+    font-weight: bold;
+    padding: 1px 6px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.tag-carb { background: #fff3e0; color: #e67e22; }
+.tag-protein { background: #e8f5e9; color: #2ecc71; }
+.tag-vitamin { background: #fffde7; color: #f1c40f; }
+.tag-beverages { background: #e3f2fd; color: #3498db; }
+ 
+.expense-item-amount {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #c62828;
+}
+
+#log-msg.success { background: #e8f5e9; color: #2d7a57; border: 1px solid #c8e6c9; padding: 8px; border-radius: 8px; font-size: 0.78rem; margin-bottom: 10px; text-align: left; }
+#log-msg.error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 8px; border-radius: 8px; font-size: 0.78rem; margin-bottom: 10px; text-align: left; }
+.hidden { display: none; }

@@ -63,8 +63,8 @@
     </div>
 
     <script>
-        window.wheelOptions = {{ options | tojson | safe }};
-    </script>
+    window.wheelOptions = {{ options | tojson | safe }};
+</script>
     <script src="{{ url_for('static', filename='game.js') }}"></script>
     <script>
         document.getElementById('logout-btn').addEventListener('click', async () => {
