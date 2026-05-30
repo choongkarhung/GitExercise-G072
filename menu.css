@@ -85,3 +85,18 @@ th:nth-child(3), td:nth-child(3) {
     font-weight: 600;
     color: #27ae60; 
 }
+
+th:nth-child(4), td:nth-child(4) {
+    text-align: center; 
+}
+
+th:nth-child(5), td:nth-child(5) {
+    text-align: right; 
+    font-variant-numeric: tabular-nums;
+    color: #7f8c8d;
+}
+
+tbody tr:has(td:contains("BrokeBite")), 
+tbody tr:hover:has(td:contains("BrokeBite")) {
+    background-color: #fff5f5;
+}
