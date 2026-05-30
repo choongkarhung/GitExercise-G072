@@ -61,3 +61,15 @@ td {
     font-size: 0.95rem;
     color: #4f5d75;
 }
+
+tbody tr:nth-child(even) {
+    background-color: #fdfdfd;
+}
+tbody tr:nth-child(odd) {
+    background-color: #f7f9fa;
+}
+
+tbody tr:hover {
+    background-color: #f1f3f5;
+    transition: background-color 0.15s ease-in-out;
+}
