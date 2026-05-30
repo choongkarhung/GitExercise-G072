@@ -1,14 +1,28 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Menu</title>   
-
+    <title>Restaurant Menu - BrokeBite</title>   
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
 </head>
-</head>
 <body>
+
+    <nav class="navbar">
+        <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
+            <a href="/calorie" class="nav-link nav-link">🔥 Calories</a>
+            <a href="/menu" class="nav-link nav-link-active">📖 Menu</a>
+        </div>
+        <div class="nav-right">
+            <span class="user-greeting">Hey, {{ username }}! 👋</span>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+    </nav>
+
     <h1>Restaurant Menu</h1>
     <table border="1">
         <thead>
@@ -136,7 +150,7 @@
             <tr><td>Roti John</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>520</td></tr>
             <tr><td>Fries</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>320</td></tr>
             <tr><td>Wet Fries</td><td>Deen Cafe</td><td>5.50</td><td>Carbs</td><td>450</td></tr>
-             <tr><td>Fish and Chips</td><td>Deen Cafe</td><td>11.00</td><td>Carbs</td><td>780</td></tr>
+            <tr><td>Fish and Chips</td><td>Deen Cafe</td><td>11.00</td><td>Carbs</td><td>780</td></tr>
             <tr><td>Chicken Chop</td><td>Deen Cafe</td><td>12.00</td><td>Carbs</td><td>680</td></tr>
             <tr><td>Chicken Grill</td><td>Deen Cafe</td><td>15.00</td><td>Carbs</td><td>550</td></tr>
             <tr><td>Lamb Chops</td><td>Deen Cafe</td><td>18.00</td><td>Carbs</td><td>620</td></tr>
@@ -162,7 +176,7 @@
             <tr><td>Campur Tom Yam Soup+Rice</td><td>Deen Cafe</td><td>8.50</td><td>Carbs</td><td>560</td></tr>
             <tr><td>Maggi Soup</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>390</td></tr>
             <tr><td>Kuey Tiau Soup</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>380</td></tr>
-               <tr><td>Bihun Soup</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>350</td></tr>
+            <tr><td>Bihun Soup</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>350</td></tr>
             <tr><td>Vegetarian+Nasi Soup</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>430</td></tr>
             <tr><td>Cendawan+Nasi Soup</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>430</td></tr>
             <tr><td>Ayam+Nasi Soup</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>530</td></tr>
@@ -185,7 +199,7 @@
             <tr><td>Nasi Goreng Sea Food</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>610</td></tr>
             <tr><td>Nasi Goreng Ayam(Chicken)</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>610</td></tr>
             <tr><td>Nasi Goreng Paprik Ayam</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>670</td></tr>
-             <tr><td>Nasi Goreng Msa(Egg)</td><td>Deen Cafe</td><td>9.00</td><td>Carbs</td><td>580</td></tr>
+            <tr><td>Nasi Goreng Msa(Egg)</td><td>Deen Cafe</td><td>9.00</td><td>Carbs</td><td>580</td></tr>
             <tr><td>Nasi Goreng Thai</td><td>Deen Cafe</td><td>9.00</td><td>Carbs</td><td>590</td></tr>
             <tr><td>Nasi Goreng Kambing</td><td>Deen Cafe</td><td>12.00</td><td>Carbs</td><td>710</td></tr>
             <tr><td>Carbonara Pasta Special</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>660</td></tr>
@@ -231,7 +245,7 @@
             <tr><td>Nasi Telur Bistik</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>730</td></tr>
             <tr><td>Teh O</td><td>Deen Cafe</td><td>1.00</td><td>Beverage</td><td>65</td></tr>
             <tr><td>Teh Tarik</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>140</td></tr>
-             <tr><td>Teh O Limau</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>70</td></tr>
+            <tr><td>Teh O Limau</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>70</td></tr>
             <tr><td>Teh O Laici</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>120</td></tr>
             <tr><td>Nescafe</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>150</td></tr>
             <tr><td>Nescafe O</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>70</td></tr>
@@ -252,7 +266,7 @@
             <tr><td>Nescafe O Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>90</td></tr>
             <tr><td>Neslo Ais</td><td>Deen Cafe</td><td>3.00</td><td>Beverage</td><td>240</td></tr>
             <tr><td>White Coffee Ais</td><td>Deen Cafe</td><td>3.00</td><td>Beverage</td><td>210</td></tr>
-             <tr><td>Kopi Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>160</td></tr>
+            <tr><td>Kopi Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>160</td></tr>
             <tr><td>Kopi O Ais</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>85</td></tr>
             <tr><td>Milo Ais</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>220</td></tr>
             <tr><td>Milo O Ais</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>140</td></tr>
@@ -268,5 +282,12 @@
             <tr><td>Carrot Juice</td><td>Deen Cafe</td><td>3.50</td><td>Beverage</td><td>90</td></tr>
         </tbody>
     </table>
+
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/';
+        });
+    </script>
 </body>
 </html>
