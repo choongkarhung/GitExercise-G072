@@ -156,7 +156,7 @@
                     <label>Calories <span style="font-weight:400; color: var(--ink-faint);">(optional)</span></label>
                     <div class="input-prefix-wrap">
                         <span class="prefix">kcal</span>
-                        <input type="number" id="log-calories" placeholder="e.g. 450" min="0" step="1">
+                        <input type="number" id="log-calories" placeholder="    e.g. 450" min="0" step="1">
                     </div>
                     <button id="log-btn">Add Expense ✚</button>
                 </div>
@@ -195,7 +195,7 @@
             window.location.href = '/';
         });
         document.getElementById('new-session-btn').addEventListener('click', () => {
-            window.location.href = '/setup';
+            window.location.href = '/setup?new=true'; // Add ?new=true here
         });
     </script>
 
