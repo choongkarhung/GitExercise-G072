@@ -23,3 +23,13 @@ h1 {
     text-align: center;
     position: relative;
 }
+
+h1::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background-color: #d35400; 
+    margin: 8px auto 0 auto;
+    border-radius: 2px;
+}
