@@ -202,9 +202,9 @@ def api_dashboard():
     remaining_balance = start_balance - total_spent
     daily_budget = remaining_balance / max(days_remaining, 1)
 
-    # Today's expenses (last 20, most recent first)
+    # Today's expenses (last 20, most recent first) with calories and accurate category tracking
     expenses_today = db.execute("""
-        SELECT label, amount, logged_at, COALESCE(category, 'Carbs') as category
+        SELECT label, amount, logged_at, COALESCE(category, 'Carbs') as category, calories
         FROM expense_logs
         WHERE session_id = ?
         AND logged_at LIKE ?
@@ -245,6 +245,7 @@ def api_log_expense():
     label    = data.get('label', '').strip()
     amount   = data.get('amount')
     calories = int(data.get('calories', 0))   
+    category = data.get('category', 'Carbs') # Captures explicit selection from interface form
  
     if not label:
         return jsonify({'error': 'Description is required.'}), 400
@@ -266,9 +267,9 @@ def api_log_expense():
  
     try:
         db.execute("""
-            INSERT INTO expense_logs (session_id, amount, label, logged_at, calories)
-            VALUES (?, ?, ?, ?, ?)
-        """, (sess['id'], float(amount), label, datetime.now().isoformat(), calories))
+            INSERT INTO expense_logs (session_id, amount, label, logged_at, calories, category)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (sess['id'], float(amount), label, datetime.now().isoformat(), calories, category))
         db.commit()
         return jsonify({'success': True}), 200
     except Exception as e:
@@ -561,6 +562,71 @@ def api_calorie_today():
         'weight_kg':        profile['weight_kg'],
         'goal_weight_kg':   profile['goal_weight_kg'],
     })
+
+# Spin the Wheel
+@app.route('/game')
+def game_page():
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+
+    user_id = session['user_id']
+    db = get_db()
+
+    sess = db.execute("""
+        SELECT id, start_balance, days_total, created_at FROM survival_sessions
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT 1
+    """, (user_id,)).fetchone()
+
+    daily_budget = 6.67
+
+    if sess:
+        session_id    = sess['id']
+        start_balance = float(sess['start_balance'])
+        days_total    = int(sess['days_total'])
+
+        try:
+            session_start = datetime.fromisoformat(sess['created_at']).date()
+        except Exception:
+            session_start = date.today()
+
+        days_elapsed   = (date.today() - session_start).days
+        days_remaining = max(days_total - days_elapsed, 0)
+
+        total_spent_row = db.execute("""
+            SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ?
+        """, (session_id,)).fetchone()
+        total_spent = float(total_spent_row['total'])
+
+        remaining_balance = start_balance - total_spent
+        daily_budget      = remaining_balance / max(days_remaining, 1)
+
+    try:
+        meals = db.execute("""
+            SELECT name FROM food_items
+            WHERE is_active = 1 AND price <= ?
+            ORDER BY price ASC
+        """, (daily_budget,)).fetchall()
+        wheel_options = [m['name'] for m in meals]
+    except Exception:
+        wheel_options = []
+
+    db.close()
+
+    if not wheel_options:
+        wheel_options = ["Meggies at Home", "Plain Water", "Deen Cafe Mamak", "Hajitapah Nasi Kandar"]
+    
+    # Slice limits: cap at maximum 10 elements so the wheel sectors look readable on HTML5 Canvas
+    if len(wheel_options) > 10:
+        import random
+        wheel_options = random.sample(wheel_options, 10)
+
+    return render_template('game.html', 
+                           options=wheel_options, 
+                           budget=round(daily_budget, 2),
+                           username=session.get('username', 'Student'))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

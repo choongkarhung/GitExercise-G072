@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrokeBite - Spin the Wheel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='game.css') }}">
+</head>
+<body class="dashboard-body">
+
+    <div class="blob-canvas">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
+            <a href="/calorie" class="nav-link">🔥 Calories</a>
+            <a href="/game" class="nav-link nav-link-active">🎰 Spin the Wheel</a>
+        </div>
+        <div class="nav-right">
+            <span class="user-greeting">Hey, {{ username }}! 👋</span>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <div class="game-wrapper">
+        <h1>BrokeBite Budget Wheel 🎰</h1>
+        <p>Affordable options within your limit: <strong style="color: #2e7d32;">RM {{ budget }}</strong></p>
+
+        <div id="canvas-container">
+            <div id="pointer"></div>
+            <canvas id="wheelCanvas" width="400" height="400"></canvas>
+        </div>
+        <br>
+        <button class="spin-btn" onclick="spinWheel()">SPIN THE WHEEL</button>
+    </div>
+
+    <div id="win-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-icon">🎉</div>
+            <h2 class="modal-title">We Have a Winner!</h2>
+            <p class="modal-subtitle">Your budget-friendly fate has been decided:</p>
+            
+            <div class="prize-box">
+                <span id="modal-prize-text">—</span>
+            </div>
+            
+            <p class="modal-meta">Enjoy your meal! 🍜</p>
+            
+            <div class="modal-actions">
+                <button class="modal-btn btn-accept" id="modal-close-btn">Awesome, thanks!</button>
+                <button class="modal-btn btn-retry" onclick="spinWheel()">Spin Again 🎰</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.wheelOptions = {{ options | tojson | safe }};
+</script>
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>

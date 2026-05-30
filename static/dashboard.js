@@ -1,9 +1,10 @@
 let dashData = null;
 
 async function init() {
-    await loadDashboard();
-    await loadMeals();
-    await loadCalorieWidget();  
+    try { await loadDashboard(); } catch(err) { console.error(err); }
+    try { await loadMeals(); } catch(err) { console.error(err); }
+    try { await loadCalorieWidget(); } catch(err) { console.error(err); }
+    setupEventListeners();
 }
 
 // LOAD DASHBOARD DATA
@@ -18,6 +19,9 @@ async function loadDashboard() {
         renderStats(dashData);
         renderProgress(dashData);
         renderExpenses(dashData.expenses_today);
+        
+        // Build the multi-colored circle chart layout
+        buildProgressChart(dashData);
     } catch (e) {
         console.error('Dashboard load error:', e);
     }
@@ -30,22 +34,18 @@ function renderStats(d) {
     const daily     = d.daily_budget;
     const spent     = d.spent_today;
 
-    document.getElementById('stat-balance').textContent = `RM ${remaining.toFixed(2)}`;
-    const balNote = remaining < 10 ? '⚠️ Almost empty!' : remaining < 30 ? '😬 Getting low' : '✅ Looking okay';
-    document.getElementById('stat-balance-note').textContent = balNote;
-
-    document.getElementById('stat-days').textContent = days;
-    document.getElementById('stat-days-note').textContent =
-        days === 1 ? 'Last day — hang in there!' : days === 0 ? 'Payday today! 🎉' : `${days} more days to go`;
-
-    document.getElementById('stat-daily').textContent = `RM ${daily.toFixed(2)}`;
-    const dailyNote = daily < 5 ? '😬 Very tight' : daily < 10 ? '🍜 Budget meals only' : '😊 Not bad!';
-    document.getElementById('stat-daily-note').textContent = dailyNote;
-
-    document.getElementById('stat-spent').textContent = `RM ${spent.toFixed(2)}`;
-    const leftToday = daily - spent;
-    document.getElementById('stat-spent-note').textContent =
-        leftToday < 0 ? `⚠️ RM ${Math.abs(leftToday).toFixed(2)} over budget!` : `RM ${leftToday.toFixed(2)} left today`;
+    if(document.getElementById('stat-balance')) {
+        document.getElementById('stat-balance').textContent = `RM ${remaining.toFixed(2)}`;
+    }
+    if(document.getElementById('stat-days')) {
+        document.getElementById('stat-days').textContent = days;
+    }
+    if(document.getElementById('stat-daily')) {
+        document.getElementById('stat-daily').textContent = `RM ${daily.toFixed(2)}`;
+    }
+    if(document.getElementById('stat-spent')) {
+        document.getElementById('stat-spent').textContent = `RM ${spent.toFixed(2)}`;
+    }
 }
 
 // FINANCIAL PROGRESS LINEAR TRACK
@@ -55,27 +55,46 @@ function renderProgress(d) {
     const remaining  = d.remaining_balance;
     const pct        = startBal > 0 ? Math.min((totalSpent / startBal) * 100, 100) : 0;
 
-    document.getElementById('progress-pct').textContent    = `${Math.round(pct)}%`;
-    document.getElementById('progress-fill').style.width   = `${pct}%`;
-    document.getElementById('progress-spent-label').textContent = `RM ${totalSpent.toFixed(2)} spent`;
-    document.getElementById('progress-left-label').textContent  = `RM ${remaining.toFixed(2)} left`;
-
-    const fill = document.getElementById('progress-fill');
-    fill.classList.remove('warn', 'danger');
-    if (pct >= 85) fill.classList.add('danger');
-    else if (pct >= 60) fill.classList.add('warn');
+    if (document.getElementById('progress-pct')) document.getElementById('progress-pct').textContent = `${Math.round(pct)}%`;
+    if (document.getElementById('progress-fill')) {
+        document.getElementById('progress-fill').style.width = `${pct}%`;
+    }
+    if (document.getElementById('progress-spent-label')) document.getElementById('progress-spent-label').textContent = `RM ${totalSpent.toFixed(2)} spent`;
+    if (document.getElementById('progress-left-label')) document.getElementById('progress-left-label').textContent = `RM ${remaining.toFixed(2)} left`;
 }
 
-// DYNAMIC NUTRITION BREAKDOWN DONUT (Chart.js)
-function buildProgressChart(consumed, target) {
+// MULTI-COLORED BREAKDOWN DONUT CHART
+function buildProgressChart(dataObj) {
     const chartCanvas = document.getElementById("progressChart");
     if (!chartCanvas) return;
 
     const ctx = chartCanvas.getContext("2d");
+
+    let carb = 0, protein = 0, vitamin = 0, fat = 0, beverages = 0;
+
+    // Tally up items directly from today's expenses array
+    const expenses = dataObj.expenses_today || [];
+    expenses.forEach(e => {
+        const cat = e.category ? e.category.trim().toLowerCase() : '';
+        const amt = parseFloat(e.amount) || 0;
+        
+        if (cat === 'carb' || cat === 'carbs') carb += amt;
+        else if (cat === 'protein') protein += amt;
+        else if (cat === 'vitamin' || cat === 'vitamins') vitamin += amt;
+        else if (cat === 'fat' || cat === 'fats') fat += amt;
+        else if (cat === 'beverages' || cat === 'beverage') beverages += amt;
+    });
+
+    const totalMacros = carb + protein + vitamin + fat + beverages;
     
-    // Fallback default target if user hasn't initialized their profile parameters yet
-    const maxTarget = target > 0 ? target : 2000;
-    const remaining = Math.max(maxTarget - consumed, 0);
+    let chartData = [carb, protein, vitamin, fat, beverages];
+    let chartColors = ["#e67e22", "#2ecc71", "#f1c40f", "#e74c3c", "#3498db"];
+    let chartLabels = ["Carb", "Protein", "Vitamin", "Fat", "Beverages"];
+
+    // If completely empty, show all 5 colors equally
+    if (totalMacros === 0) {
+        chartData = [1, 1, 1, 1, 1];
+    }
 
     if (window.myProgressChart) {
         window.myProgressChart.destroy();
@@ -84,11 +103,12 @@ function buildProgressChart(consumed, target) {
     window.myProgressChart = new Chart(ctx, {
         type: "doughnut",
         data: {
-            labels: ["Consumed (kcal)", "Remaining Target"],
+            labels: chartLabels,
             datasets: [{
-                data: [consumed, remaining],
-                backgroundColor: ["#D97706", "#E5E7EB"], // Classic Amber Orange vs Clean Light Gray
-                borderWidth: 0
+                data: chartData,
+                backgroundColor: chartColors,
+                borderWidth: 2,
+                borderColor: "#ffffff"
             }]
         },
         options: {
@@ -97,10 +117,10 @@ function buildProgressChart(consumed, target) {
             plugins: {
                 legend: { 
                     position: "bottom",
-                    labels: { boxWidth: 10, font: { size: 11, weight: '500' } }
+                    labels: { boxWidth: 12, font: { size: 11, weight: '500' } }
                 }
             },
-            cutout: "75%"
+            cutout: "70%"
         }
     });
 }
@@ -108,6 +128,7 @@ function buildProgressChart(consumed, target) {
 // EXPENSE LIST
 function renderExpenses(expenses) {
     const list = document.getElementById('expense-list');
+    if (!list) return;
 
     if (!expenses || expenses.length === 0) {
         list.innerHTML = `<div class="expense-empty">No expenses logged yet.<br>Start tracking above! 👆</div>`;
@@ -119,6 +140,8 @@ function renderExpenses(expenses) {
             hour: '2-digit', minute: '2-digit', hour12: true
         });
         const calBadge = e.calories > 0 ? `<span class="cal-badge">${e.calories} kcal</span>` : '';
+        
+        // Removed the inner category tag badge entirely from HTML string assembly
         return `
         <div class="expense-item">
             <div class="expense-item-left">
@@ -133,159 +156,53 @@ function renderExpenses(expenses) {
     }).join('');
 }
 
-// MEAL SUGGESTIONS
-async function loadMeals() {
-    try {
-        const res = await fetch('/api/meals');
-        if (!res.ok) throw new Error('Meals load failed');
-        const meals = await res.json();
-        renderMeals(meals);
-    } catch (e) {
-        document.getElementById('meal-list').innerHTML = `<div class="meal-empty">Couldn't load meals.</div>`;
-    }
-}
+// MEAL SUGGESTIONS & CALORIE CODES
+async function loadMeals() { try { const res = await fetch('/api/meals'); if (!res.ok) throw new Error(); const meals = await res.json(); renderMeals(meals); } catch (e) {} }
+function renderMeals(meals) { const list = document.getElementById('meal-list'); if (!list) return; list.innerHTML = meals.map(m => `<div class="meal-item"><div class="meal-item-name">${escHtml(m.name)}</div><span class="meal-item-price">RM ${parseFloat(m.price).toFixed(2)}</span></div>`).join(''); }
+async function loadCalorieWidget() { try { const res = await fetch('/api/calorie_today'); if (!res.ok) return; const data = await res.json(); if (data.has_profile) { document.getElementById('calorie-widget').style.display = 'block'; } } catch (e) {} }
 
-function renderMeals(meals) {
-    const list = document.getElementById('meal-list');
-    const dailyLimit = dashData ? (dashData.daily_budget - dashData.spent_today) : 0;
+function setupEventListeners() {
+    const logBtn = document.getElementById('log-btn');
+    if (logBtn) {
+        logBtn.replaceWith(logBtn.cloneNode(true)); 
+        document.getElementById('log-btn').addEventListener('click', async () => {
+            const label    = document.getElementById('log-label').value.trim();
+            const amount   = document.getElementById('log-amount').value;
+            const calories = parseInt(document.getElementById('log-calories').value) || 0;
 
-    list.innerHTML = meals.map(m => {
-        const isLuxury = m.price > (dailyLimit * 0.7);
-        const tag = isLuxury ? '<span class="status-badge status-warn">Top Choice</span>' : '';
-        const calStr = m.calories > 0 ? `${m.calories} kcal` : '';
+            if (!label || !amount || parseFloat(amount) <= 0) return;
 
-        return `
-        <div class="meal-item">
-            <div class="meal-item-info">
-                <div class="meal-item-name">${escHtml(m.name)} ${tag}</div>
-                <div class="meal-item-stall">${escHtml(m.stall)}</div>
-            </div>
-            <div class="meal-item-right">
-                ${calStr ? `<span class="meal-kcal">${calStr}</span>` : ''}
-                <span class="meal-item-price">RM ${parseFloat(m.price).toFixed(2)}</span>
-            </div>
-        </div>`;
-    }).join('');
-}
+            // DYNAMIC AUTOMATIC KEYWORD RECOGNITION
+            let detectedCategory = "Carb";
+            const lowerLabel = label.toLowerCase();
+            
+            if (lowerLabel.includes('ayam') || lowerLabel.includes('chicken') || lowerLabel.includes('daging') || lowerLabel.includes('beef') || lowerLabel.includes('telur') || lowerLabel.includes('egg') || lowerLabel.includes('fish') || lowerLabel.includes('ikan') || lowerLabel.includes('protein')) {
+                detectedCategory = "Protein";
+            } else if (lowerLabel.includes('sayur') || lowerLabel.includes('vegetable') || lowerLabel.includes('fruit') || lowerLabel.includes('buah') || lowerLabel.includes('salad') || lowerLabel.includes('broccoli') || lowerLabel.includes('vitamin')) {
+                detectedCategory = "Vitamin";
+            } else if (lowerLabel.includes('oil') || lowerLabel.includes('butter') || lowerLabel.includes('cheese') || lowerLabel.includes('keju') || lowerLabel.includes('fat')) {
+                detectedCategory = "Fat";
+            } else if (lowerLabel.includes('teh') || lowerLabel.includes('kopi') || lowerLabel.includes('coffee') || lowerLabel.includes('tea') || lowerLabel.includes('ais') || lowerLabel.includes('juice') || lowerLabel.includes('water') || lowerLabel.includes('air') || lowerLabel.includes('beverage') || lowerLabel.includes('milo')) {
+                detectedCategory = "Beverages";
+            }
 
-// CALORIE DATA INTEGRATION & UNIFIED INVOCATION
-async function loadCalorieWidget() {
-    try {
-        const res = await fetch('/api/calorie_today');
-        if (!res.ok) {
-            buildProgressChart(0, 2000); // Fail-safe default render
-            return;
-        }
-        const data = await res.json();
-
-        if (!data.has_profile) {
-            document.getElementById('calorie-cta').style.display = 'flex';
-            buildProgressChart(0, 2000);
-            return;
-        }
-
-        renderCalorieWidget(data);
-        document.getElementById('calorie-widget').style.display = 'block';
-        
-        // Correctly maps actual calorie data parameters to Chart layout
-        buildProgressChart(data.calories_today, data.target_calories);
-
-    } catch (e) {
-        console.warn('Calorie widget load failed:', e);
-        buildProgressChart(0, 2000);
-    }
-}
-
-function renderCalorieWidget(data) {
-    const target    = data.target_calories;
-    const consumed  = data.calories_today;
-    const remaining = Math.max(target - consumed, 0);
-    const pct       = target > 0 ? Math.min((consumed / target) * 100, 100) : 0;
-
-    const modeMap = {
-        deficit:  { label: '🔥 Cutting',       cls: 'cw-badge-deficit'  },
-        surplus:  { label: '💪 Bulking',        cls: 'cw-badge-surplus'  },
-        maintain: { label: '⚖️ Maintaining', cls: 'cw-badge-maintain' },
-    };
-    const mode = modeMap[data.goal_mode] || modeMap.maintain;
-    const badge = document.getElementById('cw-mode-badge');
-    badge.textContent = mode.label;
-    badge.className   = `cw-mode-badge ${mode.cls}`;
-
-    document.getElementById('cw-consumed').textContent  = consumed.toLocaleString();
-    document.getElementById('cw-target').textContent    = target.toLocaleString();
-    document.getElementById('cw-remaining').textContent = remaining > 0
-        ? `${remaining.toLocaleString()} kcal left`
-        : consumed > target ? `${(consumed - target).toLocaleString()} kcal over` : 'Goal reached! 🎉';
-
-    const fill = document.getElementById('cw-fill');
-    fill.style.width = `${pct}%`;
-    fill.className = 'cw-bar-fill';
-    if (pct >= 100) fill.classList.add('cw-fill-over');
-    else if (pct >= 80) fill.classList.add('cw-fill-warn');
-
-    document.getElementById('cw-pct-label').textContent = `${Math.round(pct)}% of daily goal`;
-
-    let statusText = '';
-    if (pct >= 100)      statusText = '🔴 Over target for today';
-    else if (pct >= 80)  statusText = '⚠️ Nearly at your limit';
-    else if (pct >= 50)  statusText = '✅ On track';
-    else if (consumed === 0) statusText = '💡 Log meals from Meal Plan to track';
-    else                 statusText = '👍 Good pace';
-    document.getElementById('cw-status-label').textContent = statusText;
-}
-
-// LOG EXPENSE
-document.getElementById('log-btn').addEventListener('click', async () => {
-    const label    = document.getElementById('log-label').value.trim();
-    const amount   = document.getElementById('log-amount').value;
-    const calories = parseInt(document.getElementById('log-calories').value) || 0;
-    const msgBox = document.getElementById('log-msg');
-
-    if (!label) return showMsg(msgBox, 'error', 'Please enter a description.');
-    if (!amount || parseFloat(amount) <= 0) return showMsg(msgBox, 'error', 'Enter a valid amount.');
-
-    try {
-        const res = await fetch('/api/log_expense', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ label, amount: parseFloat(amount), calories })
+            try {
+                await fetch('/api/log_expense', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ label, amount: parseFloat(amount), category: detectedCategory, calories })
+                });
+                document.getElementById('log-label').value    = '';
+                document.getElementById('log-amount').value   = '';
+                document.getElementById('log-calories').value = '';
+                await refreshDashboard();
+            } catch (e) {}
         });
-        const data = await res.json();
-
-        if (res.ok) {
-            showMsg(msgBox, 'success', `Logged: ${label} (RM ${parseFloat(amount).toFixed(2)})`);
-            document.getElementById('log-label').value    = '';
-            document.getElementById('log-amount').value   = '';
-            document.getElementById('log-calories').value = '';
-            await loadDashboard();
-            await loadMeals();
-            await loadCalorieWidget();
-        } else {
-            showMsg(msgBox, 'error', data.error || 'Something went wrong.');
-        }
-    } catch (e) {
-        showMsg(msgBox, 'error', 'Network error.');
     }
-});
-
-// HELPERS
-function showMsg(el, type, text) {
-    el.className = type;
-    el.textContent = text;
-    clearTimeout(el._timer);
-    el._timer = setTimeout(() => { el.className = 'hidden'; }, 4000);
+    if (document.getElementById('logout-btn')) { document.getElementById('logout-btn').addEventListener('click', () => { window.location.href = '/logout'; }); }
 }
 
-function escHtml(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-async function refreshDashboard() {
-    await loadDashboard();
-    await loadMeals();
-    await loadCalorieWidget();
-}
+function escHtml(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+async function refreshDashboard() { try { await loadDashboard(); await loadMeals(); } catch(e){} }
 
 init();
-setInterval(refreshDashboard, 30000);
