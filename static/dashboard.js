@@ -32,31 +32,31 @@ function renderStats(d) {
 
     document.getElementById('stat-balance').textContent = `RM ${remaining.toFixed(2)}`;
     const balNote = remaining < 10
-        ? '⚠️ Almost empty!'
+        ? 'Almost empty!'
         : remaining < 30
-            ? '😬 Getting low'
-            : '✅ Looking okay';
+            ? 'Getting low'
+            : 'Looking okay';
     document.getElementById('stat-balance-note').textContent = balNote;
 
     document.getElementById('stat-days').textContent = days;
     document.getElementById('stat-days-note').textContent =
         days === 1 ? 'Last day — hang in there!'
-        : days === 0 ? 'Payday today! 🎉'
+        : days === 0 ? 'Payday today!'
         : `${days} more days to go`;
 
     document.getElementById('stat-daily').textContent = `RM ${daily.toFixed(2)}`;
     const dailyNote = daily < 5
-        ? '😬 Very tight'
+        ? 'Very tight'
         : daily < 10
-            ? '🍜 Budget meals only'
-            : '😊 Not bad!';
+            ? 'Budget meals only'
+            : 'Not bad!';
     document.getElementById('stat-daily-note').textContent = dailyNote;
 
     document.getElementById('stat-spent').textContent = `RM ${spent.toFixed(2)}`;
     const leftToday = daily - spent;
     document.getElementById('stat-spent-note').textContent =
         leftToday < 0
-            ? `⚠️ RM ${Math.abs(leftToday).toFixed(2)} over budget!`
+            ? `RM ${Math.abs(leftToday).toFixed(2)} over budget!`
             : `RM ${leftToday.toFixed(2)} left today`;
 }
 

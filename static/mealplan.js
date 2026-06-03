@@ -63,21 +63,21 @@ function renderRibbon(data) {
     badge.className = 'ribbon-badge';
     if (pct <= 80) {
         badge.classList.add('ok');
-        badge.textContent = '✅ Within Budget';
+        badge.textContent = 'Within Budget';
     } else if (pct <= 100) {
         badge.classList.add('warn');
-        badge.textContent = '⚠️ Nearly Full';
+        badge.textContent = 'Nearly Full';
     } else {
         badge.classList.add('danger');
-        badge.textContent = '🔴 Over Budget';
+        badge.textContent = 'Over Budget';
     }
 }
 
 // MEAL CARDS 
 const MEAL_META = [
-    { key: 'breakfast', label: 'Breakfast', icon: '🌅', sub: 'Start the day right' },
-    { key: 'lunch',     label: 'Lunch',     icon: '☀️',  sub: 'Midday fuel' },
-    { key: 'dinner',    label: 'Dinner',    icon: '🌙',  sub: 'End the day well' },
+    { key: 'breakfast', label: 'Breakfast', sub: 'Start the day right' },
+    { key: 'lunch', label: 'Lunch',  sub: 'Midday fuel' },
+    { key: 'dinner', label: 'Dinner', sub: 'End the day well' },
 ];
 
 function renderMeals(meals) {
