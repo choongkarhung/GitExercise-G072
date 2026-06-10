@@ -328,8 +328,8 @@ def setup_database():
     print("Database synced automatically!")
 
 # Run the setup before the first request or at startup
-with app.app_context():
-    setup_database()
+#with app.app_context():
+#    setup_database()
 
 @app.route('/mealplan')
 def mealplan():
@@ -588,15 +588,9 @@ def admin():
         return redirect(url_for('home'))
     return render_template('admin.html', username=session.get('username', ''))
 
-
-# ==========================================
-# ADMIN MENU DATA CATALOG CRUD ENDPOINTS
-# ==========================================
-
 @app.route('/api/food_items', methods=['GET'])
 def get_food_items():
     db = get_db()
-    # Pull items currently flagged as active
     items = db.execute("""
         SELECT id, name, stall, price, category, calories 
         FROM food_items 
@@ -656,11 +650,16 @@ def update_food_item(item_id):
 @app.route('/api/food_items/<int:item_id>', methods=['DELETE'])
 def delete_food_item(item_id):
     db = get_db()
-    # Execute a soft-delete (is_active=0) so old expense logging histories aren't corrupted
-    db.execute("UPDATE food_items SET is_active = 0 WHERE id = ?", (item_id,))
-    db.commit()
+    # Execute a soft-delete (is_active=0) so old logs don't break due to foreign key constraints
+    try:
+        db.execute("UPDATE food_items SET is_active = 0 WHERE id = ?", (item_id,))
+        db.commit()
+    except Exception as e:
+        db.close()
+        return jsonify({'error': f'Database error occurred: {str(e)}'}), 400
+        
     db.close()
-    return jsonify({'message': 'Menu item successfully deleted.'}), 200
+    return jsonify({'message': 'Menu item removed successfully!'}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

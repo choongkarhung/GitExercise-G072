@@ -343,8 +343,8 @@ food_items = [
 ]
 
 cur.executemany("""
-INSERT OR REPLACE INTO food_items (name, stall, price, category, calories)
-VALUES (?, ?, ?, ?, ?)
+    INSERT OR IGNORE INTO food_items (name, stall, price, category, calories)
+    VALUES (?, ?, ?, ?, ?)
 """, food_items)
 
 conn.commit()
