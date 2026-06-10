@@ -3,39 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Menu</title>
-    <style>
-        body { font-family: sans-serif; margin: 20px; background-color: #f9f9f9; }
-        .nav-header { margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid #ddd; }
-        .nav-header a { text-decoration: none; color: #007bff; margin-right: 15px; font-weight: bold; }
-        table { border-collapse: collapse; width: 100%; max-width: 1000px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        th, td { border: 1px solid #dddddd; text-align: left; padding: 12px; }
-        th { background-color: #f2f2f2; }
-        tr:nth-child(even) { background-color: #f6f6f6; }
-    </style>
+    <title>Menu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
 </head>
-<body>
+<body class="menu-body">
 
-    <div class="nav-header">
-        <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
-        <a href="{{ url_for('mealplan') }}">🍲 Meal Planner</a>
-        <a href="{{ url_for('admin') }}">⚙️ Admin Control Panel</a>
+    <div class="blob-canvas">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
     </div>
+    <div class="grid-overlay"></div>
 
-    <h1>Restaurant Menu</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Item Name</th>
-                <th>Restaurant</th>
-                <th>Price (RM)</th>
-                <th>Category</th>
-                <th>Calories</th>
-            </tr>
-        </thead>
-        <tbody id="live-menu-body">
-            </tbody>
-    </table>
+    <nav class="navbar">
+        <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
+            <a href="/calorie" class="nav-link">🔥 Calories</a>
+            <a href="/menu" class="nav-link-active">📖 Menu</a>
+            <a href="/admin" class="nav-link">⚙️ Admin Panel</a>
+        </div>
+        <div class="nav-right">
+            <span class="user-greeting">Hey, {{ username }}!</span>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <div class="menu-wrapper">
+        <header class="menu-header">
+            <span class="pill-tag">Campus Dining</span>
+            <h1>Restaurant Menu</h1>
+            <p class="menu-sub">Browse available food options, current stalls, and calorie counts around campus.</p>
+        </header>
+
+        <section class="table-section card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Restaurant</th>
+                            <th>Price (RM)</th>
+                            <th>Category</th>
+                            <th>Calories</th>
+                        </tr>
+                    </thead>
+                    <tbody id="live-menu-body">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
@@ -52,16 +74,22 @@
                     row.innerHTML = `
                         <td><strong>${item.name}</strong></td>
                         <td>${item.stall}</td>
-                        <td>RM ${parseFloat(item.price).toFixed(2)}</td>
-                        <td>${item.category}</td>
-                        <td>${item.calories} kcal</td>
+                        <td class="price-cell">RM ${parseFloat(item.price).toFixed(2)}</td>
+                        <td class="category-cell">${item.category}</td>
+                        <td class="calories-cell">${item.calories} kcal</td>
                     `;
                     tableBody.appendChild(row);
                 });
             } catch (error) {
                 console.error('Error rendering menu:', error);
-                tableBody.innerHTML = '<tr><td colspan="5" style="color: red; text-align: center;">Error loading menu database data.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan=\"5\" style=\"color: var(--red-text); text-align: center;\">Error loading menu database data.</td></tr>';
             }
+        });
+
+        // Logout listener
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/';
         });
     </script>
 </body>
