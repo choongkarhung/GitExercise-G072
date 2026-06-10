@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- Dashboard Container -->
+    <div class="admin-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>BiteAdmin</h2>
+            </div>
+            <nav class="nav-links">
+                <a href="#" class="active">📋 Menu Management</a>
+                <a href="#">📊 Analytics</a>
+                <a href="#">⚙️ Settings</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Menu Management Portal</h1>
+                <div class="user-profile">Welcome, Admin 👤</div>
+            </header>
+
+            <!-- Stats Overview Widgets -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Items</h3>
+                    <p id="stat-total-items">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Restaurants</h3>
+                    <p id="stat-total-restaurants">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Price</h3>
+                    <p id="stat-avg-price">RM 0.00</p>
+                </div>
+            </section>
+
+            <!-- Form to Add/Edit Items -->
+            <section class="form-section">
+                <div class="card">
+                    <h3 id="form-title">Add New Menu Item</h3>
+                    <form id="menu-form">
+                        <input type="hidden" id="item-index">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="item-name">Item Name</label>
+                                <input type="text" id="item-name" required placeholder="e.g., Nasi Goreng Kampung">
+                            </div>
+                            <div class="form-group">
+                                <label for="restaurant">Restaurant</label>
+                                <input type="text" id="restaurant" required placeholder="e.g., Deen Cafe">
+                            </div>
+                            <div class="form-group">
+                                <label for="price">Price (RM)</label>
+                                <input type="number" id="price" step="0.01" min="0" required placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select id="category" required>
+                                    <option value="Carbs">Carbs</option>
+                                    <option value="Protein">Protein</option>
+                                    <option value="Beverage">Beverage</option>
+                                    <option value="Juice">Juice</option>
+                                    <option value="Snack">Snack</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="calories">Calories (kcal)</label>
+                                <input type="number" id="calories" min="0" required placeholder="0">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" id="submit-btn" class="btn btn-primary">Add Item</button>
+                            <button type="button" id="cancel-btn" class="btn btn-secondary" style="display: none;">Cancel Edit</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Data Management Grid Table -->
+            <section class="table-section card">
+                <h3>Live Menu Catalog</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Restaurant</th>
+                                <th>Price (RM)</th>
+                                <th>Category</th>
+                                <th>Calories</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menu-table-body">
+                            <!-- Dynamic rows will be inserted here via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

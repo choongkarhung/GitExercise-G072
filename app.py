@@ -582,6 +582,12 @@ def menu():
     if 'user_id' not in session:
         return redirect(url_for('home'))
     return render_template('menu.html', username=session.get('username', ''))
+@app.route('/admin')
+def admin():
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+    return render_template('admin.html', username=session.get('username', ''))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
