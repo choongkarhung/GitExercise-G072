@@ -4,33 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu Admin Panel</title>
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
 </head>
 <body>
 
-    <!-- Dashboard Container -->
     <div class="admin-container">
         
-        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo">
                 <h2>BiteAdmin</h2>
             </div>
             <nav class="nav-links">
-                <a href="#" class="active">📋 Menu Management</a>
-                <a href="#">📊 Analytics</a>
-                <a href="#">⚙️ Settings</a>
+                <a href="{{ url_for('admin') }}" class="active">💻 Menu Management</a>
+                <a href="{{ url_for('menu') }}">📋 Live Menu View</a>
+                <a href="{{ url_for('dashboard') }}">📊 User Dashboard</a>
+                <a href="{{ url_for('logout') }}">🚪 Logout</a>
             </nav>
         </aside>
 
-        <!-- Main Content Area -->
         <main class="main-content">
             <header class="main-header">
                 <h1>Menu Management Portal</h1>
-                <div class="user-profile">Welcome, Admin 👤</div>
+                <div class="user-profile">Welcome, {{ username }} 👋</div>
             </header>
 
-            <!-- Stats Overview Widgets -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <h3>Total Items</h3>
@@ -46,7 +43,6 @@
                 </div>
             </section>
 
-            <!-- Form to Add/Edit Items -->
             <section class="form-section">
                 <div class="card">
                     <h3 id="form-title">Add New Menu Item</h3>
@@ -88,7 +84,6 @@
                 </div>
             </section>
 
-            <!-- Data Management Grid Table -->
             <section class="table-section card">
                 <h3>Live Menu Catalog</h3>
                 <div class="table-wrapper">
@@ -104,14 +99,13 @@
                             </tr>
                         </thead>
                         <tbody id="menu-table-body">
-                            <!-- Dynamic rows will be inserted here via JS -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </section>
         </main>
     </div>
 
-    <script src="admin.js"></script>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
 </body>
 </html>

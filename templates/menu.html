@@ -3,28 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Menu - BrokeBite</title>   
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
+    <title>Restaurant Menu</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .nav-header { margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid #ddd; }
+        .nav-header a { text-decoration: none; color: #007bff; margin-right: 15px; font-weight: bold; }
+        table { border-collapse: collapse; width: 100%; max-width: 1000px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { border: 1px solid #dddddd; text-align: left; padding: 12px; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f6f6f6; }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
-        <div class="nav-links">
-            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
-            <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
-            <a href="/calorie" class="nav-link nav-link">🔥 Calories</a>
-            <a href="/menu" class="nav-link nav-link-active">📖 Menu</a>
-        </div>
-        <div class="nav-right">
-            <span class="user-greeting">Hey, {{ username }}! 👋</span>
-            <button class="logout-btn" id="logout-btn">Logout</button>
-        </div>
-    </nav>
+    <div class="nav-header">
+        <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+        <a href="{{ url_for('mealplan') }}">🍲 Meal Planner</a>
+        <a href="{{ url_for('admin') }}">⚙️ Admin Control Panel</a>
+    </div>
 
     <h1>Restaurant Menu</h1>
-    <table border="1">
+    <table>
         <thead>
             <tr>
                 <th>Item Name</th>
@@ -34,259 +33,35 @@
                 <th>Calories</th>
             </tr>
         </thead>
-        <tbody>
-            <tr><td>Nasi goreng</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>500</td></tr>
-            <tr><td>Nasi goreng double</td><td>Hajitapah Mamak</td><td>6.00</td><td>Carbs</td><td>820</td></tr>
-            <tr><td>Nasi goreng cili padi</td><td>Hajitapah Mamak</td><td>6.00</td><td>Carbs</td><td>520</td></tr>
-            <tr><td>Nasi goreng cina</td><td>Hajitapah Mamak</td><td>5.00</td><td>Carbs</td><td>480</td></tr>
-            <tr><td>Nasi goreng kampung</td><td>Hajitapah Mamak</td><td>6.00</td><td>Carbs</td><td>550</td></tr>
-            <tr><td>Nasi goreng ayam</td><td>Hajitapah Mamak</td><td>8.00</td><td>Carbs</td><td>650</td></tr>
-            <tr><td>Nasi goreng kampung ayam</td><td>Hajitapah Mamak</td><td>9.00</td><td>Carbs</td><td>720</td></tr>
-            <tr><td>Nasi goreng pattaya</td><td>Hajitapah Mamak</td><td>6.00</td><td>Carbs</td><td>600</td></tr>
-            <tr><td>Maggi</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>380</td></tr>
-            <tr><td>Maggi double</td><td>Hajitapah Mamak</td><td>7.00</td><td>Carbs</td><td>620</td></tr>
-            <tr><td>Maggi double ayam</td><td>Hajitapah Mamak</td><td>10.00</td><td>Carbs</td><td>760</td></tr>
-            <tr><td>Mee</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>380</td></tr>
-            <tr><td>Bihun</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>350</td></tr>
-            <tr><td>Kuey teow</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>400</td></tr>
-            <tr><td>Mee/nasi goreng</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>400</td></tr>
-            <tr><td>Kuey teow/bihun goreng</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>370</td></tr>
-            <tr><td>Rojak</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>250</td></tr>
-            <tr><td>Rojak biasa</td><td>Hajitapah Mamak</td><td>5.50</td><td>Carbs</td><td>270</td></tr>
-            <tr><td>Rojak telur</td><td>Hajitapah Mamak</td><td>5.50</td><td>Carbs</td><td>360</td></tr>
-            <tr><td>Rojak mee/mee</td><td>Hajitapah Mamak</td><td>5.50</td><td>Carbs</td><td>380</td></tr>
-            <tr><td>Rojak mee + telur</td><td>Hajitapah Mamak</td><td>5.50</td><td>Carbs</td><td>470</td></tr>
-            <tr><td>Telur mata</td><td>Hajitapah Mamak</td><td>1.00</td><td>Protein</td><td>90</td></tr>
-            <tr><td>Telur dadar</td><td>Hajitapah Mamak</td><td>1.50</td><td>Protein</td><td>120</td></tr>
-            <tr><td>Roti canai biasa</td><td>Hajitapah Mamak</td><td>1.20</td><td>Carbs</td><td>170</td></tr>
-            <tr><td>Roti telur</td><td>Hajitapah Mamak</td><td>2.50</td><td>Carbs</td><td>250</td></tr>
-            <tr><td>Roti telur bawang</td><td>Hajitapah Mamak</td><td>3.00</td><td>Carbs</td><td>280</td></tr>
-            <tr><td>Roti bawang</td><td>Hajitapah Mamak</td><td>2.00</td><td>Carbs</td><td>200</td></tr>
-            <tr><td>Roti planta</td><td>Hajitapah Mamak</td><td>2.50</td><td>Carbs</td><td>230</td></tr>
-            <tr><td>Roti boom</td><td>Hajitapah Mamak</td><td>2.50</td><td>Carbs</td><td>280</td></tr>
-            <tr><td>Roti cheese</td><td>Hajitapah Mamak</td><td>3.00</td><td>Carbs</td><td>300</td></tr>
-            <tr><td>Roti telur cheese</td><td>Hajitapah Mamak</td><td>4.00</td><td>Carbs</td><td>380</td></tr>
-            <tr><td>Roti sardine</td><td>Hajitapah Mamak</td><td>4.00</td><td>Protein</td><td>350</td></tr>
-            <tr><td>Roti kaya</td><td>Hajitapah Mamak</td><td>2.50</td><td>Carbs</td><td>220</td></tr>
-            <tr><td>Roti madu</td><td>Hajitapah Mamak</td><td>2.50</td><td>Carbs</td><td>220</td></tr>
-            <tr><td>Roti pisang</td><td>Hajitapah Mamak</td><td>3.00</td><td>Carbs</td><td>250</td></tr>
-            <tr><td>Tosai biasa</td><td>Hajitapah Mamak</td><td>2.00</td><td>Carbs</td><td>150</td></tr>
-            <tr><td>Tosai telur</td><td>Hajitapah Mamak</td><td>3.00</td><td>Carbs</td><td>230</td></tr>
-            <tr><td>Tosai bawang</td><td>Hajitapah Mamak</td><td>3.00</td><td>Carbs</td><td>180</td></tr>
-            <tr><td>Tosai masala</td><td>Hajitapah Mamak</td><td>3.50</td><td>Carbs</td><td>200</td></tr>
-            <tr><td>Tosai ghee</td><td>Hajitapah Mamak</td><td>3.00</td><td>Carbs</td><td>220</td></tr>
-            <tr><td>Tosai murtabak</td><td>Hajitapah Mamak</td><td>4.50</td><td>Carbs</td><td>320</td></tr>
-            <tr><td>Tosai capati</td><td>Hajitapah Mamak</td><td>2.00</td><td>Carbs</td><td>160</td></tr>
-            <tr><td>Roti bakar</td><td>Hajitapah Mamak</td><td>1.50</td><td>Carbs</td><td>140</td></tr>
-            <tr><td>Roti bakar telur</td><td>Hajitapah Mamak</td><td>3.00</td><td>Carbs</td><td>220</td></tr>
-            <tr><td>Roti bakar sardin</td><td>Hajitapah Mamak</td><td>4.00</td><td>Protein</td><td>300</td></tr>
-            <tr><td>Teh (panas)</td><td>Hajitapah Mamak</td><td>1.80</td><td>Beverage</td><td>45</td></tr>
-            <tr><td>Teh (ais)</td><td>Hajitapah Mamak</td><td>2.30</td><td>Beverage</td><td>55</td></tr>
-            <tr><td>Teh (bungkus)</td><td>Hajitapah Mamak</td><td>2.80</td><td>Beverage</td><td>65</td></tr>
-            <tr><td>Teh O (panas)</td><td>Hajitapah Mamak</td><td>1.50</td><td>Beverage</td><td>10</td></tr>
-            <tr><td>Teh O (ais)</td><td>Hajitapah Mamak</td><td>2.00</td><td>Beverage</td><td>15</td></tr>
-            <tr><td>Teh O (bungkus)</td><td>Hajitapah Mamak</td><td>2.30</td><td>Beverage</td><td>20</td></tr>
-            <tr><td>Kopi (panas)</td><td>Hajitapah Mamak</td><td>1.80</td><td>Beverage</td><td>40</td></tr>
-            <tr><td>Kopi (ais)</td><td>Hajitapah Mamak</td><td>2.30</td><td>Beverage</td><td>50</td></tr>
-            <tr><td>Kopi (bungkus)</td><td>Hajitapah Mamak</td><td>2.80</td><td>Beverage</td><td>75</td></tr>
-            <tr><td>Kopi O (panas)</td><td>Hajitapah Mamak</td><td>1.50</td><td>Beverage</td><td>10</td></tr>
-            <tr><td>Kopi O (ais)</td><td>Hajitapah Mamak</td><td>2.00</td><td>Beverage</td><td>15</td></tr>
-            <tr><td>Kopi O (bungkus)</td><td>Hajitapah Mamak</td><td>2.30</td><td>Beverage</td><td>20</td></tr>
-            <tr><td>Milo (panas)</td><td>Hajitapah Mamak</td><td>2.30</td><td>Beverage</td><td>120</td></tr>
-            <tr><td>Milo (ais)</td><td>Hajitapah Mamak</td><td>2.80</td><td>Beverage</td><td>145</td></tr>
-            <tr><td>Milo (bungkus)</td><td>Hajitapah Mamak</td><td>3.30</td><td>Beverage</td><td>165</td></tr>
-            <tr><td>Milo O (panas)</td><td>Hajitapah Mamak</td><td>2.00</td><td>Beverage</td><td>90</td></tr>
-            <tr><td>Milo O (ais)</td><td>Hajitapah Mamak</td><td>2.50</td><td>Beverage</td><td>110</td></tr>
-            <tr><td>Milo O (bungkus)</td><td>Hajitapah Mamak</td><td>3.00</td><td>Beverage</td><td>130</td></tr>
-            <tr><td>Nescafe O (panas)</td><td>Hajitapah Mamak</td><td>2.00</td><td>Beverage</td><td>20</td></tr>
-            <tr><td>Nescafe O (ais)</td><td>Hajitapah Mamak</td><td>2.50</td><td>Beverage</td><td>30</td></tr>
-            <tr><td>Nescafe O (bungkus)</td><td>Hajitapah Mamak</td><td>2.80</td><td>Beverage</td><td>40</td></tr>
-            <tr><td>Nescafe (panas)</td><td>Hajitapah Mamak</td><td>2.30</td><td>Beverage</td><td>60</td></tr>
-            <tr><td>Nescafe (ais)</td><td>Hajitapah Mamak</td><td>2.80</td><td>Beverage</td><td>75</td></tr>
-            <tr><td>Nescafe (bungkus)</td><td>Hajitapah Mamak</td><td>3.30</td><td>Beverage</td><td>90</td></tr>
-            <tr><td>Bru (panas)</td><td>Hajitapah Mamak</td><td>2.50</td><td>Beverage</td><td>80</td></tr>
-            <tr><td>Bru (ais)</td><td>Hajitapah Mamak</td><td>3.00</td><td>Beverage</td><td>100</td></tr>
-            <tr><td>Bru (bungkus)</td><td>Hajitapah Mamak</td><td>3.50</td><td>Beverage</td><td>120</td></tr>
-            <tr><td>Horlicks (panas)</td><td>Hajitapah Mamak</td><td>2.50</td><td>Beverage</td><td>150</td></tr>
-            <tr><td>Horlicks (ais)</td><td>Hajitapah Mamak</td><td>3.00</td><td>Beverage</td><td>170</td></tr>
-            <tr><td>Horlicks (bungkus)</td><td>Hajitapah Mamak</td><td>3.50</td><td>Beverage</td><td>190</td></tr>
-            <tr><td>Teh limau</td><td>Hajitapah Mamak</td><td>1.80</td><td>Beverage</td><td>40</td></tr>
-            <tr><td>Air sirap</td><td>Hajitapah Mamak</td><td>1.80</td><td>Beverage</td><td>80</td></tr>
-            <tr><td>Sirap limau</td><td>Hajitapah Mamak</td><td>1.80</td><td>Beverage</td><td>85</td></tr>
-            <tr><td>Jus oren/epal</td><td>Hajitapah Mamak</td><td>3.50</td><td>Juice</td><td>120</td></tr>
-            <tr><td>Jus belimbing</td><td>Hajitapah Mamak</td><td>3.50</td><td>Juice</td><td>90</td></tr>
-            <tr><td>Jus mangga/karot</td><td>Hajitapah Mamak</td><td>3.50</td><td>Juice</td><td>110</td></tr>
-            <tr><td>Jus asam jawa</td><td>Hajitapah Mamak</td><td>2.80</td><td>Juice</td><td>80</td></tr>
-            <tr><td>Jus barli</td><td>Hajitapah Mamak</td><td>2.80</td><td>Juice</td><td>100</td></tr>
-            <tr><td>Nasi goreng biasa</td><td>Dapo Sahang</td><td>5.00</td><td>Carbs</td><td>520</td></tr>
-            <tr><td>Nasi goreng cina</td><td>Dapo Sahang</td><td>6.00</td><td>Carbs</td><td>490</td></tr>
-            <tr><td>Nasi goreng kampung</td><td>Dapo Sahang</td><td>6.50</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Nasi goreng cili padi</td><td>Dapo Sahang</td><td>6.00</td><td>Carbs</td><td>530</td></tr>
-            <tr><td>Nasi goreng ayam</td><td>Dapo Sahang</td><td>8.50</td><td>Carbs</td><td>670</td></tr>
-            <tr><td>Nasi goreng tomyam</td><td>Dapo Sahang</td><td>7.00</td><td>Carbs</td><td>580</td></tr>
-            <tr><td>Nasi goreng pattaya</td><td>Dapo Sahang</td><td>7.00</td><td>Carbs</td><td>620</td></tr>
-            <tr><td>Nasi goreng daging</td><td>Dapo Sahang</td><td>8.00</td><td>Carbs</td><td>680</td></tr>
-            <tr><td>Nasi goreng seafood</td><td>Dapo Sahang</td><td>8.00</td><td>Carbs</td><td>600</td></tr>
-            <tr><td>Nasi goreng kambing</td><td>Dapo Sahang</td><td>9.50</td><td>Carbs</td><td>720</td></tr>
-            <tr><td>Nasi goreng ikan masin</td><td>Dapo Sahang</td><td>7.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Kuey teow goreng</td><td>Dapo Sahang</td><td>5.00</td><td>Carbs</td><td>430</td></tr>
-            <tr><td>Crispy chicken chop</td><td>Dapo Sahang</td><td>10.00</td><td>Protein</td><td>550</td></tr>
-            <tr><td>Spaghetti aglio olio</td><td>Dapo Sahang</td><td>12.00</td><td>Carbs</td><td>480</td></tr>
-            <tr><td>Yee mee</td><td>Starbees(Home Sweet Home)</td><td>6.50</td><td>Carbs</td><td>420</td></tr>
-            <tr><td>Spiced fried chicken rice</td><td>Starbees(Home Sweet Home)</td><td>7.50</td><td>Carbs</td><td>620</td></tr>
-            <tr><td>Braised chicken rice</td><td>Starbees(Home Sweet Home)</td><td>7.50</td><td>Carbs</td><td>580</td></tr>
-            <tr><td>Dry wantan noodles</td><td>Starbees(Home Sweet Home)</td><td>6.50</td><td>Carbs</td><td>390</td></tr>
-            <tr><td>Curry wantan noodles</td><td>Starbees(Home Sweet Home)</td><td>8.50</td><td>Carbs</td><td>480</td></tr>
-            <tr><td>Maggi Goreng</td><td>Starbees(Tuas anas)</td><td>5.00</td><td>Carbs</td><td>400</td></tr>
-            <tr><td>Nasi Goreng Kampung</td><td>Starbees(Tuas anas)</td><td>6.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Nasi Goreng Ikan Masin</td><td>Starbees(Tuas anas)</td><td>6.00</td><td>Carbs</td><td>540</td></tr>
-            <tr><td>Nasi Goreng Tomyam</td><td>Starbees(Tuas anas)</td><td>8.00</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Nothing</td><td>How Poor Are You? Even BrokeBite can't save your miserable life.</td><td>0.01</td><td>Carbs</td><td>1</td></tr>
-            <tr><td>Chicken Chop Combo+Rice</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>750</td></tr>
-            <tr><td>Chicken Chop Combo+Fried Rice</td><td>Deen Cafe</td><td>8.50</td><td>Carbs</td><td>920</td></tr>
-            <tr><td>Roti Bakar</td><td>Deen Cafe</td><td>1.50</td><td>Carbs</td><td>240</td></tr>
-            <tr><td>Sandwich Ayam</td><td>Deen Cafe</td><td>2.50</td><td>Carbs</td><td>290</td></tr>
-            <tr><td>Sandwich Sardin</td><td>Deen Cafe</td><td>2.50</td><td>Carbs</td><td>280</td></tr>
-            <tr><td>Roti John</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>520</td></tr>
-            <tr><td>Fries</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>320</td></tr>
-            <tr><td>Wet Fries</td><td>Deen Cafe</td><td>5.50</td><td>Carbs</td><td>450</td></tr>
-            <tr><td>Fish and Chips</td><td>Deen Cafe</td><td>11.00</td><td>Carbs</td><td>780</td></tr>
-            <tr><td>Chicken Chop</td><td>Deen Cafe</td><td>12.00</td><td>Carbs</td><td>680</td></tr>
-            <tr><td>Chicken Grill</td><td>Deen Cafe</td><td>15.00</td><td>Carbs</td><td>550</td></tr>
-            <tr><td>Lamb Chops</td><td>Deen Cafe</td><td>18.00</td><td>Carbs</td><td>620</td></tr>
-            <tr><td>Kuey Tiau Goreng</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Bihun Goreng</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>480</td></tr>
-            <tr><td>Bihun Singapore</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>450</td></tr>
-            <tr><td>Mee Goreng</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>510</td></tr>
-            <tr><td>Mee Goreng Mamak</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>660</td></tr>
-            <tr><td>Maggi Goreng</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>540</td></tr>
-            <tr><td>Yee Mee Goreng</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>570</td></tr>
-            <tr><td>Hokkien Mee</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>610</td></tr>
-            <tr><td>Maggi Goreng XL</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>790</td></tr>
-            <tr><td>Nasi Butter Chicken</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>760</td></tr>
-            <tr><td>Nasi Butter Fish</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>710</td></tr>
-            <tr><td>Nasi Butter Prawn</td><td>Deen Cafe</td><td>9.00</td><td>Carbs</td><td>730</td></tr>
-            <tr><td>Nasi Butter Squid</td><td>Deen Cafe</td><td>9.00</td><td>Carbs</td><td>730</td></tr>
-            <tr><td>Nasi Butter Campur</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>790</td></tr>
-            <tr><td>Nasi Butter Milk(CN)</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>780</td></tr>
-            <tr><td>Cendawan Tom Yam Soup+Rice</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>410</td></tr>
-            <tr><td>Ayam Tom Yam Soup+Rice</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>510</td></tr>
-            <tr><td>Daging Tom Yam Soup+Rice</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>540</td></tr>
-            <tr><td>Sea F0od Tom Yam Soup+Rice</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>520</td></tr>
-            <tr><td>Campur Tom Yam Soup+Rice</td><td>Deen Cafe</td><td>8.50</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Maggi Soup</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>390</td></tr>
-            <tr><td>Kuey Tiau Soup</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>380</td></tr>
-            <tr><td>Bihun Soup</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>350</td></tr>
-            <tr><td>Vegetarian+Nasi Soup</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>430</td></tr>
-            <tr><td>Cendawan+Nasi Soup</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>430</td></tr>
-            <tr><td>Ayam+Nasi Soup</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>530</td></tr>
-            <tr><td>Daging+Nasi Soup</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Kambing+Nasi Soup</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>620</td></tr>
-            <tr><td>Nasi Goreng Biasa</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>510</td></tr>
-            <tr><td>Nasi Goreng Kampung</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Nasi Goreng Cina</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>530</td></tr>
-            <tr><td>Nasi Goreng Mamak</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>630</td></tr>
-            <tr><td>Nasi Goreng Telur</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>540</td></tr>
-            <tr><td>Nasi Goreng Cili Api</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>520</td></tr>
-            <tr><td>Nasi Goreng Sausage</td><td>Deen Cafe</td><td>5.00</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Nasi Goreng Tom Yam</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Nasi Goreng Sardin</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>580</td></tr>
-            <tr><td>Nasi Goreng Pattaya</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>680</td></tr>
-            <tr><td>Nasi Goreng Ikan Masin</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>570</td></tr>
-            <tr><td>Nasi Goreng Tomato</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>550</td></tr>
-            <tr><td>Nasi Goreng Cendawan</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>540</td></tr>
-            <tr><td>Nasi Goreng Daging</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>620</td></tr>
-            <tr><td>Nasi Goreng Sea Food</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>610</td></tr>
-            <tr><td>Nasi Goreng Ayam(Chicken)</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>610</td></tr>
-            <tr><td>Nasi Goreng Paprik Ayam</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>670</td></tr>
-            <tr><td>Nasi Goreng Msa(Egg)</td><td>Deen Cafe</td><td>9.00</td><td>Carbs</td><td>580</td></tr>
-            <tr><td>Nasi Goreng Thai</td><td>Deen Cafe</td><td>9.00</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Nasi Goreng Kambing</td><td>Deen Cafe</td><td>12.00</td><td>Carbs</td><td>710</td></tr>
-            <tr><td>Carbonara Pasta Special</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>660</td></tr>
-            <tr><td>Chicken Alfredo Pasta Special</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>690</td></tr>
-            <tr><td>Boscaiola Pasta Special</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>680</td></tr>
-            <tr><td>Bolognese Pasta Special</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>530</td></tr>
-            <tr><td>Pasta Vegetarian Pasta Special</td><td>Deen Cafe</td><td>10.00</td><td>Carbs</td><td>460</td></tr>
-            <tr><td>Marinara Pasta Special</td><td>Deen Cafe</td><td>12.00</td><td>Carbs</td><td>510</td></tr>
-            <tr><td>Chicken Spicy Pasta Special</td><td>Deen Cafe</td><td>12.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Char Kuey Tiau Hot Plate</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>580</td></tr>
-            <tr><td>Sizzling Rice Hot Plate</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Mee Bandung Hot Plate</td><td>Deen Cafe</td><td>6.00</td><td>Carbs</td><td>620</td></tr>
-            <tr><td>Sizzling Yee Mee Hot Plate</td><td>Deen Cafe</td><td>6.50</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Cantonese Yee Mee Hot Plate</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Cantonese Kuey Tiau Hot Plate</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>580</td></tr>
-            <tr><td>Ying Yong Hot Plate</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Nasi Ayam Paprik</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Nasi Ayam Halia</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>510</td></tr>
-            <tr><td>Nasi Ayam Sambal</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>550</td></tr>
-            <tr><td>Nasi Ayam Merah</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>550</td></tr>
-            <tr><td>Nasi Ayam Kunyit</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>580</td></tr>
-            <tr><td>Nasi Ayam Kicap</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>540</td></tr>
-            <tr><td>Nasi Ayam Black Pepper</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>530</td></tr>
-            <tr><td>Nasi Ayam Sweet and Sour</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Nasi Ayam Cili Padi</td><td>Deen Cafe</td><td>7.00</td><td>Carbs</td><td>540</td></tr>
-            <tr><td>Nasi Daging Kunyit</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>610</td></tr>
-            <tr><td>Nasi Daging Kicap</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>580</td></tr>
-            <tr><td>Nasi Daging Merah</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Nasi Daging Black Pepper</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>570</td></tr>
-            <tr><td>Nasi Daging Sweet and Sour</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>600</td></tr>
-            <tr><td>Nasi Sotong Kunyit</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>550</td></tr>
-            <tr><td>Nasi Sotong Sambal</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>570</td></tr>
-            <tr><td>Nasi Sotong Merah</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>570</td></tr>
-            <tr><td>Nasi Udang Kunyit</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>540</td></tr>
-            <tr><td>Nasi Udang Sambal</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>560</td></tr>
-            <tr><td>Nasi Udang Kicap</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>550</td></tr>
-            <tr><td>Nasi Udang Black Pepper</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>530</td></tr>
-            <tr><td>Nasi Sea Food Kunyit</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>570</td></tr>
-            <tr><td>Nasi Sea Food Merah</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Nasi Sea Food Sweet and Sour</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>590</td></tr>
-            <tr><td>Nasi Putih Kari Ayam</td><td>Deen Cafe</td><td>7.50</td><td>Carbs</td><td>610</td></tr>
-            <tr><td>Nasi Telur Bungkus</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>640</td></tr>
-            <tr><td>Nasi Telur Bistik</td><td>Deen Cafe</td><td>8.00</td><td>Carbs</td><td>730</td></tr>
-            <tr><td>Teh O</td><td>Deen Cafe</td><td>1.00</td><td>Beverage</td><td>65</td></tr>
-            <tr><td>Teh Tarik</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>140</td></tr>
-            <tr><td>Teh O Limau</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>70</td></tr>
-            <tr><td>Teh O Laici</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>120</td></tr>
-            <tr><td>Nescafe</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>150</td></tr>
-            <tr><td>Nescafe O</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>70</td></tr>
-            <tr><td>Neslo</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>210</td></tr>
-            <tr><td>White Coffee</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>180</td></tr>
-            <tr><td>Kopi</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>130</td></tr>
-            <tr><td>Kopi O</td><td>Deen Cafe</td><td>1.00</td><td>Beverage</td><td>65</td></tr>
-            <tr><td>Milo</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>180</td></tr>
-            <tr><td>Milo O</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>120</td></tr>
-            <tr><td>Barley</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>80</td></tr>
-            <tr><td>Horlicks</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>190</td></tr>
-            <tr><td>Limau Panas</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>60</td></tr>
-            <tr><td>Teh O Ais</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>85</td></tr>
-            <tr><td>Teh Tarik Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>160</td></tr>
-            <tr><td>Teh O Limau Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>90</td></tr>
-            <tr><td>Teh O Laici Ais</td><td>Deen Cafe</td><td>3.00</td><td>Beverage</td><td>150</td></tr>
-            <tr><td>Nescafe Ais</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>180</td></tr>
-            <tr><td>Nescafe O Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>90</td></tr>
-            <tr><td>Neslo Ais</td><td>Deen Cafe</td><td>3.00</td><td>Beverage</td><td>240</td></tr>
-            <tr><td>White Coffee Ais</td><td>Deen Cafe</td><td>3.00</td><td>Beverage</td><td>210</td></tr>
-            <tr><td>Kopi Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>160</td></tr>
-            <tr><td>Kopi O Ais</td><td>Deen Cafe</td><td>1.50</td><td>Beverage</td><td>85</td></tr>
-            <tr><td>Milo Ais</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>220</td></tr>
-            <tr><td>Milo O Ais</td><td>Deen Cafe</td><td>2.50</td><td>Beverage</td><td>140</td></tr>
-            <tr><td>Barley Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>100</td></tr>
-            <tr><td>Horlicks Ais</td><td>Deen Cafe</td><td>3.00</td><td>Beverage</td><td>230</td></tr>
-            <tr><td>Limau Ais</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>80</td></tr>
-            <tr><td>Laici</td><td>Deen Cafe</td><td>3.00</td><td>Beverage</td><td>160</td></tr>
-            <tr><td>Sirap Bandung</td><td>Deen Cafe</td><td>2.00</td><td>Beverage</td><td>150</td></tr>
-            <tr><td>Orange Juice</td><td>Deen Cafe</td><td>4.00</td><td>Beverage</td><td>120</td></tr>
-            <tr><td>Apple Juice</td><td>Deen Cafe</td><td>4.00</td><td>Beverage</td><td>110</td></tr>
-            <tr><td>Watermelon Juice</td><td>Deen Cafe</td><td>4.00</td><td>Beverage</td><td>90</td></tr>
-            <tr><td>Extra Joss</td><td>Deen Cafe</td><td>4.00</td><td>Beverage</td><td>30</td></tr>
-            <tr><td>Carrot Juice</td><td>Deen Cafe</td><td>3.50</td><td>Beverage</td><td>90</td></tr>
-        </tbody>
+        <tbody id="live-menu-body">
+            </tbody>
     </table>
 
     <script>
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            await fetch('/logout', { method: 'POST' });
-            window.location.href = '/';
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tableBody = document.getElementById('live-menu-body');
+            try {
+                const response = await fetch('/api/food_items');
+                if (!response.ok) throw new Error('Failed to fetch items');
+                
+                const foodItems = await response.json();
+                tableBody.innerHTML = ''; 
+
+                foodItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.stall}</td>
+                        <td>RM ${parseFloat(item.price).toFixed(2)}</td>
+                        <td>${item.category}</td>
+                        <td>${item.calories} kcal</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error rendering menu:', error);
+                tableBody.innerHTML = '<tr><td colspan="5" style="color: red; text-align: center;">Error loading menu database data.</td></tr>';
+            }
         });
     </script>
 </body>

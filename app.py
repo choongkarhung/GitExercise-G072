@@ -589,6 +589,79 @@ def admin():
     return render_template('admin.html', username=session.get('username', ''))
 
 
+# ==========================================
+# ADMIN MENU DATA CATALOG CRUD ENDPOINTS
+# ==========================================
+
+@app.route('/api/food_items', methods=['GET'])
+def get_food_items():
+    db = get_db()
+    # Pull items currently flagged as active
+    items = db.execute("""
+        SELECT id, name, stall, price, category, calories 
+        FROM food_items 
+        WHERE is_active = 1 
+        ORDER BY stall ASC, name ASC
+    """).fetchall()
+    db.close()
+    return jsonify([dict(item) for item in items])
+
+
+@app.route('/api/food_items', methods=['POST'])
+def create_food_item():
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    stall = data.get('stall', '').strip()
+    price = data.get('price')
+    category = data.get('category')
+    calories = data.get('calories', 0)
+
+    if not name or not stall or price is None:
+        return jsonify({'error': 'Missing required fields (Name, Stall, Price).'}), 400
+
+    db = get_db()
+    try:
+        db.execute("""
+            INSERT INTO food_items (name, stall, price, category, calories, is_active)
+            VALUES (?, ?, ?, ?, ?, 1)
+        """, (name, stall, float(price), category, int(calories)))
+        db.commit()
+    except Exception:
+        db.close()
+        return jsonify({'error': 'Item name already exists or database constraint failed.'}), 400
+        
+    db.close()
+    return jsonify({'message': 'Menu item added successfully!'}), 201
+
+
+@app.route('/api/food_items/<int:item_id>', methods=['PUT'])
+def update_food_item(item_id):
+    data = request.get_json()
+    db = get_db()
+    try:
+        db.execute("""
+            UPDATE food_items 
+            SET name = ?, stall = ?, price = ?, category = ?, calories = ?
+            WHERE id = ? AND is_active = 1
+        """, (data['name'], data['stall'], float(data['price']), data['category'], int(data['calories']), item_id))
+        db.commit()
+    except Exception as e:
+        db.close()
+        return jsonify({'error': f'Database error or conflict occurred: {str(e)}'}), 400
+        
+    db.close()
+    return jsonify({'message': 'Menu data updated successfully!'}), 200
+
+
+@app.route('/api/food_items/<int:item_id>', methods=['DELETE'])
+def delete_food_item(item_id):
+    db = get_db()
+    # Execute a soft-delete (is_active=0) so old expense logging histories aren't corrupted
+    db.execute("UPDATE food_items SET is_active = 0 WHERE id = ?", (item_id,))
+    db.commit()
+    db.close()
+    return jsonify({'message': 'Menu item successfully deleted.'}), 200
+
 if __name__ == "__main__":
     app.run(debug=True)
     
