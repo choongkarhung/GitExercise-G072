@@ -1,5 +1,5 @@
 body.admin-body {
-    display: block; /* Override default login/card center layout */
+    display: block; 
     padding-top: 80px; 
     background: #eef7f1; 
 }
@@ -242,7 +242,7 @@ tbody tr:hover {
 }
 
 body.admin-body {
-    display: block;             /* Kill any flex layout handling on the body */
-    padding-top: 80px;          /* Safely push content down past the fixed navbar */
+    display: block;        
+    padding-top: 80px;          
     background-color: #eef7f1; 
 }

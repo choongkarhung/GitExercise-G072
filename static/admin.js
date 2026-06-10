@@ -1,4 +1,3 @@
-// Global array to store fetched items from the database
 let menuItems = [];
 
 // DOM Initialization on Page Load
