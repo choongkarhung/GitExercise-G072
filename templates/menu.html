@@ -24,7 +24,7 @@
             <a href="/dashboard" class="nav-link">📊 Dashboard</a>
             <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
             <a href="/calorie" class="nav-link">🔥 Calories</a>
-            <a href="/menu" class="nav-link-active">📖 Menu</a>
+            <a href="/menu" class="nav-link nav-link-active">📖 Menu</a>
             <a href="/admin" class="nav-link">⚙️ Admin Panel</a>
         </div>
         <div class="nav-right">
@@ -52,8 +52,7 @@
                             <th>Calories</th>
                         </tr>
                     </thead>
-                    <tbody id="live-menu-body">
-                        </tbody>
+                    <tbody id="live-menu-body"></tbody>
                 </table>
             </div>
         </section>
@@ -65,9 +64,9 @@
             try {
                 const response = await fetch('/api/food_items');
                 if (!response.ok) throw new Error('Failed to fetch items');
-                
+
                 const foodItems = await response.json();
-                tableBody.innerHTML = ''; 
+                tableBody.innerHTML = '';
 
                 foodItems.forEach(item => {
                     const row = document.createElement('tr');
@@ -82,11 +81,10 @@
                 });
             } catch (error) {
                 console.error('Error rendering menu:', error);
-                tableBody.innerHTML = '<tr><td colspan=\"5\" style=\"color: var(--red-text); text-align: center;\">Error loading menu database data.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="5" style="color:var(--red-text);text-align:center;">Error loading menu data.</td></tr>';
             }
         });
 
-        // Logout listener
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await fetch('/logout', { method: 'POST' });
             window.location.href = '/';
