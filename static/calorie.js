@@ -191,12 +191,12 @@ function renderResults(d) {
         banner.classList.add('deficit');
         document.getElementById('goal-label').textContent = 'Weight Loss Mode';
         document.getElementById('goal-sub').textContent =
-            `Eating ${Math.abs(d.adjustment)} kcal below TDEE daily to lose weight`;
+            `Eating ${Math.abs(d.adjustment)} kcal below TDEE needed to lose weight`;
     } else if (d.goalMode === 'surplus') {
         banner.classList.add('surplus');
         document.getElementById('goal-label').textContent = 'Weight Gain Mode';
         document.getElementById('goal-sub').textContent =
-            `Eating ${d.adjustment} kcal above TDEE daily to gain weight`;
+            `Eating ${d.adjustment} kcal above TDEE needed to gain weight`;
     } else {
         document.getElementById('goal-label').textContent = 'Maintaining Weight';
         document.getElementById('goal-sub').textContent = 'Your goal weight matches your current weight!';
@@ -286,5 +286,5 @@ function showSaveBadge(text) {
     badge._timer = setTimeout(() => { badge.style.display = 'none'; }, 5000);
 }
  
-// ── INIT ──
+// INIT
 loadSavedProfile();

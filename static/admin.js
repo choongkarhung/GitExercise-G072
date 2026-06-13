@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cancel-btn').addEventListener('click', resetFormState);
 });
 
-// READ: Fetch all database items to display
+// Fetch all database items to display
 async function loadDashboard() {
     try {
         const response = await fetch('/api/food_items');
@@ -20,7 +20,7 @@ async function loadDashboard() {
     }
 }
 
-// RENDER: Dynamically build the table and update admin overview metrics
+// Dynamically build the table and update admin overview metrics
 function renderUI() {
     const tableBody = document.getElementById('menu-table-body');
     tableBody.innerHTML = ''; // Clear stale data
@@ -55,7 +55,7 @@ function renderUI() {
     document.getElementById('stat-avg-price').textContent = `RM ${(totalItems > 0 ? priceSum / totalItems : 0).toFixed(2)}`;
 }
 
-// CREATE / UPDATE: Submitting changes
+// CREATE / UPDATE
 async function handleFormSubmit(e) {
     e.preventDefault();
 
@@ -91,7 +91,7 @@ async function handleFormSubmit(e) {
     }
 }
 
-// EDIT TRIGGER: Map a table row's data back into the form fields
+// Map a table row's data back into the form fields
 function startEdit(id) {
     const item = menuItems.find(i => i.id === id);
     if (!item) return;
@@ -108,7 +108,7 @@ function startEdit(id) {
     document.getElementById('cancel-btn').style.display = "inline-block";
 }
 
-// DELETE TRIGGER: Calls the backend API soft-delete route
+// Calls the backend API soft-delete route
 async function deleteItem(id) {
     if (!confirm("Are you sure you want to delete this menu item?")) return;
 
@@ -125,7 +125,7 @@ async function deleteItem(id) {
     }
 }
 
-// RESET: Return form to neutral create configuration
+// Return form to neutral create configuration
 function resetFormState() {
     document.getElementById('menu-form').reset();
     document.getElementById('item-index').value = '';

@@ -218,7 +218,6 @@ document.getElementById('log-all-btn').addEventListener('click', async () => {
     }
 });
 
-// REGENERATE 
 document.getElementById('regen-btn').addEventListener('click', generatePlan);
 
 // HELPERS 

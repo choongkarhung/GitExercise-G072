@@ -162,7 +162,7 @@ async function loadCalorieWidget() {
         renderCalorieWidget(data);
         document.getElementById('calorie-widget').style.display = 'block';
     } catch (e) {
-        // Silently ignore — calorie widget is optional
+        // Silently ignore 
         console.warn('Calorie widget load failed:', e);
     }
 }
@@ -269,8 +269,7 @@ async function refreshDashboard() {
     await loadCalorieWidget();
 }
 
-// START
 init();
 
-// AUTO-UPDATE every 30 seconds
+// Auto-update every 30 seconds
 setInterval(refreshDashboard, 30000);

@@ -165,11 +165,11 @@ food_items = [
     ("Teh limau",                "Hajitapah Mamak", 1.80, "Beverage",  40),
     ("Air sirap",                "Hajitapah Mamak", 1.80, "Beverage",  80),
     ("Sirap limau",              "Hajitapah Mamak", 1.80, "Beverage",  85),
-    ("Jus oren/epal",            "Hajitapah Mamak", 3.50, "Beverage",    120),
-    ("Jus belimbing",            "Hajitapah Mamak", 3.50, "Beverage",     90),
-    ("Jus mangga/karot",         "Hajitapah Mamak", 3.50, "Beverage",    110),
-    ("Jus asam jawa",            "Hajitapah Mamak", 2.80, "Beverage",     80),
-    ("Jus barli",                "Hajitapah Mamak", 2.80, "Beverage",    100),
+    ("Jus oren/epal",            "Hajitapah Mamak", 3.50, "Beverage",  120),
+    ("Jus belimbing",            "Hajitapah Mamak", 3.50, "Beverage",  90),
+    ("Jus mangga/karot",         "Hajitapah Mamak", 3.50, "Beverage",  110),
+    ("Jus asam jawa",            "Hajitapah Mamak", 2.80, "Beverage",  80),
+    ("Jus barli",                "Hajitapah Mamak", 2.80, "Beverage",  100),
 
     # Dapo Sahang 
     ("Nasi goreng biasa",        "Dapo Sahang", 5.00,  "Carbs",   520),

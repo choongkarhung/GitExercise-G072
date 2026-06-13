@@ -149,7 +149,6 @@ def api_dashboard():
     user_id = session['user_id']
     db = get_db()
 
-    # Get the most recent session 
     sess = db.execute("""
         SELECT * FROM survival_sessions
         WHERE user_id = ?
@@ -234,7 +233,7 @@ def api_log_expense():
     data     = request.get_json()
     label    = data.get('label', '').strip()
     amount   = data.get('amount')
-    calories = int(data.get('calories', 0))   # ← NEW: default 0 for manual entries
+    calories = int(data.get('calories', 0))   
  
     if not label:
         return jsonify({'error': 'Description is required.'}), 400
@@ -312,6 +311,7 @@ def api_meals():
 
     # Recommend meals that fits the daily budget
     # Prioritise cheap and varied categories
+    # Planning to implement a more complex meal plan generator later, but for now just return affordable items sorted by price
     meals = db.execute("""
         SELECT name, stall, price, category, calories
         FROM food_items
@@ -330,6 +330,8 @@ def setup_database():
 # Run the setup before the first request or at startup
 #with app.app_context():
 #    setup_database()
+
+# Above removed, will bring back if needed
 
 @app.route('/mealplan')
 def mealplan():
@@ -467,7 +469,8 @@ def get_calorie_profile():
     return jsonify(dict(profile))
  
  
-# CALORIE PROFILE — save / update profile
+# CALORIE PROFILE 
+# save / update profile
 @app.route('/api/calorie_profile', methods=['POST'])
 def save_calorie_profile():
     if 'user_id' not in session:
@@ -485,7 +488,7 @@ def save_calorie_profile():
  
     db = get_db()
     try:
-        # Upsert — insert on first save, update on subsequent saves
+        # Insert on first save, update on subsequent saves
         db.execute("""
             INSERT INTO calorie_profiles
                 (user_id, gender, age, height_cm, weight_kg, goal_weight_kg,
@@ -529,7 +532,8 @@ def save_calorie_profile():
     return jsonify({'message': 'Profile saved!'}), 200
  
  
-# CALORIE TODAY — used by dashboard widget
+# CALORIE TODAY 
+# Used by dashboard widget
 @app.route('/api/calorie_today')
 def api_calorie_today():
     if 'user_id' not in session:
@@ -650,7 +654,7 @@ def update_food_item(item_id):
 @app.route('/api/food_items/<int:item_id>', methods=['DELETE'])
 def delete_food_item(item_id):
     db = get_db()
-    # Execute a soft-delete (is_active=0) so old logs don't break due to foreign key constraints
+    # Execute a soft-delete (is_active=0) so old logs don't break due to foreign key 
     try:
         db.execute("UPDATE food_items SET is_active = 0 WHERE id = ?", (item_id,))
         db.commit()
@@ -660,6 +664,8 @@ def delete_food_item(item_id):
         
     db.close()
     return jsonify({'message': 'Menu item removed successfully!'}), 200
+
+# Wanted to add vendor account for admin, will do soon?
 
 if __name__ == "__main__":
     app.run(debug=True)

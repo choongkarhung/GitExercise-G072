@@ -30,10 +30,9 @@ body.menu-body {
     color: var(--ink);
     letter-spacing: -0.03em;
     margin-top: 4px;
-    text-transform: none; /* Strip old style uppercase look */
+    text-transform: none; 
 }
 
-/* Strip old layout underline style */
 .menu-header h1::after {
     display: none;
 }
@@ -45,7 +44,7 @@ body.menu-body {
     text-align: left;
 }
 
-/* Table Container Block Matching styling panels */
+/* Table Container Block */
 .card {
     background: var(--surface);
     padding: 24px;
@@ -99,4 +98,42 @@ tbody tr:hover {
     text-align: left;
     font-variant-numeric: tabular-nums;
     color: var(--ink-muted);
+}
+
+/* NAVBAR LINKS */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-link {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.nav-link:hover {
+    background: var(--cream-mid);
+    color: var(--ink);
+    border-color: var(--cream-border);
+}
+
+.nav-link-active {
+    background: var(--green-light);
+    color: var(--green);
+    border-color: var(--green-border);
+    font-weight: 600;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
