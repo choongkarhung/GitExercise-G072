@@ -205,7 +205,7 @@ def api_dashboard():
 
     remaining_balance = start_balance - total_spent
 
-    # Daily budget = remaining balance / remaining days
+    # Daily budget = remaining balance / remaining days 
     daily_budget = remaining_balance / days_remaining
 
     # Today's expenses (last 20, most recent first)
