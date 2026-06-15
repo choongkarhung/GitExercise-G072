@@ -18,12 +18,13 @@ CREATE TABLE IF NOT EXISTS users (
 cur.execute("""
 CREATE TABLE IF NOT EXISTS food_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
     stall TEXT NOT NULL,
     price REAL NOT NULL,
     category TEXT NOT NULL,
     calories INTEGER NOT NULL DEFAULT 0,
-    is_active INTEGER NOT NULL DEFAULT 1
+    is_active INTEGER NOT NULL DEFAULT 1,
+    UNIQUE(name, stall)
 )
 """)
 
@@ -199,7 +200,7 @@ food_items = [
     ("Nasi Goreng Kampung",      "Starbees(Tuas anas)", 6.00, "Carbs", 560),
     ("Nasi Goreng Ikan Masin",   "Starbees(Tuas anas)", 6.00, "Carbs", 540),
     ("Nasi Goreng Tomyam",       "Starbees(Tuas anas)", 8.00, "Carbs", 590),
-    ("Nothing", "How Poor Are You? Even BrokeBite can't save your miserable life.", 0.01, "Carbs", 1), 
+    # ("Nothing" easter egg — kept in data but inserted as inactive below, not via executemany)
     
     # Deen Cafe
     ("Chicken Chop Combo+Rice", "Deen Cafe", 7.00, "Carbs", 750),
@@ -346,6 +347,14 @@ cur.executemany("""
     INSERT OR IGNORE INTO food_items (name, stall, price, category, calories)
     VALUES (?, ?, ?, ?, ?)
 """, food_items)
+
+cur.execute("""
+    INSERT OR IGNORE INTO food_items (name, stall, price, category, calories, is_active)
+    VALUES ('Nothing', 'How Poor Are You? Even BrokeBite can''t save your miserable life.', 0.01, 'Carbs', 1, 0)
+""")
+
+cur.execute("CREATE INDEX IF NOT EXISTS idx_expense_session ON expense_logs(session_id)")
+cur.execute("CREATE INDEX IF NOT EXISTS idx_expense_date ON expense_logs(logged_at)")
 
 conn.commit()
 conn.close()

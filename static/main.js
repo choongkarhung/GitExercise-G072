@@ -14,7 +14,7 @@ async function handleAuth(url, username, password) {
             messageBox.className = 'success';
             messageBox.innerText = data.message;
             if (url === '/login') {
-                window.location.href = '/setup'; 
+                window.location.href = '/';  
             }
         } else {
             messageBox.className = 'error';

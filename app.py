@@ -1,14 +1,31 @@
 import os
-from flask import Flask, request, jsonify, session, render_template, redirect, url_for
+import secrets
+from flask import Flask, request, jsonify, session, render_template, redirect, url_for, g
 from werkzeug.security import generate_password_hash, check_password_hash
-from database import get_db
+from database import get_db as _get_db
 from datetime import datetime, date
 import subprocess
 
 app = Flask(__name__)
 
-# SECURE KEY
-app.secret_key = os.environ.get('SECRET_KEY', 'mmu_broke_student_secret_2024')
+# SECURE KEY 
+_secret = os.environ.get('SECRET_KEY')
+if not _secret:
+    if os.environ.get('FLASK_ENV') == 'production':
+        raise RuntimeError("SECRET_KEY environment variable must be set in production!")
+    _secret = secrets.token_hex(32)
+app.secret_key = _secret
+
+def get_db():
+    if 'db' not in g:
+        g.db = _get_db()
+    return g.db
+
+@app.teardown_appcontext
+def close_db(e=None):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
 
 @app.route('/')
 def home():
@@ -20,7 +37,6 @@ def home():
             ORDER BY created_at DESC
             LIMIT 1
         """, (session['user_id'],)).fetchone()
-        db.close()
 
         if sess:
             return redirect(url_for('dashboard'))  # Send straight to dashboard if saved
@@ -43,7 +59,6 @@ def setup():
             ORDER BY created_at DESC
             LIMIT 1
         """, (session['user_id'],)).fetchone()
-        db.close()
 
         if sess:
             return redirect(url_for('dashboard'))
@@ -71,7 +86,6 @@ def register():
     user_check = db.execute("SELECT id FROM users WHERE username = ?", (username,)).fetchone()
 
     if user_check:
-        db.close()
         return jsonify({'error': 'Username already exists!'}), 400
 
     hashed_password = generate_password_hash(password)
@@ -82,8 +96,6 @@ def register():
         db.commit()
     except Exception as e:
         return jsonify({'error': 'Database error occurred'}), 500
-    finally:
-        db.close()
 
     return jsonify({'message': 'Registration successful!'}), 201
 
@@ -95,7 +107,6 @@ def login():
 
     db = get_db()
     user = db.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
-    db.close()
 
     if user and check_password_hash(user['password_hash'], password):
         session.clear()
@@ -136,7 +147,6 @@ def setup_post():
     session['balance'] = float(balance)
     session['days'] = int(days)
 
-    db.close()
     return jsonify({'message': 'Session created.'}), 200
 
 # DASHBOARD DATA 
@@ -157,7 +167,6 @@ def api_dashboard():
     """, (user_id,)).fetchone()
 
     if not sess:
-        db.close()
         return jsonify({'error': 'No session found. Please set up first.'}), 404
 
     session_id   = sess['id']
@@ -173,7 +182,8 @@ def api_dashboard():
 
     # Days elapsed since session start
     days_elapsed = (date.today() - session_start).days
-    days_remaining = max(days_total - days_elapsed, 0)
+    days_remaining = max(days_total - days_elapsed, 1)
+    session_expired = days_elapsed >= days_total
 
     # Total spent across the whole session
     total_spent_row = db.execute("""
@@ -195,12 +205,12 @@ def api_dashboard():
 
     remaining_balance = start_balance - total_spent
 
-    # Daily budget = remaining balance / remaining days (fallback to 1 day)
-    daily_budget = remaining_balance / max(days_remaining, 1)
+    # Daily budget = remaining balance / remaining days
+    daily_budget = remaining_balance / days_remaining
 
     # Today's expenses (last 20, most recent first)
     expenses_today = db.execute("""
-        SELECT label, amount, logged_at
+        SELECT label, amount, logged_at, calories
         FROM expense_logs
         WHERE session_id = ?
         AND logged_at LIKE ?
@@ -208,14 +218,13 @@ def api_dashboard():
         LIMIT 20
     """, (session_id, today_str + '%')).fetchall()
 
-    db.close()
-
     return jsonify({
         'session_id':        session_id,
         'start_balance':     start_balance,
         'days_total':        days_total,
         'days_remaining':    days_remaining,
         'days_elapsed':      days_elapsed,
+        'session_expired':   session_expired,
         'total_spent':       round(total_spent, 2),
         'spent_today':       round(spent_today, 2),
         'remaining_balance': round(remaining_balance, 2),
@@ -250,7 +259,6 @@ def api_log_expense():
     """, (session['user_id'],)).fetchone()
  
     if not sess:
-        db.close()
         return jsonify({'error': 'No active session. Please set up first.'}), 404
  
     try:
@@ -260,10 +268,8 @@ def api_log_expense():
         """, (sess['id'], float(amount), label, datetime.now().isoformat(), calories))
         db.commit()
     except Exception as e:
-        db.close()
         return jsonify({'error': 'Database error.'}), 500
  
-    db.close()
     return jsonify({'message': 'Expense logged!'}), 201
 
 # MEAL SUGGESTIONS
@@ -669,4 +675,3 @@ def delete_food_item(item_id):
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
