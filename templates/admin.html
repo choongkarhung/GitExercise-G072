@@ -43,6 +43,7 @@
                 </div>
             </header>
 
+            <!-- STATS -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <h3>Total Items</h3>
@@ -58,6 +59,7 @@
                 </div>
             </section>
 
+            <!-- ADD / EDIT FORM -->
             <section class="form-section">
                 <div class="card">
                     <h3 id="form-title">Add New Menu Item</h3>
@@ -99,12 +101,13 @@
                         </div>
                         <div class="form-actions">
                             <button type="submit" id="submit-btn" class="btn-primary-action">Add Item ✚</button>
-                            <button type="button" id="cancel-btn" class="btn-secondary-action" style="display: none;">Cancel Edit</button>
+                            <button type="button" id="cancel-btn" class="btn-secondary-action" style="display:none;">Cancel Edit</button>
                         </div>
                     </form>
                 </div>
             </section>
 
+            <!-- MENU CATALOG TABLE -->
             <section class="table-section card">
                 <h3>Live Menu Catalog</h3>
                 <div class="table-wrapper">
@@ -116,14 +119,32 @@
                                 <th>Price (RM)</th>
                                 <th>Category</th>
                                 <th>Calories</th>
-                                <th style="text-align: center;">Actions</th>
+                                <th style="text-align:center;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="menu-table-body">
-                            </tbody>
+                        <tbody id="menu-table-body"></tbody>
                     </table>
                 </div>
             </section>
+
+            <!-- USER MANAGEMENT TABLE -->
+            <section class="table-section card">
+                <h3>User Management</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th style="text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
         </main>
     </div>
 
