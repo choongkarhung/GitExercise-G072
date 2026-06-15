@@ -303,6 +303,23 @@ def api_log_expense():
         return jsonify({'error': 'Database error.'}), 500
     return jsonify({'message': 'Expense logged!'}), 201
 
+@app.route('/api/expense/<int:expense_id>', methods=['DELETE'])
+def delete_expense(expense_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+    db = get_db()
+    # Verify this expense belongs to the current user's session
+    row = db.execute("""
+        SELECT e.id FROM expense_logs e
+        JOIN survival_sessions s ON e.session_id = s.id
+        WHERE e.id = ? AND s.user_id = ?
+    """, (expense_id, session['user_id'])).fetchone()
+    if not row:
+        return jsonify({'error': 'Expense not found or not yours.'}), 404
+    db.execute("DELETE FROM expense_logs WHERE id = ?", (expense_id,))
+    db.commit()
+    return jsonify({'message': 'Expense deleted.'}), 200
+
 @app.route('/api/meals')
 def api_meals():
     if 'user_id' not in session:
