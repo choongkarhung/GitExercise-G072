@@ -498,3 +498,60 @@
     .nav-links { display: none; }
     .ribbon-val { font-size: 1rem; }
 }
+
+/* Per-item calorie chip inside meal cards */
+.meal-item-kcal {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: #fff8e6;
+    color: #8a6e20;
+    border: 1px solid #f0e0a0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Right side of meal food item now stacks kcal + cat + price */
+.meal-food-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+/* left side holds total + calorie badge */
+.meal-footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Per-meal calorie summary badge in card footer */
+.meal-cal-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.meal-cal-ok {
+    background: var(--green-light);
+    color: var(--green);
+    border: 1px solid var(--green-border);
+}
+
+.meal-cal-over {
+    background: var(--red-bg);
+    color: var(--red-text);
+    border: 1px solid var(--red-border);
+}
+
+.meal-cal-under {
+    background: #eef4ff;
+    color: #4a6abf;
+    border: 1px solid #c8d8f8;
+}

@@ -45,11 +45,11 @@
                 <p class="dash-sub">We'll build you a breakfast, lunch and dinner that fits your daily budget.</p>
             </div>
             <button class="btn-regenerate" id="regen-btn">
-                <span class="regen"> Regenerate Plan </span>
+                <span class="regen-icon">🔄</span> Regenerate Plan
             </button>
         </div>
 
-        <!-- BUDGET BAR -->
+        <!-- BUDGET RIBBON -->
         <div class="budget-ribbon" id="budget-ribbon">
             <div class="ribbon-item">
                 <span class="ribbon-label">Daily Budget</span>
@@ -66,6 +66,12 @@
                 <span class="ribbon-val" id="rb-save">RM —</span>
             </div>
             <div class="ribbon-divider"></div>
+            <!-- Calorie ribbon item: hidden by JS when no profile exists -->
+            <div class="ribbon-item" id="rb-cal-wrap">
+                <span class="ribbon-label">Total Calories</span>
+                <span class="ribbon-val" id="rb-cal">— kcal</span>
+            </div>
+            <div class="ribbon-divider" id="rb-cal-divider"></div>
             <div class="ribbon-item">
                 <span class="ribbon-label">Status</span>
                 <span class="ribbon-badge" id="rb-status">—</span>
@@ -74,14 +80,13 @@
 
         <!-- MEAL CARDS ROW -->
         <div class="meals-row" id="meals-row">
-            <!-- JS renders meal cards here -->
             <div class="mp-loading" id="mp-loading">
                 <div class="loading-spinner"></div>
                 <p>Calculating your meals...</p>
             </div>
         </div>
 
-        <!-- LOG ALL BUTTON -->
+        <!-- LOG ALL SECTION -->
         <div class="log-all-section" id="log-all-section" style="display:none;">
             <div class="log-all-inner">
                 <div>
@@ -89,7 +94,7 @@
                     <p class="log-all-sub">Log all 3 meals as today's expenses with one tap.</p>
                 </div>
                 <button class="btn-log-all" id="log-all-btn">
-                    ✅ Log All Meals 
+                    ✅ Log All Meals
                 </button>
             </div>
             <div id="log-all-msg" class="hidden"></div>

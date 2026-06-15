@@ -1,31 +1,44 @@
-let planData = null;  // { daily_budget, meals: [{time, items, total}] }
-let loggedMeals = new Set(); // track which meal lists have been logged
+let planData    = null;   
+let loggedMeals = new Set();
 
 const CAT_ICONS = {
     'Carbs':    '🍚',
     'Protein':  '🍗',
     'Beverage': '🥤',
+    'Juice':    '🧃',
+    'Snack':    '🍪',
 };
+
+const MEAL_META = [
+    { key: 'breakfast', label: 'Breakfast', icon: '🌅', sub: 'Start the day right' },
+    { key: 'lunch',     label: 'Lunch',     icon: '☀️',  sub: 'Midday fuel'         },
+    { key: 'dinner',    label: 'Dinner',    icon: '🌙', sub: 'End the day well'    },
+];
 
 async function init() {
     await generatePlan();
 }
 
-// GENERATE PLAN 
-async function generatePlan() {
+// GENERATE PLAN
+// Pass ?regen=<timestamp> to break the daily seed and get a fresh plan.
+async function generatePlan(isRegen = false) {
     loggedMeals = new Set();
     showLoading(true);
     document.getElementById('log-all-section').style.display = 'none';
 
+    const url = isRegen
+        ? `/api/mealplan?regen=${Date.now()}` // timestamp breaks stable seed
+        : '/api/mealplan';                    // same seed = same plan today
+
     try {
-        const res = await fetch('/api/mealplan');
+        const res = await fetch(url);
         if (!res.ok) {
             if (res.status === 401) { window.location.href = '/'; return; }
             throw new Error('Failed to load meal plan');
         }
         planData = await res.json();
         renderRibbon(planData);
-        renderMeals(planData.meals);
+        renderMeals(planData.meals, planData.daily_cal_target);
         document.getElementById('log-all-section').style.display = 'block';
         document.getElementById('log-all-btn').disabled = false;
         document.getElementById('log-all-msg').className = 'hidden';
@@ -37,17 +50,15 @@ async function generatePlan() {
 }
 
 function showLoading(on) {
-    const row = document.getElementById('meals-row');
-    if (on) {
-        row.innerHTML = `
-            <div class="mp-loading" id="mp-loading">
-                <div class="loading-spinner"></div>
-                <p>Calculating your meals...</p>
-            </div>`;
-    }
+    if (!on) return;
+    document.getElementById('meals-row').innerHTML = `
+        <div class="mp-loading" id="mp-loading">
+            <div class="loading-spinner"></div>
+            <p>Calculating your meals...</p>
+        </div>`;
 }
 
-// RIBBON 
+// BUDGET RIBBON 
 function renderRibbon(data) {
     const budget   = data.daily_budget;
     const planCost = data.meals.reduce((s, m) => s + m.total, 0);
@@ -57,9 +68,21 @@ function renderRibbon(data) {
     document.getElementById('rb-cost').textContent   = `RM ${planCost.toFixed(2)}`;
     document.getElementById('rb-save').textContent   = `RM ${Math.max(save, 0).toFixed(2)}`;
 
+    // Calorie ribbon item
+    const totalCal    = data.meals.reduce((s, m) => s + (m.total_cal || 0), 0);
+    const calTarget   = data.daily_cal_target;
+    const calRibbon   = document.getElementById('rb-cal-wrap');
+
+    if (calTarget && calRibbon) {
+        calRibbon.style.display = '';
+        document.getElementById('rb-cal').textContent =
+            `${totalCal.toLocaleString()} / ${calTarget.toLocaleString()} kcal`;
+    } else if (calRibbon) {
+        calRibbon.style.display = 'none';
+    }
+
     const badge = document.getElementById('rb-status');
     const pct   = budget > 0 ? (planCost / budget) * 100 : 0;
-
     badge.className = 'ribbon-badge';
     if (pct <= 80) {
         badge.classList.add('ok');
@@ -74,29 +97,36 @@ function renderRibbon(data) {
 }
 
 // MEAL CARDS 
-const MEAL_META = [
-    { key: 'breakfast', label: 'Breakfast', sub: 'Start the day right' },
-    { key: 'lunch', label: 'Lunch',  sub: 'Midday fuel' },
-    { key: 'dinner', label: 'Dinner', sub: 'End the day well' },
-];
-
-function renderMeals(meals) {
+function renderMeals(meals, dailyCalTarget) {
     const row = document.getElementById('meals-row');
     row.innerHTML = '';
 
     meals.forEach((meal, idx) => {
-        const meta  = MEAL_META[idx] || MEAL_META[0];
-        const total = meal.items.reduce((s, i) => s + i.price, 0);
+        const meta     = MEAL_META[idx] || MEAL_META[0];
+        const total    = meal.items.reduce((s, i) => s + i.price, 0);
+        const totalCal = meal.total_cal || meal.items.reduce((s, i) => s + (i.calories || 0), 0);
+        const calTarget = meal.cal_target;
+
+        let calBadgeHtml = '';
+        if (totalCal > 0) {
+            let calClass = 'meal-cal-ok';
+            if (calTarget) {
+                const diff = totalCal - calTarget;
+                if (diff > 150)       calClass = 'meal-cal-over';
+                else if (diff < -150) calClass = 'meal-cal-under';
+            }
+            calBadgeHtml = `<span class="meal-cal-badge ${calClass}">${totalCal.toLocaleString()} kcal</span>`;
+        }
 
         const card = document.createElement('div');
-        card.className = `meal-card ${meta.key}`;
+        card.className   = `meal-card ${meta.key}`;
         card.dataset.idx = idx;
 
         card.innerHTML = `
             <div class="meal-card-header">
                 <div class="meal-time-badge">${meta.icon} ${meta.label}</div>
                 <p class="meal-card-title">${meta.label} Plan</p>
-                <p class="meal-card-sub">${meta.sub} · ${meal.items.length} items</p>
+                <p class="meal-card-sub">${meta.sub} · ${meal.items.length} item${meal.items.length !== 1 ? 's' : ''}</p>
             </div>
             <div class="meal-items">
                 ${meal.items.map(item => `
@@ -108,15 +138,19 @@ function renderMeals(meals) {
                                 <div class="meal-food-stall">${escHtml(item.stall)}</div>
                             </div>
                         </div>
-                        <span class="meal-food-cat cat-${item.category.toLowerCase()}">${item.category}</span>
-                        <span class="meal-food-price">RM ${item.price.toFixed(2)}</span>
+                        <div class="meal-food-right">
+                            ${item.calories > 0 ? `<span class="meal-item-kcal">${item.calories} kcal</span>` : ''}
+                            <span class="meal-food-cat cat-${item.category.toLowerCase()}">${item.category}</span>
+                            <span class="meal-food-price">RM ${item.price.toFixed(2)}</span>
+                        </div>
                     </div>
                 `).join('')}
             </div>
             <div class="meal-card-footer">
-                <div>
+                <div class="meal-footer-left">
                     <div class="meal-total-label">Meal Total</div>
                     <div class="meal-total-val">RM ${total.toFixed(2)}</div>
+                    ${calBadgeHtml}
                 </div>
                 <button class="btn-log-meal" id="log-meal-${idx}" data-idx="${idx}">
                     Log ${meta.label}
@@ -125,8 +159,6 @@ function renderMeals(meals) {
         `;
 
         row.appendChild(card);
-
-        // Individual log button
         card.querySelector(`#log-meal-${idx}`).addEventListener('click', () => logMeal(idx));
     });
 }
@@ -134,23 +166,18 @@ function renderMeals(meals) {
 // LOG A SINGLE MEAL 
 async function logMeal(idx) {
     if (loggedMeals.has(idx)) return;
-
-    const meal  = planData.meals[idx];
-    const meta  = MEAL_META[idx];
-    const items = meal.items;
-    const total = items.reduce((s, i) => s + i.price, 0);
-    const totalCalories = items.reduce((s, i) => s + (i.calories || 0), 0);
-
-    // Build a combined label
-    const label = `[${meta.label}] ${items.map(i => i.name).join(' + ')}`;
+    const meal      = planData.meals[idx];
+    const meta      = MEAL_META[idx];
+    const total     = meal.items.reduce((s, i) => s + i.price, 0);
+    const totalCal  = meal.items.reduce((s, i) => s + (i.calories || 0), 0);
+    const label     = `[${meta.label}] ${meal.items.map(i => i.name).join(' + ')}`;
 
     try {
         const res = await fetch('/api/log_expense', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)), calories: totalCalories })
+            body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)), calories: totalCal })
         });
-
         if (res.ok) {
             loggedMeals.add(idx);
             const btn = document.getElementById(`log-meal-${idx}`);
@@ -170,26 +197,24 @@ async function logMeal(idx) {
 document.getElementById('log-all-btn').addEventListener('click', async () => {
     const msgBox = document.getElementById('log-all-msg');
     const btn    = document.getElementById('log-all-btn');
-    btn.disabled = true;
+    btn.disabled    = true;
     btn.textContent = 'Logging...';
 
     try {
         let successCount = 0;
         for (let idx = 0; idx < planData.meals.length; idx++) {
             if (loggedMeals.has(idx)) { successCount++; continue; }
-
             const meal  = planData.meals[idx];
             const meta  = MEAL_META[idx];
             const total = meal.items.reduce((s, i) => s + i.price, 0);
-            const totalCalories = meal.items.reduce((s, i) => s + (i.calories || 0), 0);
+            const cal   = meal.items.reduce((s, i) => s + (i.calories || 0), 0);
             const label = `[${meta.label}] ${meal.items.map(i => i.name).join(' + ')}`;
 
             const res = await fetch('/api/log_expense', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)), calories: totalCalories })
+                body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)), calories: cal })
             });
-
             if (res.ok) {
                 loggedMeals.add(idx);
                 const logBtn = document.getElementById(`log-meal-${idx}`);
@@ -201,24 +226,26 @@ document.getElementById('log-all-btn').addEventListener('click', async () => {
                 successCount++;
             }
         }
-
         const grandTotal = planData.meals.reduce((s, m) =>
             s + m.items.reduce((ms, i) => ms + i.price, 0), 0);
+        const grandCal = planData.meals.reduce((s, m) =>
+            s + m.items.reduce((ms, i) => ms + (i.calories || 0), 0), 0);
 
         msgBox.className = 'success';
+        const calNote = grandCal > 0 ? ` · ${grandCal.toLocaleString()} kcal total` : '';
         msgBox.textContent =
-            `✅ ${successCount} meals logged! RM ${grandTotal.toFixed(2)} added to your dashboard.`;
+            `✅ ${successCount} meals logged! RM ${grandTotal.toFixed(2)} added to your dashboard${calNote}.`;
         btn.textContent = '✅ All Logged!';
-
     } catch (e) {
-        msgBox.className = 'error';
+        msgBox.className   = 'error';
         msgBox.textContent = 'Something went wrong. Please try again.';
-        btn.disabled = false;
-        btn.textContent = '✅ Log All Meals to Dashboard';
+        btn.disabled       = false;
+        btn.textContent    = '✅ Log All Meals to Dashboard';
     }
 });
 
-document.getElementById('regen-btn').addEventListener('click', generatePlan);
+// Regenerate triggers a fresh seed
+document.getElementById('regen-btn').addEventListener('click', () => generatePlan(true));
 
 // HELPERS 
 function escHtml(str) {
