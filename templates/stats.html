@@ -25,7 +25,7 @@
             <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
             <a href="/calorie" class="nav-link">🔥 Calories</a>
             <a href="/menu" class="nav-link">📖 Menu</a>
-            <a href="/stats" class="nav-link nav-link-active">🥧 Stats</a>
+            <a href="/stats" class="nav-link nav-link-active">📈 Stats</a>
             {% if role in ('vendor', 'admin') %}
             <a href="/vendor" class="nav-link">🏪 Vendor Panel</a>
             {% endif %}
@@ -46,7 +46,7 @@
         <div class="st-header">
             <div>
                 <span class="pill-tag">Meal Breakdown</span>
-                <h2 class="dash-title">What have you been eating? 🥧</h2>
+                <h2 class="dash-title">What have you been eating?</h2>
                 <p class="dash-sub">A look at your logged meals split into Carbs, Protein, and Beverages.</p>
             </div>
             <div class="range-toggle" id="range-toggle">
@@ -84,7 +84,6 @@
             </div>
 
             <div class="st-empty hidden" id="st-empty">
-                <span class="empty-icon">🍽️</span>
                 <p class="empty-title">Nothing logged yet</p>
                 <p class="empty-sub">Log a meal from your Dashboard or Meal Plan to see your breakdown here.</p>
             </div>
