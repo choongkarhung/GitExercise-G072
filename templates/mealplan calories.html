@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Plan Calories</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chart-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+    <h2>Meal Plan Calories</h2>
+    <canvas id="mealPlanChart"></canvas>
+</div>
+
+<script>
+   // Register the datalabels plugin globally
+Chart.register(ChartDataLabels);
+
+// Helper function to extract numerical values from HTML elements (e.g., "120g" -> 120)
+function getMacroValue(elementId, fallbackValue) {
+    const element = document.getElementById(elementId);
+    if (element && element.innerText && element.innerText !== '—' && element.innerText !== '—g') {
+        // Strip out non-numeric characters like 'g' or ' kcal'
+        const numericValue = parseFloat(element.innerText.replace(/[^0-9.]/g, ''));
+        return isNaN(numericValue) ? fallbackValue : numericValue;
+    }
+    return fallbackValue;
+}
+
+// 1. Fetch values from BrokeBite's DOM elements dynamically, falling back to defaults if empty
+const dynamicCarbs = getMacroValue('macro-carbs', 450);
+const dynamicProtein = getMacroValue('macro-protein', 350);
+// Pulls from macro-fat if you use fat to represent the third slice, otherwise defaults to 150
+const dynamicBeverages = getMacroValue('macro-fat', 150); 
+
+const ctx = document.getElementById('mealPlanChart').getContext('2d');
+
+const mealPlanChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['Carbs', 'Protein', 'Beverages'],
+        datasets: [{
+            // 2. Insert the dynamically tracked variables here
+            data: [dynamicCarbs, dynamicProtein, dynamicBeverages], 
+            backgroundColor: [
+                '#ff9f43', // Carbs
+                '#1dd1a1', // Protein
+                '#54a0ff'  // Beverages
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: { size: 14 },
+                    padding: 20
+                }
+            },
+            datalabels: {
+                color: '#ffffff',
+                font: {
+                    weight: 'bold',
+                    size: 14
+                },
+                formatter: (value, ctx) => {
+                    let sum = 0;
+                    let dataArr = ctx.chart.data.datasets[0].data;
+                    dataArr.map(data => {
+                        sum += data;
+                    });
+                    let percentage = (value * 100 / sum).toFixed(1) + "%";
+                    return percentage;
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        if (label) { label += ': '; }
+                        if (context.parsed !== undefined) {
+                            // Automatically switches display text based on data origin
+                            const unit = context.parsed > 200 ? ' kcal' : 'g';
+                            label += context.parsed + unit;
+                        }
+                        return label;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// 3. Optional: If values change while the user is on the page (e.g. hitting 'Calculate')
+// This observer watches for updates and updates the chart layout automatically.
+const targetNode = document.getElementById('macro-carbs');
+if (targetNode) {
+    const observer = new MutationObserver(() => {
+        mealPlanChart.data.datasets[0].data = [
+            getMacroValue('macro-carbs', 450),
+            getMacroValue('macro-protein', 350),
+            getMacroValue('macro-fat', 150)
+        ];
+        mealPlanChart.update();
+    });
+    observer.observe(targetNode, { childList: true, characterData: true, subtree: true });
+}
+</script>
+
+</body>
+</html>
