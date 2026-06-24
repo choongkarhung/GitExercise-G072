@@ -29,7 +29,7 @@ def close_db(e=None):
     if db is not None:
         db.close()
 
-# ROLE HELPERS
+# ROLE HELPERS 
 
 def current_user_role():
     """Return the role of the logged-in user, or None if not logged in."""
@@ -45,7 +45,14 @@ def require_admin():
         return jsonify({'error': 'Admin access required.'}), 403
     return None
 
-# SHARED HELPERS
+def require_vendor_or_admin():
+    """Return a 403 JSON error if the current user is not a vendor or admin, else None."""
+    role = current_user_role()
+    if role not in ('admin', 'vendor'):
+        return jsonify({'error': 'Vendor or admin access required.'}), 403
+    return None
+
+# SHARED HELPERS 
 
 def _latest_session(user_id, db):
     """Return the most recent survival_session row for a user, or None."""
@@ -101,6 +108,12 @@ def _get_budget_info(user_id, db):
 
     return session_id, round(daily_budget, 2), [dict(i) for i in all_items]
 
+# PAGE ROUTES
+
+def _role_ctx():
+    """Template context dict with the current user's role."""
+    return {'role': session.get('role', 'student')}
+
 @app.route('/')
 def home():
     if 'username' in session and 'user_id' in session:
@@ -118,40 +131,50 @@ def setup():
         db = get_db()
         if _latest_session(session['user_id'], db):
             return redirect(url_for('dashboard'))
-    return render_template('setup.html', username=session.get('username', ''))
+    return render_template('setup.html', username=session.get('username', ''), **_role_ctx())
 
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('home'))
-    return render_template('dashboard.html', username=session.get('username', ''))
+    return render_template('dashboard.html', username=session.get('username', ''), **_role_ctx())
 
 @app.route('/mealplan')
 def mealplan():
     if 'user_id' not in session:
         return redirect(url_for('home'))
-    return render_template('mealplan.html', username=session.get('username', ''))
+    return render_template('mealplan.html', username=session.get('username', ''), **_role_ctx())
 
 @app.route('/calorie')
 def calorie():
     if 'user_id' not in session:
         return redirect(url_for('home'))
-    return render_template('calorie.html', username=session.get('username', ''))
+    return render_template('calorie.html', username=session.get('username', ''), **_role_ctx())
 
 @app.route('/menu')
 def menu():
     if 'user_id' not in session:
         return redirect(url_for('home'))
-    return render_template('menu.html', username=session.get('username', ''))
+    return render_template('menu.html', username=session.get('username', ''), **_role_ctx())
 
 @app.route('/admin')
 def admin():
     if 'user_id' not in session:
         return redirect(url_for('home'))
-    # role check added, only admins can view the admin panel
     if current_user_role() != 'admin':
         return redirect(url_for('dashboard'))
-    return render_template('admin.html', username=session.get('username', ''))
+    return render_template('admin.html', username=session.get('username', ''), **_role_ctx())
+
+@app.route('/vendor')
+def vendor():
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+    role = current_user_role()
+    if role not in ('vendor', 'admin'):
+        return redirect(url_for('dashboard'))
+    return render_template('vendor.html', username=session.get('username', ''), **_role_ctx())
+
+# AUTHENTICATION
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -182,7 +205,7 @@ def login():
         session.clear()
         session['username'] = user['username']
         session['user_id']  = user['id']
-        session['role']     = user['role']          # cache role in session
+        session['role']     = user['role']
         return jsonify({'message': 'Login successful!'}), 200
     return jsonify({'error': 'Invalid username or password'}), 401
 
@@ -190,6 +213,8 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('home'))
+
+# SETUP / DASHBOARD APIs 
 
 @app.route('/setup', methods=['POST'])
 def setup_post():
@@ -224,9 +249,9 @@ def api_dashboard():
     if not sess:
         return jsonify({'error': 'No session found. Please set up first.'}), 404
 
-    session_id    = sess['id']
+    session_id = sess['id']
     start_balance = float(sess['start_balance'])
-    days_total    = int(sess['days_total'])
+    days_total = int(sess['days_total'])
     try:
         session_start = datetime.fromisoformat(sess['created_at']).date()
     except Exception:
@@ -240,14 +265,14 @@ def api_dashboard():
         SELECT COALESCE(SUM(amount), 0) as total FROM expense_logs WHERE session_id = ?
     """, (session_id,)).fetchone()['total'])
 
-    today_str   = date.today().isoformat()
+    today_str = date.today().isoformat()
     spent_today = float(db.execute("""
         SELECT COALESCE(SUM(amount), 0) as total
         FROM expense_logs WHERE session_id = ? AND logged_at LIKE ?
     """, (session_id, today_str + '%')).fetchone()['total'])
 
     remaining_balance = start_balance - total_spent
-    daily_budget      = remaining_balance / days_remaining
+    daily_budget = remaining_balance / days_remaining
 
     expenses_today = db.execute("""
         SELECT label, amount, logged_at, calories
@@ -257,26 +282,26 @@ def api_dashboard():
     """, (session_id, today_str + '%')).fetchall()
 
     return jsonify({
-        'session_id':        session_id,
-        'start_balance':     start_balance,
-        'days_total':        days_total,
-        'days_remaining':    days_remaining,
-        'days_elapsed':      days_elapsed,
-        'session_expired':   session_expired,
-        'total_spent':       round(total_spent, 2),
-        'spent_today':       round(spent_today, 2),
+        'session_id': session_id,
+        'start_balance': start_balance,
+        'days_total': days_total,
+        'days_remaining': days_remaining,
+        'days_elapsed': days_elapsed,
+        'session_expired': session_expired,
+        'total_spent': round(total_spent, 2),
+        'spent_today': round(spent_today, 2),
         'remaining_balance': round(remaining_balance, 2),
-        'daily_budget':      round(daily_budget, 2),
-        'expenses_today':    [dict(e) for e in expenses_today],
+        'daily_budget': round(daily_budget, 2),
+        'expenses_today': [dict(e) for e in expenses_today],
     })
 
 @app.route('/api/log_expense', methods=['POST'])
 def api_log_expense():
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in.'}), 401
-    data     = request.get_json()
-    label    = data.get('label', '').strip()
-    amount   = data.get('amount')
+    data = request.get_json()
+    label = data.get('label', '').strip()
+    amount = data.get('amount')
     calories = int(data.get('calories', 0))
     if not label:
         return jsonify({'error': 'Description is required.'}), 400
@@ -301,7 +326,6 @@ def delete_expense(expense_id):
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in.'}), 401
     db = get_db()
-    # Verify this expense belongs to the current user's session
     row = db.execute("""
         SELECT e.id FROM expense_logs e
         JOIN survival_sessions s ON e.session_id = s.id
@@ -313,6 +337,8 @@ def delete_expense(expense_id):
     db.commit()
     return jsonify({'message': 'Expense deleted.'}), 200
 
+# MEAL PLAN APIs 
+
 @app.route('/api/meals')
 def api_meals():
     if 'user_id' not in session:
@@ -321,7 +347,6 @@ def api_meals():
     _, daily_budget, items_list = _get_budget_info(session['user_id'], db)
     if items_list is None:
         return jsonify([])
-    # Return a varied selection: mix carbs/protein and beverages, up to 15 items
     mains = [i for i in items_list if i['category'] in ('Carbs', 'Protein')]
     bevs  = [i for i in items_list if i['category'] == 'Beverage']
     return jsonify(mains[:10] + bevs[:5])
@@ -330,16 +355,8 @@ def api_meals():
 def api_mealplan():
     """
     Returns a 3-meal plan (breakfast, lunch, dinner) for today.
-
-    Algorithm (Phase 2):
-    - Budget split: 35% breakfast, 40% lunch, 25% dinner
-    - Each meal slot: 1 main (Carbs/Protein) + 1 beverage + optional protein side
-    - Stall variety: each meal tries to use a different stall from the previous
-    - No item is repeated across meals
-    - If a calorie profile exists, calories are distributed ~30/40/30 across meals
-      and items closest to the target per-meal calorie range are preferred
-    - Stable daily seed: same plan on page refresh; Regenerate button sends
-      ?regen=<timestamp> to break the seed
+    Algorithm (Phase 2): budget split 35/40/25, stall variety, no repetition,
+    calorie-profile aware (30/40/30), stable daily seed.
     """
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in.'}), 401
@@ -351,38 +368,34 @@ def api_mealplan():
     if items_list is None:
         return jsonify({'error': 'No session found.'}), 404
 
-    # Calorie target
     profile = db.execute(
         "SELECT target_calories FROM calorie_profiles WHERE user_id = ?", (user_id,)
     ).fetchone()
     daily_cal_target = profile['target_calories'] if profile else None
 
-    # Per-meal calorie targets (30 / 40 / 30 split)
     cal_targets = None
     if daily_cal_target:
         cal_targets = [
-            int(daily_cal_target * 0.30),   # breakfast
-            int(daily_cal_target * 0.40),   # lunch
-            int(daily_cal_target * 0.30),   # dinner
+            int(daily_cal_target * 0.30),
+            int(daily_cal_target * 0.40),
+            int(daily_cal_target * 0.30),
         ]
 
-    regen_salt = request.args.get('regen', '')          # timestamp from JS on regenerate
+    regen_salt = request.args.get('regen', '')
     seed_str   = f"{user_id}:{date.today().isoformat()}:{regen_salt}"
     rng        = random.Random(seed_str)
 
     mains = [i for i in items_list if i['category'] in ('Carbs', 'Protein')]
     bevs  = [i for i in items_list if i['category'] == 'Beverage']
 
-    # Shuffle both pools once so selection order are different every day
     rng.shuffle(mains)
     rng.shuffle(bevs)
 
-    SLICES      = [0.35, 0.40, 0.25]
+    SLICES = [0.35, 0.40, 0.25]
     MEAL_LABELS = ['Breakfast', 'Lunch', 'Dinner']
 
-    used_item_names = set()   # prevent item repetition across meals
-    used_stalls     = []      # track stalls per meal for variety nudge
-
+    used_item_names = set()
+    used_stalls = []
     meals_out = []
 
     for meal_idx, (label, pct) in enumerate(zip(MEAL_LABELS, SLICES)):
@@ -393,16 +406,14 @@ def api_mealplan():
             x for x in mains
             if x['price'] <= budget_slice * 0.80 and x['name'] not in used_item_names
         ]
-
         if not candidate_mains:
             candidate_mains = [x for x in mains if x['price'] <= budget_slice * 0.80]
         if not candidate_mains:
             candidate_mains = sorted(mains, key=lambda x: x['price'])[:3]
 
-        # Prefer foods from a stall not used in the last meal
         last_stall = used_stalls[-1] if used_stalls else None
-        varied     = [x for x in candidate_mains if x['stall'] != last_stall]
-        pool       = varied if varied else candidate_mains
+        varied = [x for x in candidate_mains if x['stall'] != last_stall]
+        pool = varied if varied else candidate_mains
 
         if cal_target:
             main_cal_target = int(cal_target * 0.65)
@@ -448,10 +459,10 @@ def api_mealplan():
         total_cal = sum(x['calories'] for x in items_chosen)
 
         meals_out.append({
-            'label':      label,
-            'items':      items_chosen,
-            'total':      total,
-            'total_cal':  total_cal,
+            'label': label,
+            'items': items_chosen,
+            'total': total,
+            'total_cal': total_cal,
             'cal_target': cal_target,
         })
 
@@ -460,6 +471,8 @@ def api_mealplan():
         'daily_cal_target': daily_cal_target,
         'meals':            meals_out,
     })
+
+# CALORIE PROFILE APIs 
 
 @app.route('/api/calorie_profile', methods=['GET'])
 def get_calorie_profile():
@@ -495,18 +508,18 @@ def save_calorie_profile():
                  target_calories, goal_mode, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(user_id) DO UPDATE SET
-                gender              = excluded.gender,
-                age                 = excluded.age,
-                height_cm           = excluded.height_cm,
-                weight_kg           = excluded.weight_kg,
-                goal_weight_kg      = excluded.goal_weight_kg,
+                gender = excluded.gender,
+                age = excluded.age,
+                height_cm = excluded.height_cm,
+                weight_kg = excluded.weight_kg,
+                goal_weight_kg = excluded.goal_weight_kg,
                 activity_multiplier = excluded.activity_multiplier,
-                speed_kcal          = excluded.speed_kcal,
-                bmr                 = excluded.bmr,
-                tdee                = excluded.tdee,
-                target_calories     = excluded.target_calories,
-                goal_mode           = excluded.goal_mode,
-                updated_at          = excluded.updated_at
+                speed_kcal = excluded.speed_kcal,
+                bmr = excluded.bmr,
+                tdee = excluded.tdee,
+                target_calories = excluded.target_calories,
+                goal_mode = excluded.goal_mode,
+                updated_at = excluded.updated_at
         """, (
             session['user_id'], data['gender'], int(data['age']),
             float(data['height_cm']), float(data['weight_kg']),
@@ -525,7 +538,7 @@ def api_calorie_today():
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in.'}), 401
     user_id = session['user_id']
-    db      = get_db()
+    db = get_db()
     profile = db.execute(
         "SELECT target_calories, goal_mode, weight_kg, goal_weight_kg FROM calorie_profiles WHERE user_id = ?",
         (user_id,)
@@ -544,21 +557,20 @@ def api_calorie_today():
     return jsonify({
         'has_profile':     True,
         'target_calories': profile['target_calories'],
-        'goal_mode':       profile['goal_mode'],
+        'goal_mode': profile['goal_mode'],
         'calories_today':  calories_today,
-        'weight_kg':       profile['weight_kg'],
-        'goal_weight_kg':  profile['goal_weight_kg'],
+        'weight_kg': profile['weight_kg'],
+        'goal_weight_kg': profile['goal_weight_kg'],
     })
 
-# FOOD ITEMS
-
+# FOOD ITEMS APIs 
 @app.route('/api/food_items', methods=['GET'])
 def get_food_items():
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in.'}), 401
     db    = get_db()
     items = db.execute("""
-        SELECT id, name, stall, price, category, calories
+        SELECT id, name, stall, price, category, calories, owner_id
         FROM food_items WHERE is_active = 1
         ORDER BY stall ASC, name ASC
     """).fetchall()
@@ -566,13 +578,13 @@ def get_food_items():
 
 @app.route('/api/food_items', methods=['POST'])
 def create_food_item():
-    err = require_admin()
+    err = require_vendor_or_admin()
     if err:
         return err
-    data     = request.get_json()
-    name     = data.get('name', '').strip()
-    stall    = data.get('stall', '').strip()
-    price    = data.get('price')
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    stall = data.get('stall', '').strip()
+    price = data.get('price')
     category = data.get('category', '').strip()
     calories = data.get('calories', 0)
     if not name or not stall or price is None:
@@ -582,9 +594,9 @@ def create_food_item():
     db = get_db()
     try:
         db.execute("""
-            INSERT INTO food_items (name, stall, price, category, calories, is_active)
-            VALUES (?, ?, ?, ?, ?, 1)
-        """, (name, stall, float(price), category, int(calories)))
+            INSERT INTO food_items (name, stall, price, category, calories, is_active, owner_id)
+            VALUES (?, ?, ?, ?, ?, 1, ?)
+        """, (name, stall, float(price), category, int(calories), session['user_id']))
         db.commit()
     except Exception:
         return jsonify({'error': 'Item already exists or database constraint failed.'}), 400
@@ -592,14 +604,23 @@ def create_food_item():
 
 @app.route('/api/food_items/<int:item_id>', methods=['PUT'])
 def update_food_item(item_id):
-    err = require_admin()
+    err = require_vendor_or_admin()
     if err:
         return err
-    data     = request.get_json()
+    role = current_user_role()
+    db   = get_db()
+
+    # Vendors can only edit their own items
+    item = db.execute("SELECT owner_id FROM food_items WHERE id = ? AND is_active = 1", (item_id,)).fetchone()
+    if not item:
+        return jsonify({'error': 'Item not found.'}), 404
+    if role == 'vendor' and item['owner_id'] != session['user_id']:
+        return jsonify({'error': 'You can only edit your own items.'}), 403
+
+    data = request.get_json()
     category = data.get('category', '').strip()
     if category not in VALID_CATEGORIES:
-        return jsonify({'error': f'Invalid category.'}), 400
-    db = get_db()
+        return jsonify({'error': 'Invalid category.'}), 400
     try:
         db.execute("""
             UPDATE food_items
@@ -613,10 +634,19 @@ def update_food_item(item_id):
 
 @app.route('/api/food_items/<int:item_id>', methods=['DELETE'])
 def delete_food_item(item_id):
-    err = require_admin()
+    err = require_vendor_or_admin()
     if err:
         return err
-    db = get_db()
+    role = current_user_role()
+    db   = get_db()
+
+    # Vendors can only delete their own items
+    item = db.execute("SELECT owner_id FROM food_items WHERE id = ? AND is_active = 1", (item_id,)).fetchone()
+    if not item:
+        return jsonify({'error': 'Item not found.'}), 404
+    if role == 'vendor' and item['owner_id'] != session['user_id']:
+        return jsonify({'error': 'You can only delete your own items.'}), 403
+
     try:
         db.execute("UPDATE food_items SET is_active = 0 WHERE id = ?", (item_id,))
         db.commit()
@@ -624,14 +654,14 @@ def delete_food_item(item_id):
         return jsonify({'error': f'Database error: {str(e)}'}), 400
     return jsonify({'message': 'Menu item removed successfully!'}), 200
 
-# USER MANAGEMENT (admin only)
+# USER MANAGEMENT APIs (admin only) 
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
     err = require_admin()
     if err:
         return err
-    db    = get_db()
+    db = get_db()
     users = db.execute("SELECT id, username, role FROM users ORDER BY id ASC").fetchall()
     return jsonify([dict(u) for u in users])
 
@@ -640,10 +670,10 @@ def update_user_role(uid):
     err = require_admin()
     if err:
         return err
-    data     = request.get_json()
+    data = request.get_json()
     new_role = data.get('role', '').strip()
-    if new_role not in ('student', 'admin'):
-        return jsonify({'error': 'Role must be "student" or "admin".'}), 400
+    if new_role not in ('student', 'admin', 'vendor'):
+        return jsonify({'error': 'Role must be "student", "vendor", or "admin".'}), 400
     # Prevent self-demotion
     if uid == session['user_id'] and new_role != 'admin':
         return jsonify({'error': 'You cannot remove your own admin role.'}), 400
@@ -651,6 +681,78 @@ def update_user_role(uid):
     db.execute("UPDATE users SET role = ? WHERE id = ?", (new_role, uid))
     db.commit()
     return jsonify({'message': f'Role updated to {new_role}.'}), 200
+
+# ADMIN API 
+
+@app.route('/api/admin/activity')
+def api_admin_activity():
+    """
+    Returns per-user activity summary for the admin dashboard:
+    - Username, role, total sessions, total spent (all time),
+      expenses logged today, last active timestamp.
+    """
+    err = require_admin()
+    if err:
+        return err
+    db = get_db()
+    today_str = date.today().isoformat()
+
+    rows = db.execute("""
+        SELECT
+            u.id,
+            u.username,
+            u.role,
+            COUNT(DISTINCT ss.id)           AS total_sessions,
+            COALESCE(SUM(el.amount), 0)     AS total_spent_all_time,
+            COUNT(CASE WHEN el.logged_at LIKE ? THEN 1 END) AS logs_today,
+            MAX(el.logged_at)               AS last_active
+        FROM users u
+        LEFT JOIN survival_sessions ss ON ss.user_id = u.id
+        LEFT JOIN expense_logs el      ON el.session_id = ss.id
+        GROUP BY u.id
+        ORDER BY last_active DESC NULLS LAST
+    """, (today_str + '%',)).fetchall()
+
+    return jsonify([dict(r) for r in rows])
+
+@app.route('/api/admin/recent_logs')
+def api_admin_recent_logs():
+    """
+    Returns the 50 most recent expense log entries across all users,
+    with username attached.
+    """
+    err = require_admin()
+    if err:
+        return err
+    db   = get_db()
+    rows = db.execute("""
+        SELECT
+            u.username,
+            el.label,
+            el.amount,
+            el.calories,
+            el.logged_at
+        FROM expense_logs el
+        JOIN survival_sessions ss ON el.session_id = ss.id
+        JOIN users u              ON ss.user_id = u.id
+        ORDER BY el.logged_at DESC
+        LIMIT 50
+    """).fetchall()
+    return jsonify([dict(r) for r in rows])
+
+
+# OTHER APIs
+
+@app.route('/api/me')
+def api_me():
+    """Return basic info about the logged-in user."""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+    return jsonify({
+        'user_id':  session['user_id'],
+        'username': session.get('username'),
+        'role':     session.get('role'),
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
