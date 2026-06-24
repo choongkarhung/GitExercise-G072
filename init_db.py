@@ -28,11 +28,17 @@ CREATE TABLE IF NOT EXISTS food_items (
 )
 """)
 
-# Migrate existing DBs: add calories column if it doesn't exist yet
+# Migrate existing DB: add calories column if it doesn't exist yet
 try:
     cur.execute("ALTER TABLE food_items ADD COLUMN calories INTEGER NOT NULL DEFAULT 0")
 except Exception:
-    pass  # Column already exists — safe to ignore
+    pass  # Column already exists, ignore
+
+# Migrate existing DB: add owner_id column for vendor item ownership
+try:
+    cur.execute("ALTER TABLE food_items ADD COLUMN owner_id INTEGER REFERENCES users(id)")
+except Exception:
+    pass  # Column already exists, ignore
 
 cur.execute("""
 CREATE TABLE IF NOT EXISTS survival_sessions (
@@ -58,7 +64,7 @@ CREATE TABLE IF NOT EXISTS expense_logs (
 )
 """)
 
-# Migrate existing DBs
+# Migrate existing DB
 try:
     cur.execute("ALTER TABLE expense_logs ADD COLUMN calories INTEGER NOT NULL DEFAULT 0")
 except Exception:
@@ -200,7 +206,6 @@ food_items = [
     ("Nasi Goreng Kampung", "Starbees(Tuas anas)", 6.00, "Carbs", 560),
     ("Nasi Goreng Ikan Masin", "Starbees(Tuas anas)", 6.00, "Carbs", 540),
     ("Nasi Goreng Tomyam", "Starbees(Tuas anas)", 8.00, "Carbs", 590),
-    # ("Nothing" easter egg — kept in data but inserted as inactive below, not via executemany)
     
     # Deen Cafe
     ("Chicken Chop Combo+Rice", "Deen Cafe", 7.00, "Carbs", 750),

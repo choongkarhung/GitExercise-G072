@@ -1,31 +1,28 @@
 let menuItems = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadDashboard();
+    loadMenuItems();
     loadUsers();
+    loadActivity();
     document.getElementById('menu-form').addEventListener('submit', handleFormSubmit);
     document.getElementById('cancel-btn').addEventListener('click', resetFormState);
 });
 
 // MENU ITEMS 
 
-async function loadDashboard() {
+async function loadMenuItems() {
     try {
         const response = await fetch('/api/food_items');
-        if (response.status === 403) {
-            // If non-admin somehow reached this page, redirect them
-            window.location.href = '/dashboard';
-            return;
-        }
+        if (response.status === 403) { window.location.href = '/dashboard'; return; }
         if (!response.ok) throw new Error('Database loading issue.');
         menuItems = await response.json();
-        renderUI();
+        renderMenuUI();
     } catch (error) {
         console.error('Fetch Error:', error);
     }
 }
 
-function renderUI() {
+function renderMenuUI() {
     const tableBody = document.getElementById('menu-table-body');
     tableBody.innerHTML = '';
 
@@ -39,8 +36,8 @@ function renderUI() {
 
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><strong>${item.name}</strong></td>
-            <td>${item.stall}</td>
+            <td><strong>${escHtml(item.name)}</strong></td>
+            <td>${escHtml(item.stall)}</td>
             <td>RM ${parseFloat(item.price).toFixed(2)}</td>
             <td><span class="badge ${item.category.toLowerCase()}">${item.category}</span></td>
             <td>${item.calories} kcal</td>
@@ -82,7 +79,7 @@ async function handleFormSubmit(e) {
         if (!response.ok) throw new Error(data.error || 'Server error.');
         alert(data.message);
         resetFormState();
-        loadDashboard();
+        loadMenuItems();
     } catch (error) {
         alert(`Transaction Failed: ${error.message}`);
     }
@@ -109,7 +106,7 @@ async function deleteItem(id) {
         const data     = await response.json();
         if (!response.ok) throw new Error(data.error || 'Failed to remove entry.');
         alert(data.message);
-        loadDashboard();
+        loadMenuItems();
     } catch (error) {
         alert(`Deletion Error: ${error.message}`);
     }
@@ -118,8 +115,8 @@ async function deleteItem(id) {
 function resetFormState() {
     document.getElementById('menu-form').reset();
     document.getElementById('item-index').value = '';
-    document.getElementById('form-title').textContent = 'Add New Menu Item';
-    document.getElementById('submit-btn').textContent = 'Add Item ✚';
+    document.getElementById('form-title').textContent   = 'Add New Menu Item';
+    document.getElementById('submit-btn').textContent   = 'Add Item ✚';
     document.getElementById('cancel-btn').style.display = 'none';
 }
 
@@ -128,7 +125,7 @@ function resetFormState() {
 async function loadUsers() {
     try {
         const res = await fetch('/api/users');
-        if (!res.ok) return;   // silently skip if not admin (shouldn't happen)
+        if (!res.ok) return;
         const users = await res.json();
         renderUsers(users);
     } catch (e) {
@@ -151,7 +148,8 @@ function renderUsers(users) {
             <td style="text-align:center;">
                 <select class="role-select" id="role-select-${user.id}">
                     <option value="student" ${user.role === 'student' ? 'selected' : ''}>student</option>
-                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option>
+                    <option value="vendor" ${user.role === 'vendor' ? 'selected' : ''}>vendor</option>
+                    <option value="admin" ${user.role === 'admin'  ? 'selected' : ''}>admin</option>
                 </select>
                 <button class="btn btn-edit" onclick="saveUserRole(${user.id})">Save</button>
             </td>
@@ -161,7 +159,7 @@ function renderUsers(users) {
 }
 
 async function saveUserRole(uid) {
-    const select = document.getElementById(`role-select-${uid}`);
+    const select  = document.getElementById(`role-select-${uid}`);
     const newRole = select.value;
     try {
         const res  = await fetch(`/api/users/${uid}/role`, {
@@ -177,6 +175,107 @@ async function saveUserRole(uid) {
         alert(`Role update failed: ${e.message}`);
     }
 }
+
+// USER ACTIVITY
+
+async function loadActivity() {
+    try {
+        const [summaryRes, feedRes] = await Promise.all([
+            fetch('/api/admin/activity'),
+            fetch('/api/admin/recent_logs'),
+        ]);
+        if (!summaryRes.ok || !feedRes.ok) return;
+        const summary = await summaryRes.json();
+        const feed = await feedRes.json();
+        renderActivitySummary(summary);
+        renderActivityFeed(feed);
+    } catch (e) {
+        console.error('Activity load error:', e);
+    }
+}
+
+function renderActivitySummary(rows) {
+    const tbody = document.getElementById('activity-table-body');
+    tbody.innerHTML = '';
+
+    // Update overview stats
+    const totalUsers = rows.length;
+    const activeToday = rows.filter(r => r.logs_today > 0).length;
+    const totalSessions = rows.reduce((s, r) => s + (r.total_sessions || 0), 0);
+    document.getElementById('stat-total-users').textContent = totalUsers;
+    document.getElementById('stat-active-today').textContent = activeToday;
+    document.getElementById('stat-total-sessions').textContent = totalSessions;
+
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--ink-faint);padding:24px;">No user data yet.</td></tr>`;
+        return;
+    }
+
+    rows.forEach(row => {
+        const lastActive = row.last_active
+            ? new Date(row.last_active).toLocaleString('en-MY', {
+                  day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true,
+              })
+            : '—';
+
+        const activityDot = row.logs_today > 0
+            ? '<span class="activity-dot dot-active" title="Active today"></span>'
+            : '<span class="activity-dot dot-idle" title="Not active today"></span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                ${activityDot}
+                <strong>${escHtml(row.username)}</strong>
+            </td>
+            <td><span class="role-badge role-${row.role}">${row.role}</span></td>
+            <td>${row.total_sessions}</td>
+            <td>RM ${parseFloat(row.total_spent_all_time).toFixed(2)}</td>
+            <td>
+                ${row.logs_today > 0
+                    ? `<span class="logs-today-badge">${row.logs_today} log${row.logs_today !== 1 ? 's' : ''} today</span>`
+                    : '<span style="color:var(--ink-faint);font-size:0.8rem;">—</span>'}
+            </td>
+            <td style="font-size:0.82rem;color:var(--ink-muted);">${lastActive}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function renderActivityFeed(logs) {
+    const feed = document.getElementById('activity-feed');
+    feed.innerHTML = '';
+
+    if (logs.length === 0) {
+        feed.innerHTML = `<div class="feed-empty">No expense logs recorded yet.</div>`;
+        return;
+    }
+
+    logs.forEach(log => {
+        const time = new Date(log.logged_at).toLocaleString('en-MY', {
+            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true,
+        });
+        const calBadge = log.calories > 0
+            ? `<span class="feed-cal">${log.calories} kcal</span>`
+            : '';
+        const el = document.createElement('div');
+        el.className = 'feed-item';
+        el.innerHTML = `
+            <div class="feed-left">
+                <span class="feed-user">${escHtml(log.username)}</span>
+                <span class="feed-label">${escHtml(log.label)}</span>
+                ${calBadge}
+            </div>
+            <div class="feed-right">
+                <span class="feed-amount">RM ${parseFloat(log.amount).toFixed(2)}</span>
+                <span class="feed-time">${time}</span>
+            </div>
+        `;
+        feed.appendChild(el);
+    });
+}
+
+// HELPERS 
 
 function escHtml(str) {
     return String(str)

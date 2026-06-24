@@ -5,8 +5,6 @@ const CAT_ICONS = {
     'Carbs':    '🍚',
     'Protein':  '🍗',
     'Beverage': '🥤',
-    'Juice':    '🧃',
-    'Snack':    '🍪',
 };
 
 const MEAL_META = [

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Admin Panel - BrokeBite</title>
+    <title>Admin Panel - BrokeBite</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
 </head>
@@ -25,7 +25,12 @@
             <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
             <a href="/calorie" class="nav-link">🔥 Calories</a>
             <a href="/menu" class="nav-link">📖 Menu</a>
+            {% if role in ('vendor', 'admin') %}
+            <a href="/vendor" class="nav-link">🏪 Vendor Panel</a>
+            {% endif %}
+            {% if role == 'admin' %}
             <a href="/admin" class="nav-link nav-link-active">⚙️ Admin Panel</a>
+            {% endif %}
         </div>
         <div class="nav-right">
             <span class="user-greeting">Hey, {{ username }}!</span>
@@ -38,12 +43,12 @@
             <header class="main-header">
                 <div>
                     <span class="pill-tag">System Settings</span>
-                    <h1>Menu Management Portal 🛠️</h1>
-                    <p class="admin-sub">Update items, categories, and keep track of student-friendly pricing.</p>
+                    <h1>Admin Control Centre 🛠️</h1>
+                    <p class="admin-sub">Manage the full menu catalog, user roles, and monitor platform activity.</p>
                 </div>
             </header>
 
-            <!-- STATS -->
+            <!-- ── MENU STATS ── -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <h3>Total Items</h3>
@@ -59,7 +64,7 @@
                 </div>
             </section>
 
-            <!-- ADD / EDIT FORM -->
+            <!-- ── ADD / EDIT FORM ── -->
             <section class="form-section">
                 <div class="card">
                     <h3 id="form-title">Add New Menu Item</h3>
@@ -107,7 +112,7 @@
                 </div>
             </section>
 
-            <!-- MENU CATALOG TABLE -->
+            <!-- ── MENU CATALOG TABLE ── -->
             <section class="table-section card">
                 <h3>Live Menu Catalog</h3>
                 <div class="table-wrapper">
@@ -127,7 +132,7 @@
                 </div>
             </section>
 
-            <!-- USER MANAGEMENT TABLE -->
+            <!-- ── USER MANAGEMENT TABLE ── -->
             <section class="table-section card">
                 <h3>User Management</h3>
                 <div class="table-wrapper">
@@ -137,12 +142,59 @@
                                 <th>#</th>
                                 <th>Username</th>
                                 <th>Role</th>
-                                <th style="text-align:center;">Actions</th>
+                                <th style="text-align:center;">Change Role</th>
                             </tr>
                         </thead>
                         <tbody id="user-table-body"></tbody>
                     </table>
                 </div>
+            </section>
+
+            <!-- USER ACTIVITY OVERVIEW -->
+            <section class="card activity-section">
+                <h3>User Activity Overview 📊</h3>
+
+                <!-- Activity quick-stats -->
+                <div class="activity-stats-row">
+                    <div class="activity-stat">
+                        <div class="as-label">Total Users</div>
+                        <div class="as-val" id="stat-total-users">—</div>
+                    </div>
+                    <div class="activity-stat">
+                        <div class="as-label">Active Today</div>
+                        <div class="as-val green" id="stat-active-today">—</div>
+                    </div>
+                    <div class="activity-stat">
+                        <div class="as-label">Total Sessions</div>
+                        <div class="as-val" id="stat-total-sessions">—</div>
+                    </div>
+                </div>
+
+                <!-- Per-user activity table -->
+                <div class="table-wrapper" style="margin-top:20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Sessions</th>
+                                <th>Total Spent</th>
+                                <th>Today</th>
+                                <th>Last Active</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- RECENT EXPENSE FEED -->
+            <section class="card">
+                <h3>Recent Expense Feed 🧾</h3>
+                <p class="admin-sub" style="margin-top:-14px;margin-bottom:18px;">
+                    Last 50 expense logs across all users, newest first.
+                </p>
+                <div id="activity-feed" class="activity-feed"></div>
             </section>
 
         </main>
