@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Stats - BrokeBite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='stats.css') }}">
+</head>
+<body class="dashboard-body">
+
+    <div class="blob-canvas">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <span class="brand-nav">🍜 <span>Broke</span>Bite</span>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="/mealplan" class="nav-link">🍽️ Meal Plan</a>
+            <a href="/calorie" class="nav-link">🔥 Calories</a>
+            <a href="/menu" class="nav-link">📖 Menu</a>
+            <a href="/stats" class="nav-link nav-link-active">🥧 Stats</a>
+            {% if role in ('vendor', 'admin') %}
+            <a href="/vendor" class="nav-link">🏪 Vendor Panel</a>
+            {% endif %}
+            {% if role == 'admin' %}
+            <a href="/admin" class="nav-link">⚙️ Admin Panel</a>
+            {% endif %}
+        </div>
+        <div class="nav-right">
+            <span class="user-greeting">Hey, {{ username }}!</span>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="stats-wrapper">
+
+        <!-- HEADER -->
+        <div class="st-header">
+            <div>
+                <span class="pill-tag">Meal Breakdown</span>
+                <h2 class="dash-title">What have you been eating? 🥧</h2>
+                <p class="dash-sub">A look at your logged meals split into Carbs, Protein, and Beverages.</p>
+            </div>
+            <div class="range-toggle" id="range-toggle">
+                <button class="range-btn active" data-range="today">Today</button>
+                <button class="range-btn" data-range="all">All Time</button>
+            </div>
+        </div>
+
+        <!-- MAIN CARD -->
+        <div class="st-card" id="st-card">
+
+            <div class="st-loading" id="st-loading">
+                <div class="loading-spinner"></div>
+                <p>Calculating your macros...</p>
+            </div>
+
+            <div class="st-content hidden" id="st-content">
+
+                <div class="st-layout">
+
+                    <!-- PIE CHART -->
+                    <div class="pie-wrap">
+                        <div class="pie-chart" id="pie-chart"></div>
+                        <div class="pie-center">
+                            <div class="pie-center-val" id="pie-total">0</div>
+                            <div class="pie-center-lbl">items logged</div>
+                        </div>
+                    </div>
+
+                    <!-- LEGEND -->
+                    <div class="legend" id="legend"></div>
+
+                </div>
+
+            </div>
+
+            <div class="st-empty hidden" id="st-empty">
+                <span class="empty-icon">🍽️</span>
+                <p class="empty-title">Nothing logged yet</p>
+                <p class="empty-sub">Log a meal from your Dashboard or Meal Plan to see your breakdown here.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='stats.js') }}"></script>
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/';
+        });
+    </script>
+
+</body>
+</html>
