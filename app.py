@@ -174,6 +174,12 @@ def vendor():
         return redirect(url_for('dashboard'))
     return render_template('vendor.html', username=session.get('username', ''), **_role_ctx())
 
+@app.route('/stats')
+def stats():
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+    return render_template('stats.html', username=session.get('username', ''), **_role_ctx())
+
 # AUTHENTICATION
 
 @app.route('/register', methods=['POST'])
@@ -562,6 +568,60 @@ def api_calorie_today():
         'weight_kg': profile['weight_kg'],
         'goal_weight_kg': profile['goal_weight_kg'],
     })
+
+# PIE CHART APIs
+@app.route('/api/category_breakdown')
+def api_category_breakdown():
+    """
+    Returns a count of logged expenses broken down by food category
+    (Carbs / Protein / Beverage), based on matching expense_logs
+    labels against known food_items names.
+    """
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in.'}), 401
+
+    user_id = session['user_id']
+    db      = get_db()
+    rng     = request.args.get('range', 'today')
+
+    sess = _latest_session(user_id, db)
+    if not sess:
+        return jsonify({'error': 'No active session.'}), 404
+
+    if rng == 'all':
+        rows = db.execute("""
+            SELECT label FROM expense_logs WHERE session_id = ?
+        """, (sess['id'],)).fetchall()
+    else:
+        today_str = date.today().isoformat()
+        rows = db.execute("""
+            SELECT label FROM expense_logs
+            WHERE session_id = ? AND logged_at LIKE ?
+        """, (sess['id'], today_str + '%')).fetchall()
+
+    food_rows = db.execute("SELECT name, category FROM food_items").fetchall()
+    name_to_cat = {r['name'].strip().lower(): r['category'] for r in food_rows}
+
+    counts = {'Carbs': 0, 'Protein': 0, 'Beverage': 0, 'Other': 0}
+    total_items = 0
+
+    for row in rows:
+        label = row['label'] or ''
+        if label.startswith('['):
+            close = label.find(']')
+            if close != -1:
+                label = label[close + 1:].strip()
+
+        pieces = [p.strip() for p in label.split('+') if p.strip()]
+        for piece in pieces:
+            cat = name_to_cat.get(piece.lower())
+            if cat in counts:
+                counts[cat] += 1
+            else:
+                counts['Other'] += 1
+            total_items += 1
+
+    return jsonify({'range': rng, 'total_items': total_items, 'counts': counts})
 
 # FOOD ITEMS APIs 
 @app.route('/api/food_items', methods=['GET'])
