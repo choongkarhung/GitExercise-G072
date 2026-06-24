@@ -1,4 +1,4 @@
-let planData    = null;   
+let planData    = null;
 let loggedMeals = new Set();
 
 const CAT_ICONS = {
@@ -23,7 +23,7 @@ async function init() {
 // Pass ?regen=<timestamp> to break the daily seed and get a fresh plan.
 async function generatePlan(isRegen = false) {
     loggedMeals = new Set();
-    showLoading(true);
+    showLoading();
     document.getElementById('log-all-section').style.display = 'none';
 
     const url = isRegen
@@ -49,8 +49,7 @@ async function generatePlan(isRegen = false) {
     }
 }
 
-function showLoading(on) {
-    if (!on) return;
+function showLoading() {
     document.getElementById('meals-row').innerHTML = `
         <div class="mp-loading" id="mp-loading">
             <div class="loading-spinner"></div>
@@ -58,7 +57,7 @@ function showLoading(on) {
         </div>`;
 }
 
-// BUDGET RIBBON 
+// BUDGET RIBBON
 function renderRibbon(data) {
     const budget   = data.daily_budget;
     const planCost = data.meals.reduce((s, m) => s + m.total, 0);
@@ -69,9 +68,9 @@ function renderRibbon(data) {
     document.getElementById('rb-save').textContent   = `RM ${Math.max(save, 0).toFixed(2)}`;
 
     // Calorie ribbon item
-    const totalCal    = data.meals.reduce((s, m) => s + (m.total_cal || 0), 0);
-    const calTarget   = data.daily_cal_target;
-    const calRibbon   = document.getElementById('rb-cal-wrap');
+    const totalCal  = data.meals.reduce((s, m) => s + (m.total_cal || 0), 0);
+    const calTarget = data.daily_cal_target;
+    const calRibbon = document.getElementById('rb-cal-wrap');
 
     if (calTarget && calRibbon) {
         calRibbon.style.display = '';
@@ -96,15 +95,15 @@ function renderRibbon(data) {
     }
 }
 
-// MEAL CARDS 
+// MEAL CARDS
 function renderMeals(meals, dailyCalTarget) {
     const row = document.getElementById('meals-row');
     row.innerHTML = '';
 
     meals.forEach((meal, idx) => {
-        const meta     = MEAL_META[idx] || MEAL_META[0];
-        const total    = meal.items.reduce((s, i) => s + i.price, 0);
-        const totalCal = meal.total_cal || meal.items.reduce((s, i) => s + (i.calories || 0), 0);
+        const meta      = MEAL_META[idx] || MEAL_META[0];
+        const total     = meal.items.reduce((s, i) => s + i.price, 0);
+        const totalCal  = meal.total_cal || meal.items.reduce((s, i) => s + (i.calories || 0), 0);
         const calTarget = meal.cal_target;
 
         let calBadgeHtml = '';
@@ -163,20 +162,27 @@ function renderMeals(meals, dailyCalTarget) {
     });
 }
 
-// LOG A SINGLE MEAL 
+// HELPERS
+function mealSummary(idx) {
+    const meal  = planData.meals[idx];
+    const meta  = MEAL_META[idx];
+    return {
+        label:    `[${meta.label}] ${meal.items.map(i => i.name).join(' + ')}`,
+        amount:   parseFloat(meal.items.reduce((s, i) => s + i.price, 0).toFixed(2)),
+        calories: meal.items.reduce((s, i) => s + (i.calories || 0), 0),
+    };
+}
+
+// LOG A SINGLE MEAL
 async function logMeal(idx) {
     if (loggedMeals.has(idx)) return;
-    const meal      = planData.meals[idx];
-    const meta      = MEAL_META[idx];
-    const total     = meal.items.reduce((s, i) => s + i.price, 0);
-    const totalCal  = meal.items.reduce((s, i) => s + (i.calories || 0), 0);
-    const label     = `[${meta.label}] ${meal.items.map(i => i.name).join(' + ')}`;
+    const { label, amount, calories } = mealSummary(idx);
 
     try {
         const res = await fetch('/api/log_expense', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)), calories: totalCal })
+            body: JSON.stringify({ label, amount, calories })
         });
         if (res.ok) {
             loggedMeals.add(idx);
@@ -193,7 +199,7 @@ async function logMeal(idx) {
     }
 }
 
-// LOG ALL MEALS 
+// LOG ALL MEALS
 document.getElementById('log-all-btn').addEventListener('click', async () => {
     const msgBox = document.getElementById('log-all-msg');
     const btn    = document.getElementById('log-all-btn');
@@ -204,16 +210,12 @@ document.getElementById('log-all-btn').addEventListener('click', async () => {
         let successCount = 0;
         for (let idx = 0; idx < planData.meals.length; idx++) {
             if (loggedMeals.has(idx)) { successCount++; continue; }
-            const meal  = planData.meals[idx];
-            const meta  = MEAL_META[idx];
-            const total = meal.items.reduce((s, i) => s + i.price, 0);
-            const cal   = meal.items.reduce((s, i) => s + (i.calories || 0), 0);
-            const label = `[${meta.label}] ${meal.items.map(i => i.name).join(' + ')}`;
+            const { label, amount, calories } = mealSummary(idx);
 
             const res = await fetch('/api/log_expense', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ label, amount: parseFloat(total.toFixed(2)), calories: cal })
+                body: JSON.stringify({ label, amount, calories })
             });
             if (res.ok) {
                 loggedMeals.add(idx);
@@ -247,7 +249,6 @@ document.getElementById('log-all-btn').addEventListener('click', async () => {
 // Regenerate triggers a fresh seed
 document.getElementById('regen-btn').addEventListener('click', () => generatePlan(true));
 
-// HELPERS 
 function escHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')

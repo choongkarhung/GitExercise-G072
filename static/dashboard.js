@@ -40,7 +40,7 @@ function renderStats(d) {
 
     document.getElementById('stat-days').textContent = days;
     document.getElementById('stat-days-note').textContent =
-        days === 1 ? 'Last day — hang in there!'
+        days === 1 ? 'Last day!'
         : days === 0 ? 'Payday today!'
         : `${days} more days to go`;
 

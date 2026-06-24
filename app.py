@@ -1,20 +1,22 @@
 import os
+import random
 import secrets
 from flask import Flask, request, jsonify, session, render_template, redirect, url_for, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db as _get_db
 from datetime import datetime, date
-import subprocess
 
 app = Flask(__name__)
 
-# SECURE KEY 
+# SECURE KEY
 _secret = os.environ.get('SECRET_KEY')
 if not _secret:
     if os.environ.get('FLASK_ENV') == 'production':
         raise RuntimeError("SECRET_KEY environment variable must be set in production!")
     _secret = secrets.token_hex(32)
 app.secret_key = _secret
+
+VALID_CATEGORIES = {'Carbs', 'Protein', 'Beverage', 'Juice', 'Snack'}
 
 def get_db():
     if 'db' not in g:
@@ -39,12 +41,19 @@ def current_user_role():
 
 def require_admin():
     """Return a 403 JSON error if the current user is not an admin, else None."""
-    role = current_user_role()
-    if role != 'admin':
+    if current_user_role() != 'admin':
         return jsonify({'error': 'Admin access required.'}), 403
     return None
 
-# BUDGET HELPER (shared by /api/mealplan and /api/meals) 
+# SHARED HELPERS
+
+def _latest_session(user_id, db):
+    """Return the most recent survival_session row for a user, or None."""
+    return db.execute("""
+        SELECT id FROM survival_sessions
+        WHERE user_id = ?
+        ORDER BY created_at DESC LIMIT 1
+    """, (user_id,)).fetchone()
 
 def _get_budget_info(user_id, db):
     """
@@ -96,13 +105,7 @@ def _get_budget_info(user_id, db):
 def home():
     if 'username' in session and 'user_id' in session:
         db = get_db()
-        sess = db.execute("""
-            SELECT id FROM survival_sessions
-            WHERE user_id = ?
-            ORDER BY created_at DESC
-            LIMIT 1
-        """, (session['user_id'],)).fetchone()
-        if sess:
+        if _latest_session(session['user_id'], db):
             return redirect(url_for('dashboard'))
         return redirect(url_for('setup'))
     return render_template('login.html')
@@ -111,16 +114,9 @@ def home():
 def setup():
     if 'user_id' not in session:
         return redirect(url_for('home'))
-    force_new = request.args.get('new') == 'true'
-    if not force_new:
+    if request.args.get('new') != 'true':
         db = get_db()
-        sess = db.execute("""
-            SELECT id FROM survival_sessions
-            WHERE user_id = ?
-            ORDER BY created_at DESC
-            LIMIT 1
-        """, (session['user_id'],)).fetchone()
-        if sess:
+        if _latest_session(session['user_id'], db):
             return redirect(url_for('dashboard'))
     return render_template('setup.html', username=session.get('username', ''))
 
@@ -287,10 +283,7 @@ def api_log_expense():
     if not amount or float(amount) <= 0:
         return jsonify({'error': 'Amount must be greater than 0.'}), 400
     db   = get_db()
-    sess = db.execute("""
-        SELECT id FROM survival_sessions WHERE user_id = ?
-        ORDER BY created_at DESC LIMIT 1
-    """, (session['user_id'],)).fetchone()
+    sess = _latest_session(session['user_id'], db)
     if not sess:
         return jsonify({'error': 'No active session. Please set up first.'}), 404
     try:
@@ -331,8 +324,7 @@ def api_meals():
     # Return a varied selection: mix carbs/protein and beverages, up to 15 items
     mains = [i for i in items_list if i['category'] in ('Carbs', 'Protein')]
     bevs  = [i for i in items_list if i['category'] == 'Beverage']
-    combined = (mains[:10] + bevs[:5])
-    return jsonify(combined)
+    return jsonify(mains[:10] + bevs[:5])
 
 @app.route('/api/mealplan')
 def api_mealplan():
@@ -349,8 +341,6 @@ def api_mealplan():
     - Stable daily seed: same plan on page refresh; Regenerate button sends
       ?regen=<timestamp> to break the seed
     """
-    import random
-
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in.'}), 401
 
@@ -387,17 +377,17 @@ def api_mealplan():
     rng.shuffle(mains)
     rng.shuffle(bevs)
 
-    SLICES = [0.35, 0.40, 0.25]
+    SLICES      = [0.35, 0.40, 0.25]
     MEAL_LABELS = ['Breakfast', 'Lunch', 'Dinner']
 
     used_item_names = set()   # prevent item repetition across meals
-    used_stalls = []      # track stalls per meal for variety nudge
+    used_stalls     = []      # track stalls per meal for variety nudge
 
     meals_out = []
 
     for meal_idx, (label, pct) in enumerate(zip(MEAL_LABELS, SLICES)):
         budget_slice = daily_budget * pct
-        cal_target = cal_targets[meal_idx] if cal_targets else None
+        cal_target   = cal_targets[meal_idx] if cal_targets else None
 
         candidate_mains = [
             x for x in mains
@@ -411,8 +401,8 @@ def api_mealplan():
 
         # Prefer foods from a stall not used in the last meal
         last_stall = used_stalls[-1] if used_stalls else None
-        varied = [x for x in candidate_mains if x['stall'] != last_stall]
-        pool   = varied if varied else candidate_mains
+        varied     = [x for x in candidate_mains if x['stall'] != last_stall]
+        pool       = varied if varied else candidate_mains
 
         if cal_target:
             main_cal_target = int(cal_target * 0.65)
@@ -454,7 +444,7 @@ def api_mealplan():
             items_chosen.append(bev)
             used_item_names.add(bev['name'])
 
-        total = round(sum(x['price'] for x in items_chosen), 2)
+        total     = round(sum(x['price'] for x in items_chosen), 2)
         total_cal = sum(x['calories'] for x in items_chosen)
 
         meals_out.append({
@@ -542,11 +532,8 @@ def api_calorie_today():
     ).fetchone()
     if not profile:
         return jsonify({'has_profile': False}), 200
-    sess = db.execute("""
-        SELECT id FROM survival_sessions WHERE user_id = ?
-        ORDER BY created_at DESC LIMIT 1
-    """, (user_id,)).fetchone()
     calories_today = 0
+    sess = _latest_session(user_id, db)
     if sess:
         today_str = date.today().isoformat()
         row = db.execute("""
@@ -563,7 +550,7 @@ def api_calorie_today():
         'goal_weight_kg':  profile['goal_weight_kg'],
     })
 
-# FOOD ITEMS 
+# FOOD ITEMS
 
 @app.route('/api/food_items', methods=['GET'])
 def get_food_items():
@@ -588,13 +575,10 @@ def create_food_item():
     price    = data.get('price')
     category = data.get('category', '').strip()
     calories = data.get('calories', 0)
-
-    VALID_CATEGORIES = {'Carbs', 'Protein', 'Beverage', 'Juice', 'Snack'}
     if not name or not stall or price is None:
         return jsonify({'error': 'Missing required fields (Name, Stall, Price).'}), 400
     if category not in VALID_CATEGORIES:
         return jsonify({'error': f'Invalid category. Must be one of: {", ".join(sorted(VALID_CATEGORIES))}'}), 400
-
     db = get_db()
     try:
         db.execute("""
@@ -613,7 +597,6 @@ def update_food_item(item_id):
         return err
     data     = request.get_json()
     category = data.get('category', '').strip()
-    VALID_CATEGORIES = {'Carbs', 'Protein', 'Beverage', 'Juice', 'Snack'}
     if category not in VALID_CATEGORIES:
         return jsonify({'error': f'Invalid category.'}), 400
     db = get_db()
@@ -657,7 +640,7 @@ def update_user_role(uid):
     err = require_admin()
     if err:
         return err
-    data = request.get_json()
+    data     = request.get_json()
     new_role = data.get('role', '').strip()
     if new_role not in ('student', 'admin'):
         return jsonify({'error': 'Role must be "student" or "admin".'}), 400
