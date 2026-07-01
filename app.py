@@ -16,7 +16,7 @@ if not _secret:
     _secret = secrets.token_hex(32)
 app.secret_key = _secret
 
-VALID_CATEGORIES = {'Carbs', 'Protein', 'Beverage', 'Juice', 'Snack'}
+VALID_CATEGORIES = {'Carbs', 'Protein', 'Beverage'}
 
 def get_db():
     if 'db' not in g:
