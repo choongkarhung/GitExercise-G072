@@ -814,5 +814,28 @@ def api_me():
         'role':     session.get('role'),
     })
 
+@app.route('/game')
+def game():
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+        
+    db = get_db()
+    _, daily_budget, items_list = _get_budget_info(session['user_id'], db)
+    
+    if items_list:
+        options = [item['name'] for item in items_list]
+        if len(options) > 8:
+            options = random.sample(options, 8)
+    else:
+        options = ["Economy Rice", "Maggi Soup", "Nasi Lemak"]
+        
+    return render_template(
+        'game.html', 
+        username=session.get('username', ''), 
+        options=options, 
+        **_role_ctx()
+    )
+    
+
 if __name__ == "__main__":
     app.run(debug=True)
